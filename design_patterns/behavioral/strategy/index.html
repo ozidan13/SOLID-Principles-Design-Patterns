@@ -1,0 +1,843 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Strategy Pattern</title>
+    <style>
+        /* Modern, clean styling */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap');
+        
+        :root {
+            --primary-color: #14b8a6;
+            --primary-dark: #0d9488;
+            --secondary-color: #8b5cf6;
+            --accent-color: #f97316;
+            --text-color: #1f2937;
+            --bg-color: #f9fafb;
+            --card-bg: #ffffff;
+            --code-bg: #f8fafc;
+            --border-color: #e2e8f0;
+            --button-hover: #0f766e;
+            --output-bg: #f1f5f9;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+            padding: 0;
+            margin: 0;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+            padding: 3rem 0;
+            text-align: center;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+        }
+
+        h2 {
+            font-size: 1.8rem;
+            margin: 2rem 0 1rem;
+            color: var(--primary-dark);
+            font-weight: 600;
+        }
+
+        h3 {
+            font-size: 1.4rem;
+            margin: 1.5rem 0 1rem;
+            color: var(--primary-dark);
+            font-weight: 600;
+        }
+
+        p {
+            margin-bottom: 1rem;
+            font-size: 1.05rem;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        pre {
+            background-color: var(--code-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 1.25rem;
+            margin: 1.5rem 0;
+            overflow-x: auto;
+            position: relative;
+        }
+
+        code {
+            font-family: 'Fira Code', Consolas, Monaco, 'Andale Mono', monospace;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            color: var(--text-color);
+        }
+
+        .code-header {
+            padding: 0.5rem 1rem;
+            background-color: #e5e7eb;
+            border-top-left-radius: 6px;
+            border-top-right-radius: 6px;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.85rem;
+            color: #4b5563;
+            border: 1px solid var(--border-color);
+            border-bottom: none;
+        }
+
+        .code-container {
+            margin: 1.5rem 0;
+        }
+
+        .code-container pre {
+            margin-top: 0;
+            border-top-left-radius: 0;
+            border-top-right-radius: 0;
+        }
+
+        .interactive-demo {
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            padding: 2rem;
+            margin: 2rem 0;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        .demo-title {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .demo-icon {
+            background-color: var(--primary-color);
+            color: white;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            margin-right: 0.75rem;
+            font-weight: bold;
+        }
+
+        .strategy-config {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .strategy-group {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .strategy-group h3 {
+            margin-top: 0;
+            margin-bottom: 0.75rem;
+            font-size: 1.1rem;
+        }
+
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 0.75rem 1.5rem;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        button:hover {
+            background-color: var(--button-hover);
+        }
+
+        button:active {
+            transform: translateY(1px);
+        }
+
+        button.active {
+            background-color: var(--primary-dark);
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .secondary-btn {
+            background-color: var(--secondary-color);
+        }
+
+        .secondary-btn:hover {
+            background-color: #7c3aed;
+        }
+
+        input {
+            padding: 0.75rem;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            font-size: 1rem;
+            font-family: 'Inter', sans-serif;
+            width: 100%;
+            max-width: 300px;
+            margin-bottom: 1rem;
+        }
+
+        .text-input-group {
+            margin-bottom: 1rem;
+        }
+
+        .output-container {
+            background-color: var(--output-bg);
+            border-radius: 6px;
+            padding: 1.5rem;
+            margin-top: 1.5rem;
+            min-height: 200px;
+        }
+
+        .output-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .output-title {
+            font-weight: 600;
+            color: #4b5563;
+        }
+
+        .result-container {
+            margin-top: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .result-title {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--primary-dark);
+        }
+
+        .result-value {
+            background-color: white;
+            padding: 1rem;
+            border-radius: 4px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            font-family: 'Fira Code', monospace;
+        }
+
+        .algo-description {
+            margin-top: 1rem;
+            padding: 1rem;
+            background-color: white;
+            border-radius: 4px;
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .explanation {
+            padding: 1.5rem;
+            background-color: #fffbeb;
+            border-left: 4px solid var(--accent-color);
+            border-radius: 0 6px 6px 0;
+            margin: 1.5rem 0;
+        }
+
+        ul, ol {
+            margin-left: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        .pattern-diagram {
+            margin: 2rem 0;
+            padding: 1.5rem;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            overflow-x: auto;
+        }
+
+        .diagram-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .class-box {
+            border: 2px solid var(--border-color);
+            border-radius: 6px;
+            background-color: white;
+            width: 200px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .class-name {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 0.5rem;
+            font-weight: 600;
+            text-align: center;
+            border-top-left-radius: 4px;
+            border-top-right-radius: 4px;
+        }
+
+        .strategy-class-name {
+            background-color: var(--secondary-color);
+        }
+
+        .class-methods {
+            padding: 0.5rem;
+            font-size: 0.9rem;
+            font-family: 'Fira Code', monospace;
+        }
+
+        .interface {
+            border-style: dashed;
+        }
+
+        .relationship-line {
+            height: 30px;
+            border-left: 2px solid #666;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .relationship-line::after {
+            content: "↓";
+            position: absolute;
+            bottom: -10px;
+            left: -5px;
+            font-size: 1.2rem;
+        }
+
+        .context-strategies {
+            display: flex;
+            align-items: flex-start;
+            gap: 30px;
+        }
+
+        .strategies {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .strategy-line {
+            width: 30px;
+            border-top: 2px dashed #666;
+            margin: 0 auto;
+        }
+
+        .concrete-strategies {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 20px;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 3rem;
+            padding: 2rem 0;
+            background-color: #f3f4f6;
+            color: #6b7280;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-top: 1rem;
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s ease;
+        }
+
+        .back-link:hover {
+            color: var(--primary-dark);
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Strategy Pattern</h1>
+            <p>Define a family of algorithms, encapsulate each one, and make them interchangeable</p>
+        </div>
+    </header>
+
+    <div class="container">
+        <section class="card">
+            <h2>What is the Strategy Pattern?</h2>
+            <p>The Strategy pattern is a behavioral design pattern that enables selecting an algorithm at runtime. Instead of implementing a single algorithm directly, code receives run-time instructions as to which algorithm to use from among a family of algorithms.</p>
+            
+            <p>The Strategy pattern defines a family of algorithms, encapsulates each one, and makes them interchangeable. It lets the algorithm vary independently from the clients that use it.</p>
+            
+            <div class="pattern-diagram">
+                <div class="diagram-container">
+                    <div class="class-box">
+                        <div class="class-name">Context</div>
+                        <div class="class-methods">- strategy: Strategy<br>+ setStrategy(Strategy)<br>+ executeStrategy()</div>
+                    </div>
+                    
+                    <div class="context-strategies">
+                        <div class="class-box" style="visibility: hidden;">
+                            <div class="class-name">Placeholder</div>
+                        </div>
+                        
+                        <div class="strategies">
+                            <div class="strategy-line"></div>
+                            <div class="class-box interface">
+                                <div class="class-name strategy-class-name">Strategy</div>
+                                <div class="class-methods">+ execute()</div>
+                            </div>
+                            <div class="relationship-line"></div>
+                            <div class="concrete-strategies">
+                                <div class="class-box">
+                                    <div class="class-name strategy-class-name">ConcreteStrategyA</div>
+                                    <div class="class-methods">+ execute()</div>
+                                </div>
+                                <div class="class-box">
+                                    <div class="class-name strategy-class-name">ConcreteStrategyB</div>
+                                    <div class="class-methods">+ execute()</div>
+                                </div>
+                                <div class="class-box">
+                                    <div class="class-name strategy-class-name">ConcreteStrategyC</div>
+                                    <div class="class-methods">+ execute()</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="explanation">
+                <h3>When to use the Strategy Pattern:</h3>
+                <ul>
+                    <li>When you want to define a class that will have one behavior that is similar to other behaviors in a list</li>
+                    <li>When you need different variants of an algorithm</li>
+                    <li>When an algorithm uses data that clients shouldn't know about</li>
+                    <li>When a class defines many behaviors, and these appear as multiple conditional statements in its operations</li>
+                </ul>
+            </div>
+        </section>
+
+        <section class="card">
+            <h2>Implementation</h2>
+            <p>Here's a JavaScript implementation of the Strategy pattern using a text formatting example:</p>
+            
+            <div class="code-container">
+                <div class="code-header">JavaScript Implementation</div>
+                <pre><code class="language-javascript">// Strategy interface (implicit in JavaScript)
+class TextFormattingStrategy {
+    format(text) {
+        throw new Error("format() method must be implemented");
+    }
+}
+
+// Concrete strategies
+class PlainTextStrategy extends TextFormattingStrategy {
+    format(text) {
+        return text;
+    }
+    
+    getDescription() {
+        return "No formatting applied. Returns the text as-is.";
+    }
+}
+
+class UpperCaseStrategy extends TextFormattingStrategy {
+    format(text) {
+        return text.toUpperCase();
+    }
+    
+    getDescription() {
+        return "Converts all characters to uppercase.";
+    }
+}
+
+class LowerCaseStrategy extends TextFormattingStrategy {
+    format(text) {
+        return text.toLowerCase();
+    }
+    
+    getDescription() {
+        return "Converts all characters to lowercase.";
+    }
+}
+
+class CamelCaseStrategy extends TextFormattingStrategy {
+    format(text) {
+        return text
+            .toLowerCase()
+            .replace(/[\s-_]+(\w)/g, (_, p) => p.toUpperCase());
+    }
+    
+    getDescription() {
+        return "Converts text to camelCase (e.g., 'hello world' → 'helloWorld').";
+    }
+}
+
+class TitleCaseStrategy extends TextFormattingStrategy {
+    format(text) {
+        return text.replace(
+            /\w\S*/g,
+            (word) => word.charAt(0).toUpperCase() + word.substr(1).toLowerCase()
+        );
+    }
+    
+    getDescription() {
+        return "Capitalizes the first letter of each word.";
+    }
+}
+
+class SlugStrategy extends TextFormattingStrategy {
+    format(text) {
+        return text
+            .toLowerCase()
+            .replace(/\s+/g, '-')
+            .replace(/[^\w-]+/g, '');
+    }
+    
+    getDescription() {
+        return "Creates a URL-friendly slug (e.g., 'Hello World' → 'hello-world').";
+    }
+}
+
+// Context
+class TextFormatter {
+    constructor(strategy = new PlainTextStrategy()) {
+        this.strategy = strategy;
+    }
+    
+    setStrategy(strategy) {
+        this.strategy = strategy;
+    }
+    
+    format(text) {
+        return this.strategy.format(text);
+    }
+    
+    getStrategyDescription() {
+        return this.strategy.getDescription();
+    }
+}</code></pre>
+            </div>
+            
+            <p>Using the strategies is simple:</p>
+            
+            <div class="code-container">
+                <div class="code-header">Using the Strategy Pattern</div>
+                <pre><code class="language-javascript">// Client code
+const formatter = new TextFormatter();
+
+// Use the default strategy (PlainTextStrategy)
+console.log(formatter.format("Hello World")); // Output: Hello World
+
+// Switch to uppercase strategy
+formatter.setStrategy(new UpperCaseStrategy());
+console.log(formatter.format("Hello World")); // Output: HELLO WORLD
+
+// Switch to camelCase strategy
+formatter.setStrategy(new CamelCaseStrategy());
+console.log(formatter.format("Hello World")); // Output: helloWorld</code></pre>
+            </div>
+        </section>
+
+        <section class="interactive-demo">
+            <div class="demo-title">
+                <div class="demo-icon">▶</div>
+                <h2>Interactive Demo</h2>
+            </div>
+            
+            <p>This interactive demo demonstrates the Strategy pattern using text formatting strategies. Enter some text, select a formatting strategy, and see how the same text is transformed in different ways without changing the client code.</p>
+            
+            <div class="text-input-group">
+                <h3>Enter Text:</h3>
+                <input type="text" id="input-text" placeholder="Enter text to format..." value="The Strategy Pattern is Awesome!">
+            </div>
+            
+            <div class="strategy-config">
+                <div class="strategy-group">
+                    <h3>Select Formatting Strategy:</h3>
+                    <div>
+                        <button class="strategy-btn active" data-strategy="plain">Plain Text</button>
+                        <button class="strategy-btn" data-strategy="upper">UPPERCASE</button>
+                        <button class="strategy-btn" data-strategy="lower">lowercase</button>
+                        <button class="strategy-btn" data-strategy="camel">camelCase</button>
+                        <button class="strategy-btn" data-strategy="title">Title Case</button>
+                        <button class="strategy-btn" data-strategy="slug">slug-case</button>
+                    </div>
+                </div>
+            </div>
+            
+            <button id="apply-btn" class="secondary-btn">Apply Formatting</button>
+            
+            <div class="output-container">
+                <div class="output-header">
+                    <div class="output-title">Formatting Result</div>
+                </div>
+                
+                <div class="result-container">
+                    <div class="result-title">Output:</div>
+                    <div class="result-value" id="output-text">The Strategy Pattern is Awesome!</div>
+                </div>
+                
+                <div class="algo-description" id="strategy-description">
+                    No formatting applied. Returns the text as-is.
+                </div>
+            </div>
+        </section>
+
+        <section class="card">
+            <h2>Key Components</h2>
+            
+            <h3>Strategy (Interface)</h3>
+            <p>Declares an interface common to all supported algorithms. Context uses this interface to call the algorithm defined by the ConcreteStrategy.</p>
+            
+            <h3>ConcreteStrategy</h3>
+            <p>Implements the algorithm using the Strategy interface. In our example, these are the different text formatting classes.</p>
+            
+            <h3>Context</h3>
+            <p>Is configured with a ConcreteStrategy object, maintains a reference to a Strategy object, and may define an interface that lets Strategy access its data.</p>
+            
+            <h2>Benefits</h2>
+            <ul>
+                <li><strong>Eliminates conditional statements:</strong> Reduces complex conditionals by encapsulating related algorithms into separate strategy classes.</li>
+                <li><strong>Provides alternative implementations:</strong> Same problem can be handled in different ways based on the context and requirements.</li>
+                <li><strong>Isolates the algorithm from the client:</strong> Client doesn't need to know how the strategies are implemented.</li>
+                <li><strong>Makes switching between behaviors easy:</strong> You can switch algorithms at runtime.</li>
+                <li><strong>Follows Open/Closed Principle:</strong> You can add new strategies without modifying the context.</li>
+            </ul>
+            
+            <h2>Examples in Real-World Applications</h2>
+            <ul>
+                <li><strong>Sorting Algorithms:</strong> Different sorting strategies (QuickSort, MergeSort, BubbleSort) can be used depending on the data size and requirements.</li>
+                <li><strong>Payment Processing:</strong> Different payment methods (Credit Card, PayPal, Cryptocurrency) can be implemented as strategies.</li>
+                <li><strong>Navigation Systems:</strong> Different routing algorithms (fastest, shortest, avoid highways) can be selected at runtime.</li>
+                <li><strong>Data Compression:</strong> Different compression algorithms can be used based on speed vs. compression ratio needs.</li>
+                <li><strong>Authentication:</strong> Various authentication methods (password, fingerprint, face recognition) can be implemented as strategies.</li>
+            </ul>
+        </section>
+    </div>
+
+    <footer>
+        <div class="container">
+            <p>Part of the Interactive Design Patterns and SOLID Principles Showcase</p>
+            <a href="../../../index.html" class="back-link">← Back to Main Page</a>
+        </div>
+    </footer>
+
+    <script>
+        // Strategy interface (implicit in JavaScript)
+        class TextFormattingStrategy {
+            format(text) {
+                throw new Error("format() method must be implemented");
+            }
+            
+            getDescription() {
+                throw new Error("getDescription() method must be implemented");
+            }
+        }
+
+        // Concrete strategies
+        class PlainTextStrategy extends TextFormattingStrategy {
+            format(text) {
+                return text;
+            }
+            
+            getDescription() {
+                return "No formatting applied. Returns the text as-is.";
+            }
+        }
+
+        class UpperCaseStrategy extends TextFormattingStrategy {
+            format(text) {
+                return text.toUpperCase();
+            }
+            
+            getDescription() {
+                return "Converts all characters to uppercase.";
+            }
+        }
+
+        class LowerCaseStrategy extends TextFormattingStrategy {
+            format(text) {
+                return text.toLowerCase();
+            }
+            
+            getDescription() {
+                return "Converts all characters to lowercase.";
+            }
+        }
+
+        class CamelCaseStrategy extends TextFormattingStrategy {
+            format(text) {
+                return text
+                    .toLowerCase()
+                    .replace(/[\s-_]+(\w)/g, (_, p) => p.toUpperCase());
+            }
+            
+            getDescription() {
+                return "Converts text to camelCase (e.g., 'hello world' → 'helloWorld').";
+            }
+        }
+
+        class TitleCaseStrategy extends TextFormattingStrategy {
+            format(text) {
+                return text.replace(
+                    /\w\S*/g,
+                    (word) => word.charAt(0).toUpperCase() + word.substr(1).toLowerCase()
+                );
+            }
+            
+            getDescription() {
+                return "Capitalizes the first letter of each word.";
+            }
+        }
+
+        class SlugStrategy extends TextFormattingStrategy {
+            format(text) {
+                return text
+                    .toLowerCase()
+                    .replace(/\s+/g, '-')
+                    .replace(/[^\w-]+/g, '');
+            }
+            
+            getDescription() {
+                return "Creates a URL-friendly slug (e.g., 'Hello World' → 'hello-world').";
+            }
+        }
+
+        // Context
+        class TextFormatter {
+            constructor(strategy = new PlainTextStrategy()) {
+                this.strategy = strategy;
+            }
+            
+            setStrategy(strategy) {
+                this.strategy = strategy;
+            }
+            
+            format(text) {
+                return this.strategy.format(text);
+            }
+            
+            getStrategyDescription() {
+                return this.strategy.getDescription();
+            }
+        }
+
+        // UI interaction code
+        document.addEventListener('DOMContentLoaded', function() {
+            const inputText = document.getElementById('input-text');
+            const outputText = document.getElementById('output-text');
+            const strategyDescription = document.getElementById('strategy-description');
+            const applyBtn = document.getElementById('apply-btn');
+            const strategyButtons = document.querySelectorAll('.strategy-btn');
+            
+            // Create the formatter with default strategy
+            const formatter = new TextFormatter();
+            
+            // Strategy factory
+            const strategies = {
+                plain: new PlainTextStrategy(),
+                upper: new UpperCaseStrategy(),
+                lower: new LowerCaseStrategy(),
+                camel: new CamelCaseStrategy(),
+                title: new TitleCaseStrategy(),
+                slug: new SlugStrategy()
+            };
+            
+            // Apply formatting based on current input and selected strategy
+            function applyFormatting() {
+                const text = inputText.value || '';
+                outputText.textContent = formatter.format(text);
+                strategyDescription.textContent = formatter.getStrategyDescription();
+            }
+            
+            // Set active button and apply formatting
+            function setActiveStrategy(strategyName) {
+                // Update active button
+                strategyButtons.forEach(btn => {
+                    if (btn.dataset.strategy === strategyName) {
+                        btn.classList.add('active');
+                    } else {
+                        btn.classList.remove('active');
+                    }
+                });
+                
+                // Set the strategy
+                formatter.setStrategy(strategies[strategyName]);
+                
+                // Apply formatting
+                applyFormatting();
+            }
+            
+            // Add click event listeners to strategy buttons
+            strategyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const strategyName = this.dataset.strategy;
+                    setActiveStrategy(strategyName);
+                });
+            });
+            
+            // Apply button click handler
+            applyBtn.addEventListener('click', applyFormatting);
+            
+            // Input text change handler
+            inputText.addEventListener('input', applyFormatting);
+            
+            // Initialize with default strategy
+            applyFormatting();
+        });
+    </script>
+</body>
+</html>

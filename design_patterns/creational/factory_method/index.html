@@ -1,0 +1,912 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Factory Method Pattern</title>
+    <style>
+        /* Modern, clean styling */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap');
+        
+        :root {
+            --primary-color: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary-color: #10b981;
+            --accent-color: #f97316;
+            --text-color: #1f2937;
+            --bg-color: #f9fafb;
+            --card-bg: #ffffff;
+            --code-bg: #f8fafc;
+            --border-color: #e2e8f0;
+            --button-hover: #4338ca;
+            --output-bg: #f1f5f9;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+            padding: 0;
+            margin: 0;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+            padding: 3rem 0;
+            text-align: center;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+        }
+
+        h2 {
+            font-size: 1.8rem;
+            margin: 2rem 0 1rem;
+            color: var(--primary-dark);
+            font-weight: 600;
+        }
+
+        h3 {
+            font-size: 1.4rem;
+            margin: 1.5rem 0 1rem;
+            color: var(--primary-dark);
+            font-weight: 600;
+        }
+
+        p {
+            margin-bottom: 1rem;
+            font-size: 1.05rem;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        pre {
+            background-color: var(--code-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 1.25rem;
+            margin: 1.5rem 0;
+            overflow-x: auto;
+            position: relative;
+        }
+
+        code {
+            font-family: 'Fira Code', Consolas, Monaco, 'Andale Mono', monospace;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            color: var(--text-color);
+        }
+
+        .code-header {
+            padding: 0.5rem 1rem;
+            background-color: #e5e7eb;
+            border-top-left-radius: 6px;
+            border-top-right-radius: 6px;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.85rem;
+            color: #4b5563;
+            border: 1px solid var(--border-color);
+            border-bottom: none;
+        }
+
+        .code-container {
+            margin: 1.5rem 0;
+        }
+
+        .code-container pre {
+            margin-top: 0;
+            border-top-left-radius: 0;
+            border-top-right-radius: 0;
+        }
+
+        .interactive-demo {
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            padding: 2rem;
+            margin: 2rem 0;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        .demo-title {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .demo-icon {
+            background-color: var(--primary-color);
+            color: white;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            margin-right: 0.75rem;
+            font-weight: bold;
+        }
+
+        .demo-controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 0.75rem 1.5rem;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        button:hover {
+            background-color: var(--button-hover);
+        }
+
+        button:active {
+            transform: translateY(1px);
+        }
+
+        select {
+            padding: 0.75rem;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            font-size: 1rem;
+            font-family: 'Inter', sans-serif;
+            background-color: white;
+            min-width: 200px;
+        }
+
+        .output-container {
+            background-color: var(--output-bg);
+            border-radius: 6px;
+            padding: 1.5rem;
+            min-height: 150px;
+            margin-top: 1.5rem;
+            font-family: 'Fira Code', monospace;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .output-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .output-title {
+            font-weight: 600;
+            color: #4b5563;
+        }
+
+        .output-content {
+            min-height: 60px;
+            line-height: 1.6;
+        }
+
+        .product-item {
+            background-color: white;
+            border-radius: 4px;
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .product-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .product-name {
+            font-weight: 600;
+            color: var(--primary-dark);
+        }
+
+        .product-type {
+            font-size: 0.85rem;
+            color: #6b7280;
+            background-color: var(--output-bg);
+            padding: 0.2rem 0.5rem;
+            border-radius: 12px;
+        }
+
+        .product-details {
+            font-size: 0.9rem;
+            color: #4b5563;
+        }
+
+        .explanation {
+            padding: 1.5rem;
+            background-color: #fffbeb;
+            border-left: 4px solid var(--accent-color);
+            border-radius: 0 6px 6px 0;
+            margin: 1.5rem 0;
+        }
+
+        ul, ol {
+            margin-left: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 3rem;
+            padding: 2rem 0;
+            background-color: #f3f4f6;
+            color: #6b7280;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-top: 1rem;
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s ease;
+        }
+
+        .back-link:hover {
+            color: var(--primary-dark);
+            text-decoration: underline;
+        }
+
+        .product-diagram {
+            margin: 2rem 0;
+            padding: 1.5rem;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            overflow-x: auto;
+        }
+
+        .diagram-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .class-box {
+            border: 2px solid var(--border-color);
+            border-radius: 6px;
+            background-color: white;
+            width: 200px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .class-name {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 0.5rem;
+            font-weight: 600;
+            text-align: center;
+            border-top-left-radius: 4px;
+            border-top-right-radius: 4px;
+        }
+
+        .class-methods {
+            padding: 0.5rem;
+            font-size: 0.9rem;
+            font-family: 'Fira Code', monospace;
+        }
+
+        .interface {
+            border-style: dashed;
+        }
+
+        .relationship-line {
+            height: 30px;
+            border-left: 2px solid #666;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .relationship-line::after {
+            content: "↓";
+            position: absolute;
+            bottom: -10px;
+            left: -5px;
+            font-size: 1.2rem;
+        }
+
+        .subclasses {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 20px;
+        }
+
+        .products {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 20px;
+        }
+
+        .pattern-link {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .pattern-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Factory Method Pattern</h1>
+            <p>Define an interface for creating an object, but let subclasses decide which class to instantiate</p>
+        </div>
+    </header>
+
+    <div class="container">
+        <section class="card">
+            <h2>What is the Factory Method Pattern?</h2>
+            <p>The Factory Method is a creational design pattern that provides an interface for creating objects in a superclass, but allows subclasses to alter the type of objects that will be created. It addresses the problem of creating product objects without specifying their concrete classes.</p>
+            
+            <div class="explanation">
+                <h3>When to use it:</h3>
+                <ul>
+                    <li>When a class cannot anticipate the class of objects it must create</li>
+                    <li>When a class wants its subclasses to specify the objects it creates</li>
+                    <li>When classes delegate responsibility to one of several helper subclasses, and you want to localize the knowledge of which helper subclass is the delegate</li>
+                </ul>
+                <h3>Relation to other patterns:</h3>
+                <ul>
+                    <li>The Factory Method is often used in frameworks that need to instantiate classes whose type isn't known in advance</li>
+                    <li>Factory Method is a specialization of the <a href="../singleton/index.html" class="pattern-link">Template Method</a> pattern</li>
+                    <li>Factory Method can be used along with the <a href="../abstract_factory/index.html" class="pattern-link">Abstract Factory</a> pattern, which often uses Factory Methods to implement its concrete factories</li>
+                </ul>
+            </div>
+
+            <div class="product-diagram">
+                <div class="diagram-container">
+                    <div class="class-box interface">
+                        <div class="class-name">Creator</div>
+                        <div class="class-methods">+ createProduct()<br>+ someOperation()</div>
+                    </div>
+                    <div class="relationship-line"></div>
+                    <div class="subclasses">
+                        <div class="class-box">
+                            <div class="class-name">ConcreteCreatorA</div>
+                            <div class="class-methods">+ createProduct()</div>
+                        </div>
+                        <div class="class-box">
+                            <div class="class-name">ConcreteCreatorB</div>
+                            <div class="class-methods">+ createProduct()</div>
+                        </div>
+                    </div>
+                    <div class="relationship-line"></div>
+                    <div class="class-box interface">
+                        <div class="class-name">Product</div>
+                        <div class="class-methods">+ operation()</div>
+                    </div>
+                    <div class="relationship-line"></div>
+                    <div class="products">
+                        <div class="class-box">
+                            <div class="class-name">ConcreteProductA</div>
+                            <div class="class-methods">+ operation()</div>
+                        </div>
+                        <div class="class-box">
+                            <div class="class-name">ConcreteProductB</div>
+                            <div class="class-methods">+ operation()</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="card">
+            <h2>Implementation</h2>
+            <p>Here's a practical implementation of the Factory Method pattern in JavaScript:</p>
+            
+            <div class="code-container">
+                <div class="code-header">JavaScript Implementation</div>
+                <pre><code class="language-javascript">// Product interface
+class Vehicle {
+    constructor(options) {
+        this.color = options.color || 'white';
+    }
+
+    getInfo() {
+        throw new Error('You must implement getInfo() in the derived class');
+    }
+
+    startEngine() {
+        throw new Error('You must implement startEngine() in the derived class');
+    }
+}
+
+// Concrete Products
+class Car extends Vehicle {
+    constructor(options) {
+        super(options);
+        this.doors = options.doors || 4;
+        this.model = options.model || 'Sedan';
+        this.fuelType = options.fuelType || 'Gasoline';
+    }
+    
+    getInfo() {
+        return {
+            type: 'Car',
+            model: this.model,
+            color: this.color,
+            doors: this.doors,
+            fuelType: this.fuelType
+        };
+    }
+    
+    startEngine() {
+        return `The ${this.color} ${this.model} car engine starts with a quiet hum. Ready to drive!`;
+    }
+}
+
+class Truck extends Vehicle {
+    constructor(options) {
+        super(options);
+        this.cargoCapacity = options.cargoCapacity || 'Standard';
+        this.model = options.model || 'Pickup';
+        this.wheelDrive = options.wheelDrive || '4x4';
+    }
+    
+    getInfo() {
+        return {
+            type: 'Truck',
+            model: this.model,
+            color: this.color,
+            cargoCapacity: this.cargoCapacity,
+            wheelDrive: this.wheelDrive
+        };
+    }
+    
+    startEngine() {
+        return `The ${this.color} ${this.model} truck engine roars to life. Ready to haul!`;
+    }
+}
+
+class Motorcycle extends Vehicle {
+    constructor(options) {
+        super(options);
+        this.engineSize = options.engineSize || '500cc';
+        this.model = options.model || 'Standard';
+        this.hasABS = options.hasABS === undefined ? true : options.hasABS;
+    }
+    
+    getInfo() {
+        return {
+            type: 'Motorcycle',
+            model: this.model,
+            color: this.color,
+            engineSize: this.engineSize,
+            hasABS: this.hasABS
+        };
+    }
+    
+    startEngine() {
+        return `The ${this.color} ${this.model} motorcycle engine revs up loudly. Ready to ride!`;
+    }
+}
+
+// Creator class (abstract)
+class VehicleFactory {
+    // Factory method
+    createVehicle(options) {
+        throw new Error('You must implement createVehicle() in the derived class');
+    }
+    
+    // This is a method that uses the factory method
+    orderVehicle(options) {
+        const vehicle = this.createVehicle(options);
+        
+        // Additional operations
+        const result = {
+            vehicleInfo: vehicle.getInfo(),
+            startMessage: vehicle.startEngine(),
+            orderDate: new Date().toISOString(),
+            deliveryStatus: 'Processing'
+        };
+        
+        return result;
+    }
+}
+
+// Concrete Creators
+class CarFactory extends VehicleFactory {
+    createVehicle(options) {
+        return new Car(options);
+    }
+}
+
+class TruckFactory extends VehicleFactory {
+    createVehicle(options) {
+        return new Truck(options);
+    }
+}
+
+class MotorcycleFactory extends VehicleFactory {
+    createVehicle(options) {
+        return new Motorcycle(options);
+    }
+}
+
+// Client code
+function clientCode(factory, options) {
+    return factory.orderVehicle(options);
+}</code></pre>
+            </div>
+        </section>
+
+        <section class="interactive-demo">
+            <div class="demo-title">
+                <div class="demo-icon">▶</div>
+                <h2>Interactive Demo</h2>
+            </div>
+            
+            <p>This demo shows how the Factory Method pattern allows different factories to create different types of vehicles. Select a vehicle type and customize it, then click "Create Vehicle" to see the factory method in action.</p>
+            
+            <div class="demo-controls">
+                <select id="vehicleType">
+                    <option value="car">Car</option>
+                    <option value="truck">Truck</option>
+                    <option value="motorcycle">Motorcycle</option>
+                </select>
+                
+                <select id="colorOption">
+                    <option value="white">White</option>
+                    <option value="red">Red</option>
+                    <option value="blue">Blue</option>
+                    <option value="black">Black</option>
+                    <option value="silver">Silver</option>
+                </select>
+                
+                <select id="modelOption">
+                    <option value="default">Default Model</option>
+                    <!-- Dynamic options will be added by JavaScript -->
+                </select>
+                
+                <button id="createVehicleBtn">Create Vehicle</button>
+            </div>
+            
+            <div class="output-container">
+                <div class="output-header">
+                    <div class="output-title">Vehicle Orders</div>
+                </div>
+                <div class="output-content" id="ordersOutput">
+                    <p>Select a vehicle type and click "Create Vehicle" to place an order.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="card">
+            <h2>Key Concepts</h2>
+            
+            <h3>Participants</h3>
+            <ul>
+                <li><strong>Product:</strong> Defines the interface for objects the factory method creates (Vehicle)</li>
+                <li><strong>ConcreteProduct:</strong> Implements the Product interface (Car, Truck, Motorcycle)</li>
+                <li><strong>Creator:</strong> Declares the factory method, which returns a Product object (VehicleFactory)</li>
+                <li><strong>ConcreteCreator:</strong> Overrides the factory method to return a specific ConcreteProduct (CarFactory, TruckFactory, MotorcycleFactory)</li>
+            </ul>
+            
+            <h3>Advantages</h3>
+            <ul>
+                <li>Eliminates the need to bind application-specific classes into your code</li>
+                <li>Provides hooks for subclasses to extend functionalities</li>
+                <li>Connects parallel class hierarchies</li>
+                <li>Follows the Single Responsibility Principle</li>
+                <li>Follows the Open/Closed Principle</li>
+            </ul>
+            
+            <h3>Disadvantages</h3>
+            <ul>
+                <li>May introduce many small subclasses</li>
+                <li>Can be overkill for simple cases where a parameterized factory might be sufficient</li>
+                <li>Makes the code more complicated since you need to introduce many new subclasses</li>
+            </ul>
+        </section>
+    </div>
+
+    <footer>
+        <div class="container">
+            <p>Part of the Interactive Design Patterns and SOLID Principles Showcase</p>
+            <a href="../../../index.html" class="back-link">← Back to Main Page</a>
+        </div>
+    </footer>
+
+    <script>
+        // Product interface
+        class Vehicle {
+            constructor(options) {
+                this.color = options.color || 'white';
+            }
+
+            getInfo() {
+                throw new Error('You must implement getInfo() in the derived class');
+            }
+
+            startEngine() {
+                throw new Error('You must implement startEngine() in the derived class');
+            }
+        }
+
+        // Concrete Products
+        class Car extends Vehicle {
+            constructor(options) {
+                super(options);
+                this.doors = options.doors || 4;
+                this.model = options.model || 'Sedan';
+                this.fuelType = options.fuelType || 'Gasoline';
+            }
+            
+            getInfo() {
+                return {
+                    type: 'Car',
+                    model: this.model,
+                    color: this.color,
+                    doors: this.doors,
+                    fuelType: this.fuelType
+                };
+            }
+            
+            startEngine() {
+                return `The ${this.color} ${this.model} car engine starts with a quiet hum. Ready to drive!`;
+            }
+        }
+
+        class Truck extends Vehicle {
+            constructor(options) {
+                super(options);
+                this.cargoCapacity = options.cargoCapacity || 'Standard';
+                this.model = options.model || 'Pickup';
+                this.wheelDrive = options.wheelDrive || '4x4';
+            }
+            
+            getInfo() {
+                return {
+                    type: 'Truck',
+                    model: this.model,
+                    color: this.color,
+                    cargoCapacity: this.cargoCapacity,
+                    wheelDrive: this.wheelDrive
+                };
+            }
+            
+            startEngine() {
+                return `The ${this.color} ${this.model} truck engine roars to life. Ready to haul!`;
+            }
+        }
+
+        class Motorcycle extends Vehicle {
+            constructor(options) {
+                super(options);
+                this.engineSize = options.engineSize || '500cc';
+                this.model = options.model || 'Standard';
+                this.hasABS = options.hasABS === undefined ? true : options.hasABS;
+            }
+            
+            getInfo() {
+                return {
+                    type: 'Motorcycle',
+                    model: this.model,
+                    color: this.color,
+                    engineSize: this.engineSize,
+                    hasABS: this.hasABS
+                };
+            }
+            
+            startEngine() {
+                return `The ${this.color} ${this.model} motorcycle engine revs up loudly. Ready to ride!`;
+            }
+        }
+
+        // Creator class (abstract)
+        class VehicleFactory {
+            // Factory method
+            createVehicle(options) {
+                throw new Error('You must implement createVehicle() in the derived class');
+            }
+            
+            // This is a method that uses the factory method
+            orderVehicle(options) {
+                const vehicle = this.createVehicle(options);
+                
+                // Additional operations
+                const result = {
+                    vehicleInfo: vehicle.getInfo(),
+                    startMessage: vehicle.startEngine(),
+                    orderDate: new Date().toISOString(),
+                    deliveryStatus: 'Processing'
+                };
+                
+                return result;
+            }
+        }
+
+        // Concrete Creators
+        class CarFactory extends VehicleFactory {
+            createVehicle(options) {
+                return new Car(options);
+            }
+        }
+
+        class TruckFactory extends VehicleFactory {
+            createVehicle(options) {
+                return new Truck(options);
+            }
+        }
+
+        class MotorcycleFactory extends VehicleFactory {
+            createVehicle(options) {
+                return new Motorcycle(options);
+            }
+        }
+
+        // UI interaction code
+        document.addEventListener('DOMContentLoaded', function() {
+            const vehicleTypeSelect = document.getElementById('vehicleType');
+            const colorOption = document.getElementById('colorOption');
+            const modelOption = document.getElementById('modelOption');
+            const createVehicleBtn = document.getElementById('createVehicleBtn');
+            const ordersOutput = document.getElementById('ordersOutput');
+            
+            // Model options for each vehicle type
+            const modelOptions = {
+                car: ['Sedan', 'SUV', 'Hatchback', 'Convertible', 'Coupe'],
+                truck: ['Pickup', 'Box Truck', 'Semi', 'Dump Truck', 'Flatbed'],
+                motorcycle: ['Cruiser', 'Sport', 'Touring', 'Off-road', 'Scooter']
+            };
+            
+            // Update model options based on selected vehicle type
+            function updateModelOptions() {
+                const selectedType = vehicleTypeSelect.value;
+                modelOption.innerHTML = '';
+                
+                modelOptions[selectedType].forEach(model => {
+                    const option = document.createElement('option');
+                    option.value = model;
+                    option.textContent = model;
+                    modelOption.appendChild(option);
+                });
+            }
+            
+            // Initialize model options
+            updateModelOptions();
+            
+            // Listen for changes to vehicle type
+            vehicleTypeSelect.addEventListener('change', updateModelOptions);
+            
+            // Create a new vehicle when the button is clicked
+            createVehicleBtn.addEventListener('click', function() {
+                const selectedType = vehicleTypeSelect.value;
+                const color = colorOption.value;
+                const model = modelOption.value;
+                
+                let factory;
+                let options = { color, model };
+                
+                // Create the appropriate factory based on the selected vehicle type
+                switch(selectedType) {
+                    case 'car':
+                        factory = new CarFactory();
+                        options.doors = 4;
+                        options.fuelType = 'Gasoline';
+                        break;
+                    case 'truck':
+                        factory = new TruckFactory();
+                        options.cargoCapacity = 'Heavy';
+                        options.wheelDrive = '4x4';
+                        break;
+                    case 'motorcycle':
+                        factory = new MotorcycleFactory();
+                        options.engineSize = '750cc';
+                        options.hasABS = true;
+                        break;
+                }
+                
+                // Use the factory to order a vehicle
+                const order = factory.orderVehicle(options);
+                
+                // Display the order information
+                if (ordersOutput.querySelector('p')) {
+                    ordersOutput.innerHTML = '';
+                }
+                
+                const orderItem = document.createElement('div');
+                orderItem.className = 'product-item';
+                
+                const info = order.vehicleInfo;
+                let detailsHTML = '';
+                
+                switch(info.type) {
+                    case 'Car':
+                        detailsHTML = `Doors: ${info.doors} | Fuel Type: ${info.fuelType}`;
+                        break;
+                    case 'Truck':
+                        detailsHTML = `Cargo Capacity: ${info.cargoCapacity} | Wheel Drive: ${info.wheelDrive}`;
+                        break;
+                    case 'Motorcycle':
+                        detailsHTML = `Engine Size: ${info.engineSize} | ABS: ${info.hasABS ? 'Yes' : 'No'}`;
+                        break;
+                }
+                
+                orderItem.innerHTML = `
+                    <div class="product-header">
+                        <span class="product-name">${info.color} ${info.model}</span>
+                        <span class="product-type">${info.type}</span>
+                    </div>
+                    <div class="product-details">
+                        ${detailsHTML}
+                    </div>
+                    <div class="product-details" style="margin-top: 0.5rem;">
+                        ${order.startMessage}
+                    </div>
+                    <div class="product-details" style="margin-top: 0.5rem; font-size: 0.8rem; color: #6b7280;">
+                        Order Date: ${new Date(order.orderDate).toLocaleString()} | Status: ${order.deliveryStatus}
+                    </div>
+                `;
+                
+                ordersOutput.prepend(orderItem);
+            });
+        });
+    </script>
+</body>
+</html>

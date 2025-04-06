@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Open-Closed Principle</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #3b82f6; /* Vibrant blue */
+            --primary-dark: #2563eb;
+            --primary-light: #60a5fa;
+            --secondary-color: #10b981; /* Green */
+            --secondary-dark: #059669;
+            --accent-color: #ef4444; /* Red */
+            --text-color: #e2e8f0;
+            --text-muted: #94a3b8;
+            --bg-color: #0f172a; /* Dark blue background */
+            --bg-light: #1e293b;
+            --bg-lighter: #334155;
+            --bg-card: #1e293b;
+            --border-color: #334155;
+            --code-bg: #0f172a;
+            --code-text: #e2e8f0;
+            --heading-font: 'Poppins', sans-serif;
+            --body-font: 'Inter', sans-serif;
+            --code-font: 'Fira Code', monospace;
+            --border-radius: 8px;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2), 0 2px 4px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
+            --glow: 0 0 15px rgba(59, 130, 246, 0.5);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--body-font);
+            line-height: 1.7;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* Hero Section */
+        header {
+            position: relative;
+            background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
+            color: white;
+            padding: 3rem 0;
+            text-align: center;
+            margin-bottom: -50px;
+            overflow: hidden;
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2000 1500"><rect fill="%23000000" width="2000" height="1500"/><defs><circle stroke="%23222" vector-effect="non-scaling-stroke" id="a" fill="none" stroke-width="5" r="315"/></defs><g transform="translate(1000 750)"><use stroke="%233b82f6" href="%23a" transform="rotate(60 0 0) scale(0.4 0.4)"/><use stroke="%233b82f6" href="%23a" transform="rotate(120 0 0) scale(0.5 0.5)"/><use stroke="%233b82f6" href="%23a" transform="rotate(180 0 0) scale(0.6 0.6)"/><use stroke="%233b82f6" href="%23a" transform="rotate(240 0 0) scale(0.7 0.7)"/><use stroke="%233b82f6" href="%23a" transform="rotate(300 0 0) scale(0.8 0.8)"/></g></svg>');
+            background-size: cover;
+            opacity: 0.1;
+            animation: pulse 15s ease-in-out infinite alternate;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 0.1; }
+            50% { transform: scale(1.05); opacity: 0.15; }
+            100% { transform: scale(1); opacity: 0.1; }
+        }
+
+        /* Shapes animation */
+        .shapes {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            overflow: hidden;
+        }
+
+        .shape {
+            position: absolute;
+            opacity: 0.2;
+            animation: float 15s infinite linear;
+        }
+
+        .shape-1 {
+            top: 20%;
+            left: 10%;
+            width: 60px;
+            height: 60px;
+            border-radius: 41% 59% 37% 63% / 44% 67% 33% 56%;
+            background-color: #10b981;
+            animation-duration: 25s;
+            box-shadow: 0 0 30px rgba(16, 185, 129, 0.4);
+        }
+
+        .shape-2 {
+            top: 60%;
+            right: 15%;
+            width: 80px;
+            height: 80px;
+            border-radius: 73% 27% 59% 41% / 57% 43% 57% 43%;
+            background-color: #8b5cf6;
+            animation-duration: 30s;
+            animation-delay: 2s;
+            box-shadow: 0 0 30px rgba(139, 92, 246, 0.4);
+        }
+
+        @keyframes float {
+            0% {
+                transform: translate(0, 0) rotate(0deg);
+            }
+            25% {
+                transform: translate(10px, 15px) rotate(90deg);
+            }
+            50% {
+                transform: translate(5px, -10px) rotate(180deg);
+            }
+            75% {
+                transform: translate(-10px, 5px) rotate(270deg);
+            }
+            100% {
+                transform: translate(0, 0) rotate(360deg);
+            }
+        }
+
+        h1 {
+            font-family: var(--heading-font);
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            text-shadow: 0 0 30px rgba(59, 130, 246, 0.5);
+            position: relative;
+            z-index: 10;
+        }
+
+        h2 {
+            font-family: var(--heading-font);
+            font-size: 1.8rem;
+            margin: 2rem 0 1rem;
+            color: var(--primary-light);
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 0.5rem;
+        }
+
+        p {
+            margin-bottom: 1.5rem;
+            color: var(--text-muted);
+            font-size: 1.05rem;
+        }
+
+        .main-content {
+            position: relative;
+            z-index: 10;
+        }
+
+        .content-container {
+            background-color: var(--bg-light);
+            border-radius: var(--border-radius);
+            padding: 3rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--border-color);
+        }
+
+        .definition-box {
+            background-color: var(--bg-lighter);
+            border-left: 4px solid var(--primary-color);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            border-radius: 0 var(--border-radius) var(--border-radius) 0;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .example-wrapper {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .example-card {
+            flex: 1 1 45%;
+            background-color: var(--bg-card);
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: 1px solid var(--border-color);
+        }
+
+        .example-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--glow);
+        }
+
+        .example-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .example-icon {
+            width: 30px;
+            height: 30px;
+            margin-right: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            color: white;
+            font-weight: bold;
+        }
+
+        .bad-example .example-icon {
+            background-color: var(--accent-color);
+        }
+
+        .good-example .example-icon {
+            background-color: var(--secondary-color);
+        }
+
+        .example-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+
+        .bad-example .example-title {
+            color: var(--accent-color);
+        }
+
+        .good-example .example-title {
+            color: var(--secondary-color);
+        }
+
+        pre {
+            background-color: var(--code-bg);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            overflow-x: auto;
+            position: relative;
+        }
+
+        code {
+            font-family: var(--code-font);
+            font-size: 14px;
+            line-height: 1.5;
+            color: var(--code-text);
+            display: block;
+        }
+
+        .explanation {
+            background-color: var(--bg-lighter);
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            margin-top: 1.5rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .explanation-title {
+            font-weight: bold;
+            margin-bottom: 0.8rem;
+            color: var(--text-color);
+        }
+
+        .violation-points, .adherence-points {
+            margin-top: 1rem;
+        }
+
+        .violation-points li, .adherence-points li {
+            margin-bottom: 0.8rem;
+        }
+
+        .violation-points {
+            color: var(--accent-color);
+        }
+
+        .adherence-points {
+            color: var(--secondary-color);
+        }
+
+        /* Interactive Demo */
+        .interactive-demo {
+            background-color: var(--bg-lighter);
+            padding: 2rem;
+            margin: 3rem 0;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-color);
+        }
+
+        .interactive-demo h3 {
+            margin-top: 0;
+            color: var(--primary-light);
+            font-family: var(--heading-font);
+            font-size: 1.4rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .demo-controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            font-family: var(--body-font);
+            font-weight: 500;
+            font-size: 0.95rem;
+            padding: 0.75rem 1.25rem;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s, box-shadow 0.2s;
+        }
+
+        button:hover {
+            background-color: var(--primary-dark);
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.5);
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        .output-container {
+            background-color: var(--bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .output {
+            font-family: var(--code-font);
+            color: var(--text-color);
+            white-space: pre-wrap;
+            line-height: 1.6;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 3rem;
+            padding: 2rem 0;
+            border-top: 1px solid var(--border-color);
+            color: var(--text-muted);
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            margin: 2rem 0;
+            color: var(--primary-light);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+        
+        .back-link:hover {
+            color: var(--primary-color);
+            text-shadow: 0 0 8px rgba(59, 130, 246, 0.5);
+        }
+
+        .back-link svg {
+            margin-right: 0.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .example-wrapper {
+                flex-direction: column;
+            }
+            
+            .example-card {
+                flex: 1 1 100%;
+            }
+            
+            h1 {
+                font-size: 2.5rem;
+            }
+            
+            .content-container {
+                padding: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="shapes">
+            <div class="shape shape-1"></div>
+            <div class="shape shape-2"></div>
+        </div>
+        <div class="container">
+            <h1>Open-Closed Principle</h1>
+            <p>Software entities should be open for extension, but closed for modification</p>
+        </div>
+    </header>
+
+    <div class="main-content">
+        <div class="container">
+            <a href="../index.html" class="back-link">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M19 12H5M12 19l-7-7 7-7"/>
+                </svg>
+                Back to SOLID Principles
+            </a>
+            
+            <div class="content-container">
+                <div class="definition-box">
+                    <h2>Definition</h2>
+                    <p>The Open-Closed Principle (OCP) is the second of the five SOLID principles of object-oriented design. It states that:</p>
+                    <blockquote>
+                        <p><strong>"Software entities (classes, modules, functions, etc.) should be open for extension, but closed for modification."</strong></p>
+                    </blockquote>
+                    <p>This means that you should be able to add new functionality to a system without changing existing code. The goal is to make the system easy to extend with new behaviors without having to modify the classes that already exist.</p>
+                </div>
+
+                <div class="example-wrapper">
+                    <div class="example-card bad-example">
+                        <div class="example-header">
+                            <div class="example-icon">✗</div>
+                            <div class="example-title">Bad Example: Violating OCP</div>
+                        </div>
+                        <pre><code class="language-javascript">class AreaCalculator {
+    calculateArea(shapes) {
+        let area = 0;
+        
+        for (let shape of shapes) {
+            if (shape.type === 'circle') {
+                area += Math.PI * shape.radius * shape.radius;
+            } 
+            else if (shape.type === 'rectangle') {
+                area += shape.width * shape.height;
+            }
+            // What if we want to add a triangle? We'd have to modify this class!
+        }
+        
+        return area;
+    }
+}</code></pre>
+                        <div class="explanation">
+                            <div class="explanation-title">Why This Violates OCP:</div>
+                            <p>This implementation violates the Open-Closed Principle for several reasons:</p>
+                            <ul class="violation-points">
+                                <li>To add a new shape type (like a triangle), we must modify the <code>AreaCalculator</code> class.</li>
+                                <li>The <code>calculateArea</code> method contains conditional logic that checks the type of shape.</li>
+                                <li>Each new shape requires a new conditional branch, making the code increasingly complex.</li>
+                                <li>Changes to existing shape calculations risk breaking the entire calculator.</li>
+                                <li>The class is not closed for modification, as it needs to be changed whenever a new shape is added.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="example-card good-example">
+                        <div class="example-header">
+                            <div class="example-icon">✓</div>
+                            <div class="example-title">Good Example: Following OCP</div>
+                        </div>
+                        <pre><code class="language-javascript">// Base Shape class or interface
+class Shape {
+    calculateArea() {
+        // This should be implemented by subclasses
+        throw new Error("Method 'calculateArea()' must be implemented.");
+    }
+    
+    getDescription() {
+        // This should be implemented by subclasses
+        throw new Error("Method 'getDescription()' must be implemented.");
+    }
+}
+
+// Rectangle implementation
+class Rectangle extends Shape {
+    constructor(width, height) {
+        super();
+        this.width = width;
+        this.height = height;
+    }
+    
+    calculateArea() {
+        return this.width * this.height;
+    }
+    
+    getDescription() {
+        return `Rectangle: ${this.width} × ${this.height}`;
+    }
+}
+
+// Circle implementation
+class Circle extends Shape {
+    constructor(radius) {
+        super();
+        this.radius = radius;
+    }
+    
+    calculateArea() {
+        return Math.PI * this.radius * this.radius;
+    }
+    
+    getDescription() {
+        return `Circle: radius ${this.radius}`;
+    }
+}
+
+// We can add a new shape without modifying existing code
+class Triangle extends Shape {
+    constructor(base, height) {
+        super();
+        this.base = base;
+        this.height = height;
+    }
+    
+    calculateArea() {
+        return 0.5 * this.base * this.height;
+    }
+    
+    getDescription() {
+        return `Triangle: base ${this.base}, height ${this.height}`;
+    }
+}
+
+// Area calculator that works with any Shape
+class AreaCalculator {
+    calculateTotalArea(shapes) {
+        return shapes.reduce((sum, shape) => sum + shape.calculateArea(), 0);
+    }
+}</code></pre>
+                        <div class="explanation">
+                            <div class="explanation-title">Why This Follows OCP:</div>
+                            <p>This implementation follows the Open-Closed Principle:</p>
+                            <ul class="adherence-points">
+                                <li>The <code>AreaCalculator</code> class is closed for modification - it doesn't need to change when new shapes are added.</li>
+                                <li>The system is open for extension - we can add new shapes by creating new subclasses of <code>Shape</code>.</li>
+                                <li>Each shape is responsible for calculating its own area through the <code>calculateArea()</code> method.</li>
+                                <li>Adding a new shape (like <code>Triangle</code>) doesn't require changing any existing code.</li>
+                                <li>The code is more maintainable and less prone to bugs when extending functionality.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="interactive-demo">
+                    <h3>Interactive Demo: Area Calculator</h3>
+                    <p>Click the buttons below to add different shapes. The area calculator will compute the total area without needing to be modified for each shape type.</p>
+                    
+                    <div class="demo-controls">
+                        <button id="addRectangleBtn">Add Rectangle</button>
+                        <button id="addCircleBtn">Add Circle</button>
+                        <button id="addTriangleBtn">Add Triangle</button>
+                        <button id="clearShapesBtn">Clear All</button>
+                    </div>
+                    
+                    <div class="output-container">
+                        <h4>Shapes:</h4>
+                        <div id="shapesOutput" class="output">No shapes added yet.</div>
+                    </div>
+                    
+                    <div class="output-container">
+                        <h4>Total Area:</h4>
+                        <div id="calculationOutput" class="output">Total area: 0</div>
+                    </div>
+                </div>
+            </div>
+            
+            <a href="../../index.html" class="back-link">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M19 12H5M12 19l-7-7 7-7"/>
+                </svg>
+                Back to Main Page
+            </a>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 SOLID Principles Interactive Guide</p>
+        </div>
+    </footer>
+
+    <script>
+        // Implementation of the Shape hierarchy
+        class Shape {
+            calculateArea() {
+                throw new Error("Method 'calculateArea()' must be implemented.");
+            }
+            
+            getDescription() {
+                throw new Error("Method 'getDescription()' must be implemented.");
+            }
+        }
+        
+        class Rectangle extends Shape {
+            constructor(width, height) {
+                super();
+                this.width = width;
+                this.height = height;
+            }
+            
+            calculateArea() {
+                return this.width * this.height;
+            }
+            
+            getDescription() {
+                return `Rectangle: ${this.width} × ${this.height}`;
+            }
+        }
+        
+        class Circle extends Shape {
+            constructor(radius) {
+                super();
+                this.radius = radius;
+            }
+            
+            calculateArea() {
+                return Math.PI * this.radius * this.radius;
+            }
+            
+            getDescription() {
+                return `Circle: radius ${this.radius}`;
+            }
+        }
+        
+        class Triangle extends Shape {
+            constructor(base, height) {
+                super();
+                this.base = base;
+                this.height = height;
+            }
+            
+            calculateArea() {
+                return 0.5 * this.base * this.height;
+            }
+            
+            getDescription() {
+                return `Triangle: base ${this.base}, height ${this.height}`;
+            }
+        }
+        
+        class AreaCalculator {
+            calculateTotalArea(shapes) {
+                return shapes.reduce((sum, shape) => sum + shape.calculateArea(), 0);
+            }
+        }
+
+        // Demo interaction code
+        document.addEventListener('DOMContentLoaded', function() {
+            const shapesOutput = document.getElementById('shapesOutput');
+            const calculationOutput = document.getElementById('calculationOutput');
+            const addRectangleBtn = document.getElementById('addRectangleBtn');
+            const addCircleBtn = document.getElementById('addCircleBtn');
+            const addTriangleBtn = document.getElementById('addTriangleBtn');
+            const clearShapesBtn = document.getElementById('clearShapesBtn');
+            
+            const calculator = new AreaCalculator();
+            const shapes = [];
+            
+            function updateShapesOutput() {
+                if (shapes.length === 0) {
+                    shapesOutput.textContent = "No shapes added yet.";
+                } else {
+                    shapesOutput.textContent = shapes.map((shape, index) => 
+                        `${index + 1}. ${shape.getDescription()}`
+                    ).join('\n');
+                }
+                
+                const totalArea = calculator.calculateTotalArea(shapes);
+                calculationOutput.textContent = `Total area: ${totalArea.toFixed(2)}`;
+            }
+            
+            addRectangleBtn.addEventListener('click', function() {
+                const width = Math.floor(Math.random() * 10) + 1;
+                const height = Math.floor(Math.random() * 10) + 1;
+                shapes.push(new Rectangle(width, height));
+                updateShapesOutput();
+            });
+            
+            addCircleBtn.addEventListener('click', function() {
+                const radius = Math.floor(Math.random() * 5) + 1;
+                shapes.push(new Circle(radius));
+                updateShapesOutput();
+            });
+            
+            addTriangleBtn.addEventListener('click', function() {
+                const base = Math.floor(Math.random() * 10) + 1;
+                const height = Math.floor(Math.random() * 10) + 1;
+                shapes.push(new Triangle(base, height));
+                updateShapesOutput();
+            });
+            
+            clearShapesBtn.addEventListener('click', function() {
+                shapes.length = 0; // Clear the array
+                updateShapesOutput();
+            });
+        });
+    </script>
+</body>
+</html>

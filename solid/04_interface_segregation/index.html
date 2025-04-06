@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interface Segregation Principle (ISP)</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #121212;
+            --bg-card: #1e1e1e;
+            --bg-code: #2d2d2d;
+            --text-primary: #e0e0e0;
+            --text-secondary: #a0a0a0;
+            --accent-primary: #6d28d9;
+            --accent-secondary: #4c1d95;
+            --border-color: #333333;
+            --header-bg: #1e1e1e;
+            --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-dark);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+        
+        header {
+            background-color: var(--header-bg);
+            color: var(--text-primary);
+            padding: 0;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            height: 70vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            max-width: 800px;
+            padding: 2rem;
+        }
+        
+        .hero-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #4c1d95 0%, #6d28d9 100%);
+            opacity: 0.8;
+            z-index: 1;
+        }
+        
+        .floating-shape {
+            position: absolute;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            z-index: 1;
+            animation: float 15s infinite ease-in-out;
+        }
+        
+        .shape1 {
+            width: 150px;
+            height: 150px;
+            top: 10%;
+            left: 10%;
+            animation-delay: 0s;
+        }
+        
+        .shape2 {
+            width: 100px;
+            height: 100px;
+            top: 60%;
+            left: 15%;
+            animation-delay: 2s;
+        }
+        
+        .shape3 {
+            width: 200px;
+            height: 200px;
+            top: 20%;
+            right: 10%;
+            animation-delay: 4s;
+        }
+        
+        .shape4 {
+            width: 120px;
+            height: 120px;
+            bottom: 15%;
+            right: 20%;
+            animation-delay: 6s;
+        }
+        
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0) translateX(0);
+            }
+            25% {
+                transform: translateY(-15px) translateX(15px);
+            }
+            50% {
+                transform: translateY(10px) translateX(-10px);
+            }
+            75% {
+                transform: translateY(-5px) translateX(5px);
+            }
+        }
+        
+        .container {
+            width: 80%;
+            margin: 2rem auto;
+            padding: 2rem;
+            background-color: var(--bg-card);
+            box-shadow: var(--card-shadow);
+            border-radius: 8px;
+        }
+        
+        h1, h2, h3 {
+            font-family: 'Poppins', sans-serif;
+            color: var(--text-primary);
+        }
+        
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            border-bottom: 2px solid var(--accent-primary);
+            padding-bottom: 0.5rem;
+        }
+        
+        h2 {
+            color: var(--accent-primary);
+            margin-top: 2rem;
+            font-size: 1.8rem;
+        }
+        
+        h3 {
+            color: var(--text-primary);
+            font-size: 1.4rem;
+            margin-top: 1.5rem;
+        }
+        
+        p {
+            margin-bottom: 1rem;
+            color: var(--text-secondary);
+        }
+        
+        ul {
+            margin-left: 2rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        li {
+            margin-bottom: 0.5rem;
+            color: var(--text-secondary);
+        }
+        
+        strong {
+            color: var(--text-primary);
+        }
+        
+        code {
+            background-color: var(--bg-code);
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+            color: #e6db74;
+        }
+        
+        pre {
+            background-color: var(--bg-code);
+            padding: 1rem;
+            border-radius: 4px;
+            overflow-x: auto;
+            font-size: 0.9em;
+            margin: 1.5rem 0;
+        }
+        
+        .example {
+            border: 1px solid var(--border-color);
+            padding: 1.5rem;
+            margin-top: 1.5rem;
+            border-radius: 5px;
+            background-color: var(--bg-card);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .example:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .bad-example {
+            border-left: 5px solid #e63946;
+        }
+        
+        .good-example {
+            border-left: 5px solid #2a9d8f;
+        }
+        
+        .interactive-demo {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            background-color: var(--bg-card);
+        }
+        
+        label {
+            font-weight: bold;
+            margin-right: 10px;
+            color: var(--text-primary);
+        }
+        
+        select, button {
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            border: 1px solid var(--border-color);
+            margin-top: 0.5rem;
+            background-color: var(--bg-code);
+            color: var(--text-primary);
+        }
+        
+        button {
+            background-color: var(--accent-primary);
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            border: none;
+        }
+        
+        button:hover {
+            background-color: var(--accent-secondary);
+        }
+        
+        .output {
+            margin-top: 1rem;
+            padding: 1rem;
+            background-color: var(--bg-code);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            min-height: 50px;
+            color: var(--text-secondary);
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 2rem;
+            padding: 1rem;
+            background-color: var(--header-bg);
+            color: var(--text-secondary);
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="hero-bg"></div>
+        <div class="floating-shape shape1"></div>
+        <div class="floating-shape shape2"></div>
+        <div class="floating-shape shape3"></div>
+        <div class="floating-shape shape4"></div>
+        <div class="hero-content">
+            <h1>Interface Segregation Principle (ISP)</h1>
+            <p>No client should be forced to depend on methods it does not use</p>
+        </div>
+    </header>
+
+    <div class="container">
+        <h2>Definition</h2>
+        <p>The <strong>Interface Segregation Principle (ISP)</strong> states that <em>no client should be forced to depend on methods it does not use</em>. Essentially, it's better to have many small, specific interfaces than one large, general-purpose interface (often called a "fat" interface).</p>
+        <p>When interfaces are too large, implementing classes are forced to implement methods they don't need, often leading to empty implementations or throwing exceptions. This violates the principle and can make the system more rigid and harder to maintain.</p>
+
+        <h2>Why ISP Matters</h2>
+        <ul>
+            <li><strong>Reduces Coupling:</strong> Clients only depend on the methods they actually use, reducing unnecessary dependencies.</li>
+            <li><strong>Increases Cohesion:</strong> Interfaces become more focused and cohesive, grouping related methods together.</li>
+            <li><strong>Improves Flexibility & Maintainability:</strong> Changes to an interface affect fewer clients. Smaller interfaces are easier to understand and implement.</li>
+            <li><strong>Avoids "Fat" Interfaces:</strong> Prevents interfaces from becoming bloated with unrelated methods.</li>
+        </ul>
+
+        <h2>Bad Example: Violating ISP</h2>
+        <div class="example bad-example">
+            <h3>Scenario: Multi-function Printer</h3>
+            <p>Imagine an interface <code>IMultiFunctionDevice</code> that includes methods for printing, scanning, and faxing.</p>
+            <pre><code class="language-javascript">// "Fat" Interface
+interface IMultiFunctionDevice {
+    print(document);
+    scan(document);
+    fax(document);
+}
+
+// A simple printer that only prints
+class SimplePrinter implements IMultiFunctionDevice {
+    print(document) {
+        console.log("Printing document...");
+    }
+
+    // Forced to implement scan and fax, even though it can't perform these actions.
+    scan(document) {
+        throw new Error("SimplePrinter cannot scan."); // Or empty implementation
+    }
+
+    fax(document) {
+        throw new Error("SimplePrinter cannot fax."); // Or empty implementation
+    }
+}
+
+// A dedicated scanner
+class DedicatedScanner implements IMultiFunctionDevice {
+    print(document) {
+        throw new Error("DedicatedScanner cannot print.");
+    }
+
+    scan(document) {
+        console.log("Scanning document...");
+    }
+
+    fax(document) {
+        throw new Error("DedicatedScanner cannot fax.");
+    }
+}
+</code></pre>
+            <p>In this example, <code>SimplePrinter</code> is forced to implement <code>scan</code> and <code>fax</code> methods it doesn't use. Similarly, <code>DedicatedScanner</code> is forced to implement <code>print</code> and <code>fax</code>. This violates ISP because clients (the implementing classes) are forced to depend on methods they don't need.</p>
+        </div>
+
+        <h2>Good Example: Applying ISP</h2>
+        <div class="example good-example">
+            <h3>Scenario: Segregated Printer Interfaces</h3>
+            <p>We can fix the previous example by segregating the <code>IMultiFunctionDevice</code> interface into smaller, more specific interfaces.</p>
+            <pre><code class="language-javascript">// Segregated Interfaces
+interface IPrinter {
+    print(document);
+}
+
+interface IScanner {
+    scan(document);
+}
+
+interface IFax {
+    fax(document);
+}
+
+// Simple printer implements only IPrinter
+class SimplePrinter implements IPrinter {
+    print(document) {
+        console.log("Printing document...");
+    }
+}
+
+// Photocopier implements IPrinter and IScanner
+class Photocopier implements IPrinter, IScanner {
+    print(document) {
+        console.log("Photocopier printing document...");
+    }
+
+    scan(document) {
+        console.log("Photocopier scanning document...");
+    }
+}
+
+// Multi-function device implements all interfaces
+class MultiFunctionMachine implements IPrinter, IScanner, IFax {
+    print(document) {
+        console.log("MultiFunctionMachine printing...");
+    }
+    scan(document) {
+        console.log("MultiFunctionMachine scanning...");
+    }
+    fax(document) {
+        console.log("MultiFunctionMachine faxing...");
+    }
+}
+</code></pre>
+            <p>By breaking down the large interface into smaller ones (<code>IPrinter</code>, <code>IScanner</code>, <code>IFax</code>), each class now only implements the interfaces relevant to its capabilities. <code>SimplePrinter</code> only needs <code>IPrinter</code>. <code>Photocopier</code> needs <code>IPrinter</code> and <code>IScanner</code>. No class is forced to implement methods it doesn't use.</p>
+        </div>
+
+        <div class="interactive-demo">
+            <h3>Interactive Demo: Worker Tasks</h3>
+            <p>Select a worker type to see which tasks they can perform based on segregated interfaces (<code>IWork</code>, <code>IEat</code>, <code>IManage</code>).</p>
+            <label for="worker-select">Select Worker:</label>
+            <select id="worker-select">
+                <option value="programmer">Programmer</option>
+                <option value="manager">Manager</option>
+                <option value="robot">Robot</option>
+            </select>
+            <button onclick="showTasks()">Show Available Tasks</button>
+            <div class="output" id="worker-output">Select a worker and click the button.</div>
+        </div>
+    </div>
+
+    <footer>
+        <p>SOLID Principles Showcase</p>
+    </footer>
+
+    <script>
+        // --- Interfaces (Conceptual in JS) ---
+        // interface IWork { work(); }
+        // interface IEat { eat(); }
+        // interface IManage { manage(); }
+
+        // --- Worker Classes ---
+        class Programmer {
+            work() { return "Writes code."; }
+            eat() { return "Eats snacks."; }
+        }
+
+        class Manager {
+            work() { return "Attends meetings."; }
+            eat() { return "Eats lunch."; }
+            manage() { return "Manages the team."; }
+        }
+
+        class Robot {
+            work() { return "Assembles parts."; }
+            // Robots don't eat or manage in the human sense
+        }
+
+        function showTasks() {
+            const workerType = document.getElementById('worker-select').value;
+            const outputDiv = document.getElementById('worker-output');
+            let worker;
+            let tasks = [];
+
+            outputDiv.innerHTML = ""; // Clear previous output
+
+            switch (workerType) {
+                case 'programmer':
+                    worker = new Programmer();
+                    if (typeof worker.work === 'function') tasks.push(`<li>Work Task: ${worker.work()}</li>`);
+                    if (typeof worker.eat === 'function') tasks.push(`<li>Eat Task: ${worker.eat()}</li>`);
+                    // Programmers don't manage
+                    break;
+                case 'manager':
+                    worker = new Manager();
+                    if (typeof worker.work === 'function') tasks.push(`<li>Work Task: ${worker.work()}</li>`);
+                    if (typeof worker.eat === 'function') tasks.push(`<li>Eat Task: ${worker.eat()}</li>`);
+                    if (typeof worker.manage === 'function') tasks.push(`<li>Manage Task: ${worker.manage()}</li>`);
+                    break;
+                case 'robot':
+                    worker = new Robot();
+                    if (typeof worker.work === 'function') tasks.push(`<li>Work Task: ${worker.work()}</li>`);
+                    // Robots don't eat or manage
+                    break;
+                default:
+                    outputDiv.innerHTML = "Invalid worker type selected.";
+                    return;
+            }
+
+            if (tasks.length > 0) {
+                 outputDiv.innerHTML = `<h4>Tasks for ${workerType.charAt(0).toUpperCase() + workerType.slice(1)}:</h4><ul>${tasks.join('')}</ul>`;
+            } else {
+                outputDiv.innerHTML = `The ${workerType} has no applicable tasks from the selected interfaces.`;
+            }
+        }
+
+         // Initial call to display default worker tasks if needed
+        // showTasks(); // Optional: uncomment to show default on load
+
+    </script>
+
+</body>
+</html>

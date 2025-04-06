@@ -1,0 +1,843 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Observer Pattern</title>
+    <style>
+        /* Modern, clean styling */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap');
+        
+        :root {
+            --primary-color: #8b5cf6;
+            --primary-dark: #7c3aed;
+            --secondary-color: #10b981;
+            --accent-color: #f97316;
+            --text-color: #1f2937;
+            --bg-color: #f9fafb;
+            --card-bg: #ffffff;
+            --code-bg: #f8fafc;
+            --border-color: #e2e8f0;
+            --button-hover: #6d28d9;
+            --output-bg: #f1f5f9;
+            --subscriber-color: #3b82f6;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+            padding: 0;
+            margin: 0;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+            padding: 3rem 0;
+            text-align: center;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+        }
+
+        h2 {
+            font-size: 1.8rem;
+            margin: 2rem 0 1rem;
+            color: var(--primary-dark);
+            font-weight: 600;
+        }
+
+        h3 {
+            font-size: 1.4rem;
+            margin: 1.5rem 0 1rem;
+            color: var(--primary-dark);
+            font-weight: 600;
+        }
+
+        p {
+            margin-bottom: 1rem;
+            font-size: 1.05rem;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        pre {
+            background-color: var(--code-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 1.25rem;
+            margin: 1.5rem 0;
+            overflow-x: auto;
+            position: relative;
+        }
+
+        code {
+            font-family: 'Fira Code', Consolas, Monaco, 'Andale Mono', monospace;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            color: var(--text-color);
+        }
+
+        .interactive-demo {
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            padding: 2rem;
+            margin: 2rem 0;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        .demo-title {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .demo-icon {
+            background-color: var(--primary-color);
+            color: white;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            margin-right: 0.75rem;
+            font-weight: bold;
+        }
+
+        .demo-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .subject-panel {
+            flex: 1;
+            min-width: 300px;
+            background-color: var(--output-bg);
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .subscribers-panel {
+            flex: 2;
+            min-width: 300px;
+            background-color: var(--output-bg);
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .panel-title {
+            font-weight: 600;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .subscriber-count {
+            background-color: var(--subscriber-color);
+            color: white;
+            font-size: 0.8rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 12px;
+        }
+
+        .controls {
+            margin: 1.5rem 0;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 0.75rem 1.5rem;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        button:hover {
+            background-color: var(--button-hover);
+        }
+
+        button:active {
+            transform: translateY(1px);
+        }
+
+        .secondary-btn {
+            background-color: var(--subscriber-color);
+        }
+
+        .secondary-btn:hover {
+            background-color: #2563eb;
+        }
+
+        .danger-btn {
+            background-color: var(--accent-color);
+        }
+
+        .danger-btn:hover {
+            background-color: #ea580c;
+        }
+
+        input {
+            padding: 0.75rem;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            font-size: 1rem;
+            font-family: 'Inter', sans-serif;
+            width: 100%;
+            max-width: 300px;
+        }
+
+        .stock-info {
+            background-color: white;
+            border-radius: 8px;
+            padding: 1.25rem;
+            margin-top: 1rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .stock-price {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary-dark);
+        }
+
+        .price-change {
+            font-size: 1rem;
+            margin-left: 0.5rem;
+        }
+
+        .price-up {
+            color: var(--secondary-color);
+        }
+
+        .price-down {
+            color: var(--accent-color);
+        }
+
+        .subscriber-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .subscriber-card {
+            background-color: white;
+            border-radius: 8px;
+            padding: 1rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .subscriber-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+        }
+
+        .subscriber-name {
+            font-weight: 600;
+            color: var(--subscriber-color);
+        }
+
+        .subscriber-log {
+            background-color: var(--output-bg);
+            border-radius: 4px;
+            padding: 0.5rem;
+            margin-top: 0.5rem;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.9rem;
+            min-height: 100px;
+            max-height: 150px;
+            overflow-y: auto;
+        }
+
+        .log-entry {
+            margin-bottom: 0.25rem;
+            padding-bottom: 0.25rem;
+            border-bottom: 1px dashed #ddd;
+        }
+
+        .log-entry:last-child {
+            border-bottom: none;
+        }
+
+        .remove-btn {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            background-color: #ef4444;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            opacity: 0.7;
+            transition: opacity 0.2s;
+        }
+
+        .remove-btn:hover {
+            opacity: 1;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 3rem;
+            padding: 2rem 0;
+            background-color: #f3f4f6;
+            color: #6b7280;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-top: 1rem;
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s ease;
+        }
+
+        .back-link:hover {
+            color: var(--primary-dark);
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Observer Pattern</h1>
+            <p>Define a one-to-many dependency so that when one object changes state, all its dependents are notified</p>
+        </div>
+    </header>
+
+    <div class="container">
+        <section class="card">
+            <h2>What is the Observer Pattern?</h2>
+            <p>The Observer pattern is a behavioral design pattern that defines a one-to-many dependency between objects. When the state of one object (the Subject) changes, all its dependents (Observers) are notified and updated automatically.</p>
+            
+            <p>This pattern is widely used in implementing distributed event handling systems and is fundamental to many reactive programming frameworks. It provides a way to react to state changes in objects without coupling the Subject to its Observers.</p>
+            
+            <h3>Key Participants</h3>
+            <ul>
+                <li><strong>Subject:</strong> Knows its observers and provides an interface for attaching and detaching observers</li>
+                <li><strong>ConcreteSubject:</strong> Stores state of interest to observers and sends notifications when state changes</li>
+                <li><strong>Observer:</strong> Defines an updating interface for objects that should be notified of changes</li>
+                <li><strong>ConcreteObserver:</strong> Implements the Observer updating interface to keep its state consistent with Subject's</li>
+            </ul>
+        </section>
+
+        <section class="card">
+            <h2>Implementation</h2>
+            <p>Here's a JavaScript implementation of the Observer pattern:</p>
+            
+            <pre><code class="language-javascript">// Observer interface
+class Observer {
+    update(subject) {
+        throw new Error('Observer.update() method must be implemented');
+    }
+}
+
+// Subject (Observable) interface
+class Subject {
+    constructor() {
+        this.observers = [];
+    }
+    
+    attach(observer) {
+        if (observer instanceof Observer) {
+            this.observers.push(observer);
+        } else {
+            throw new Error('Observer must implement Observer interface');
+        }
+    }
+    
+    detach(observer) {
+        const index = this.observers.indexOf(observer);
+        if (index !== -1) {
+            this.observers.splice(index, 1);
+        }
+    }
+    
+    notify() {
+        for (const observer of this.observers) {
+            observer.update(this);
+        }
+    }
+}
+
+// Concrete Subject
+class StockMarket extends Subject {
+    constructor() {
+        super();
+        this.symbol = 'ACME';
+        this.price = 100.00;
+        this.previousPrice = 100.00;
+    }
+    
+    getSymbol() {
+        return this.symbol;
+    }
+    
+    getPrice() {
+        return this.price;
+    }
+    
+    getPriceChange() {
+        return this.price - this.previousPrice;
+    }
+    
+    updatePrice(newPrice) {
+        this.previousPrice = this.price;
+        this.price = newPrice;
+        this.notify();
+    }
+}
+
+// Concrete Observer
+class Investor extends Observer {
+    constructor(name) {
+        super();
+        this.name = name;
+        this.logs = [];
+    }
+    
+    update(stockMarket) {
+        const price = stockMarket.getPrice();
+        const symbol = stockMarket.getSymbol();
+        const priceChange = stockMarket.getPriceChange();
+        
+        const direction = priceChange >= 0 ? 'up' : 'down';
+        const message = `${symbol} price changed to $${price.toFixed(2)} (${direction} $${Math.abs(priceChange).toFixed(2)})`;
+        
+        this.logs.push({
+            timestamp: new Date(),
+            message: message
+        });
+    }
+    
+    getName() {
+        return this.name;
+    }
+    
+    getLogs() {
+        return this.logs;
+    }
+}</code></pre>
+        </section>
+
+        <section class="interactive-demo">
+            <div class="demo-title">
+                <div class="demo-icon">▶</div>
+                <h2>Interactive Demo</h2>
+            </div>
+            
+            <p>This demo demonstrates the Observer pattern using a stock market example. When the stock price changes, all subscribed investors (observers) are notified automatically.</p>
+            
+            <div class="demo-container">
+                <div class="subject-panel">
+                    <div class="panel-title">
+                        <span>Stock Market (Subject)</span>
+                        <span class="subscriber-count" id="observer-count">0 Subscribers</span>
+                    </div>
+                    
+                    <div class="stock-info">
+                        <div>
+                            <span>Symbol: </span>
+                            <strong>ACME</strong>
+                        </div>
+                        <div>
+                            <span class="stock-price" id="stock-price">$100.00</span>
+                            <span class="price-change" id="price-change"></span>
+                        </div>
+                    </div>
+                    
+                    <div class="controls">
+                        <input type="number" id="price-input" placeholder="Enter new price" min="1" step="0.01" value="100.00">
+                        <button id="update-price-btn">Update Price</button>
+                    </div>
+                    
+                    <button id="random-price-btn">Generate Random Price</button>
+                </div>
+                
+                <div class="subscribers-panel">
+                    <div class="panel-title">Investors (Observers)</div>
+                    
+                    <div class="controls">
+                        <input type="text" id="investor-name" placeholder="Enter investor name">
+                        <button id="add-investor-btn" class="secondary-btn">Add Investor</button>
+                        <button id="remove-all-btn" class="danger-btn">Remove All Investors</button>
+                    </div>
+                    
+                    <div class="subscriber-list" id="investor-list">
+                        <p>No investors are currently subscribed. Add an investor to start.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="card">
+            <h2>When to Use the Observer Pattern</h2>
+            <ul>
+                <li>When changes to one object require changing others, but you don't know how many objects need to change</li>
+                <li>When an object should be able to notify other objects without making assumptions about those objects</li>
+                <li>When an abstraction has two aspects, one dependent on the other</li>
+                <li>When you need to maintain consistency between related objects without making them tightly coupled</li>
+            </ul>
+            
+            <h3>Real-World Examples</h3>
+            <ul>
+                <li><strong>Event handling systems:</strong> UI components notify listeners when user interactions occur</li>
+                <li><strong>Newsletter subscriptions:</strong> Subscribers receive updates when new content is published</li>
+                <li><strong>Social media notifications:</strong> Users receive updates when someone they follow posts content</li>
+                <li><strong>MVC Architecture:</strong> Model notifies Views when data changes</li>
+                <li><strong>Pub/Sub systems:</strong> Message brokers route events to appropriate subscribers</li>
+            </ul>
+            
+            <h3>Benefits</h3>
+            <ul>
+                <li>Supports loose coupling between the subject and its observers</li>
+                <li>Allows sending data to other objects without knowing their specific types</li>
+                <li>Supports the Open/Closed Principle by allowing new observers to be added without modifying the subject</li>
+                <li>Subjects and observers can vary and evolve independently</li>
+            </ul>
+            
+            <h3>Drawbacks</h3>
+            <ul>
+                <li>Observers are notified in random order</li>
+                <li>Potential memory leaks if observers aren't properly detached</li>
+                <li>Can lead to complex update dependencies that are hard to track</li>
+                <li>May cause cascading updates if not implemented carefully</li>
+            </ul>
+        </section>
+    </div>
+
+    <footer>
+        <div class="container">
+            <p>Part of the Interactive Design Patterns and SOLID Principles Showcase</p>
+            <a href="../../../index.html" class="back-link">← Back to Main Page</a>
+        </div>
+    </footer>
+
+    <script>
+        // Observer pattern implementation
+        class Observer {
+            update(subject) {
+                throw new Error('Observer.update() method must be implemented');
+            }
+        }
+
+        class Subject {
+            constructor() {
+                this.observers = [];
+            }
+            
+            attach(observer) {
+                if (observer instanceof Observer) {
+                    this.observers.push(observer);
+                } else {
+                    throw new Error('Observer must implement Observer interface');
+                }
+            }
+            
+            detach(observer) {
+                const index = this.observers.indexOf(observer);
+                if (index !== -1) {
+                    this.observers.splice(index, 1);
+                }
+            }
+            
+            notify() {
+                for (const observer of this.observers) {
+                    observer.update(this);
+                }
+            }
+        }
+
+        class StockMarket extends Subject {
+            constructor() {
+                super();
+                this.symbol = 'ACME';
+                this.price = 100.00;
+                this.previousPrice = 100.00;
+            }
+            
+            getSymbol() {
+                return this.symbol;
+            }
+            
+            getPrice() {
+                return this.price;
+            }
+            
+            getPriceChange() {
+                return this.price - this.previousPrice;
+            }
+            
+            updatePrice(newPrice) {
+                this.previousPrice = this.price;
+                this.price = newPrice;
+                this.notify();
+            }
+        }
+
+        class Investor extends Observer {
+            constructor(name) {
+                super();
+                this.name = name;
+                this.logs = [];
+            }
+            
+            update(stockMarket) {
+                const price = stockMarket.getPrice();
+                const symbol = stockMarket.getSymbol();
+                const priceChange = stockMarket.getPriceChange();
+                
+                const direction = priceChange >= 0 ? 'up' : 'down';
+                const message = `${symbol} price changed to $${price.toFixed(2)} (${direction} $${Math.abs(priceChange).toFixed(2)})`;
+                
+                this.logs.push({
+                    timestamp: new Date(),
+                    message: message
+                });
+            }
+            
+            getName() {
+                return this.name;
+            }
+            
+            getLogs() {
+                return this.logs;
+            }
+        }
+
+        // UI interaction code
+        document.addEventListener('DOMContentLoaded', function() {
+            const stockMarket = new StockMarket();
+            const investors = new Map();
+            
+            const stockPriceElement = document.getElementById('stock-price');
+            const priceChangeElement = document.getElementById('price-change');
+            const observerCountElement = document.getElementById('observer-count');
+            const priceInput = document.getElementById('price-input');
+            const updatePriceBtn = document.getElementById('update-price-btn');
+            const randomPriceBtn = document.getElementById('random-price-btn');
+            const investorNameInput = document.getElementById('investor-name');
+            const addInvestorBtn = document.getElementById('add-investor-btn');
+            const removeAllBtn = document.getElementById('remove-all-btn');
+            const investorListElement = document.getElementById('investor-list');
+            
+            // Update the UI with current stock market state
+            function updateUI() {
+                // Update stock price display
+                stockPriceElement.textContent = `$${stockMarket.getPrice().toFixed(2)}`;
+                
+                // Update price change display
+                const priceChange = stockMarket.getPriceChange();
+                if (priceChange !== 0) {
+                    priceChangeElement.textContent = priceChange > 0 
+                        ? `▲ $${priceChange.toFixed(2)}` 
+                        : `▼ $${Math.abs(priceChange).toFixed(2)}`;
+                    priceChangeElement.className = 'price-change ' + (priceChange > 0 ? 'price-up' : 'price-down');
+                } else {
+                    priceChangeElement.textContent = '';
+                }
+                
+                // Update observer count
+                observerCountElement.textContent = `${investors.size} Subscriber${investors.size !== 1 ? 's' : ''}`;
+                
+                // Update investor logs
+                investors.forEach((investor, id) => {
+                    const logElement = document.getElementById(`log-${id}`);
+                    if (logElement) {
+                        const logs = investor.getLogs();
+                        if (logs.length > 0) {
+                            logElement.innerHTML = logs.map(log => {
+                                const time = log.timestamp.toLocaleTimeString('en-US', { 
+                                    hour: '2-digit', 
+                                    minute: '2-digit',
+                                    second: '2-digit'
+                                });
+                                return `<div class="log-entry">${time}: ${log.message}</div>`;
+                            }).join('');
+                        }
+                    }
+                });
+            }
+            
+            // Add a new investor
+            function addInvestor(name) {
+                if (!name.trim()) {
+                    alert('Please enter an investor name');
+                    return;
+                }
+                
+                // Create a unique ID for the investor
+                const id = Date.now().toString();
+                
+                // Create a new investor and add it to the map
+                const investor = new Investor(name);
+                investors.set(id, investor);
+                
+                // Attach the investor to the stock market
+                stockMarket.attach(investor);
+                
+                // Update the investor list UI
+                renderInvestorList();
+                updateUI();
+            }
+            
+            // Remove an investor
+            function removeInvestor(id) {
+                const investor = investors.get(id);
+                if (investor) {
+                    stockMarket.detach(investor);
+                    investors.delete(id);
+                    renderInvestorList();
+                    updateUI();
+                }
+            }
+            
+            // Render the investor list
+            function renderInvestorList() {
+                if (investors.size === 0) {
+                    investorListElement.innerHTML = '<p>No investors are currently subscribed. Add an investor to start.</p>';
+                    return;
+                }
+                
+                investorListElement.innerHTML = '';
+                
+                investors.forEach((investor, id) => {
+                    const subscriberCard = document.createElement('div');
+                    subscriberCard.className = 'subscriber-card';
+                    subscriberCard.innerHTML = `
+                        <div class="subscriber-header">
+                            <div class="subscriber-name">${investor.getName()}</div>
+                        </div>
+                        <div class="subscriber-log" id="log-${id}">
+                            <p>No notifications yet. Update the stock price to see notifications.</p>
+                        </div>
+                        <button class="remove-btn" data-id="${id}">×</button>
+                    `;
+                    
+                    investorListElement.appendChild(subscriberCard);
+                });
+                
+                // Add event listeners to remove buttons
+                document.querySelectorAll('.remove-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const id = this.getAttribute('data-id');
+                        removeInvestor(id);
+                    });
+                });
+            }
+            
+            // Update the stock price
+            function updateStockPrice(price) {
+                const newPrice = parseFloat(price);
+                if (isNaN(newPrice) || newPrice <= 0) {
+                    alert('Please enter a valid price greater than 0');
+                    return;
+                }
+                
+                stockMarket.updatePrice(newPrice);
+                updateUI();
+            }
+            
+            // Generate a random price
+            function generateRandomPrice() {
+                const min = Math.max(5, stockMarket.getPrice() * 0.9);
+                const max = stockMarket.getPrice() * 1.1;
+                const randomPrice = Math.random() * (max - min) + min;
+                priceInput.value = randomPrice.toFixed(2);
+                updateStockPrice(randomPrice);
+            }
+            
+            // Event listeners
+            updatePriceBtn.addEventListener('click', function() {
+                updateStockPrice(priceInput.value);
+            });
+            
+            randomPriceBtn.addEventListener('click', generateRandomPrice);
+            
+            addInvestorBtn.addEventListener('click', function() {
+                addInvestor(investorNameInput.value);
+                investorNameInput.value = '';
+            });
+            
+            investorNameInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    addInvestor(this.value);
+                    this.value = '';
+                }
+            });
+            
+            removeAllBtn.addEventListener('click', function() {
+                if (investors.size === 0) return;
+                
+                if (confirm('Are you sure you want to remove all investors?')) {
+                    investors.forEach((investor) => {
+                        stockMarket.detach(investor);
+                    });
+                    investors.clear();
+                    renderInvestorList();
+                    updateUI();
+                }
+            });
+            
+            // Initialize the UI
+            updateUI();
+            renderInvestorList();
+        });
+    </script>
+</body>
+</html>

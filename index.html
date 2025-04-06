@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Design Patterns & SOLID Principles Showcase</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #3b82f6; /* Vibrant blue */
+            --primary-dark: #2563eb;
+            --primary-light: #60a5fa;
+            --secondary-color: #10b981; /* Green */
+            --secondary-dark: #059669;
+            --accent-color: #8b5cf6; /* Purple */
+            --text-color: #e2e8f0;
+            --text-muted: #94a3b8;
+            --bg-color: #0f172a; /* Dark blue background */
+            --bg-light: #1e293b;
+            --bg-lighter: #334155;
+            --bg-card: #1e293b;
+            --border-color: #334155;
+            --heading-font: 'Poppins', sans-serif;
+            --body-font: 'Inter', sans-serif;
+            --border-radius: 8px;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2), 0 2px 4px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
+            --glow: 0 0 15px rgba(59, 130, 246, 0.5);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--body-font);
+            line-height: 1.7;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+        }
+
+        /* Hero Section with Advanced Animation */
+        .hero {
+            position: relative;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            text-align: center;
+            overflow: hidden;
+            background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2000 1500"><rect fill="%23000000" width="2000" height="1500"/><defs><circle stroke="%23222" vector-effect="non-scaling-stroke" id="a" fill="none" stroke-width="5" r="315"/></defs><g transform="translate(1000 750)"><use stroke="%233b82f6" href="%23a" transform="rotate(60 0 0) scale(0.4 0.4)"/><use stroke="%233b82f6" href="%23a" transform="rotate(120 0 0) scale(0.5 0.5)"/><use stroke="%233b82f6" href="%23a" transform="rotate(180 0 0) scale(0.6 0.6)"/><use stroke="%233b82f6" href="%23a" transform="rotate(240 0 0) scale(0.7 0.7)"/><use stroke="%233b82f6" href="%23a" transform="rotate(300 0 0) scale(0.8 0.8)"/></g></svg>');
+            background-size: cover;
+            opacity: 0.1;
+            animation: pulse 15s ease-in-out infinite alternate;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 0.1; }
+            50% { transform: scale(1.05); opacity: 0.15; }
+            100% { transform: scale(1); opacity: 0.1; }
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 10;
+            max-width: 800px;
+            padding: 0 2rem;
+        }
+
+        .hero h1 {
+            font-family: var(--heading-font);
+            font-size: 4rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(90deg, #ffffff 0%, #93c5fd 100%);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            line-height: 1.2;
+            text-shadow: 0 0 30px rgba(59, 130, 246, 0.5);
+        }
+
+        .hero p {
+            font-family: var(--body-font);
+            font-size: 1.5rem;
+            font-weight: 400;
+            margin-bottom: 2.5rem;
+            color: rgba(255, 255, 255, 0.9);
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .cta-button {
+            display: inline-block;
+            background-color: var(--secondary-color);
+            color: white;
+            font-family: var(--body-font);
+            font-weight: 600;
+            font-size: 1.1rem;
+            padding: 1rem 2.5rem;
+            border-radius: 50px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.5);
+        }
+
+        .cta-button:hover {
+            background-color: var(--secondary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 0 25px rgba(16, 185, 129, 0.7);
+        }
+
+        /* Floating shapes animation */
+        .shapes {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            overflow: hidden;
+        }
+
+        .shape {
+            position: absolute;
+            opacity: 0.2;
+            animation: float 15s infinite linear;
+        }
+
+        .shape-1 {
+            top: 20%;
+            left: 10%;
+            width: 100px;
+            height: 100px;
+            border-radius: 41% 59% 37% 63% / 44% 67% 33% 56%;
+            background-color: var(--secondary-color);
+            animation-duration: 25s;
+            box-shadow: 0 0 30px rgba(16, 185, 129, 0.4);
+        }
+
+        .shape-2 {
+            top: 60%;
+            right: 15%;
+            width: 150px;
+            height: 150px;
+            border-radius: 73% 27% 59% 41% / 57% 43% 57% 43%;
+            background-color: var(--accent-color);
+            animation-duration: 30s;
+            animation-delay: 2s;
+            box-shadow: 0 0 30px rgba(139, 92, 246, 0.4);
+        }
+
+        .shape-3 {
+            bottom: 15%;
+            left: 25%;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background-color: #f97316;
+            animation-duration: 20s;
+            animation-delay: 4s;
+            box-shadow: 0 0 30px rgba(249, 115, 22, 0.4);
+        }
+
+        @keyframes float {
+            0% {
+                transform: translate(0, 0) rotate(0deg);
+            }
+            25% {
+                transform: translate(10px, 15px) rotate(90deg);
+            }
+            50% {
+                transform: translate(5px, -10px) rotate(180deg);
+            }
+            75% {
+                transform: translate(-10px, 5px) rotate(270deg);
+            }
+            100% {
+                transform: translate(0, 0) rotate(360deg);
+            }
+        }
+
+        /* Main Content */
+        .main-content {
+            position: relative;
+            margin-top: -100px;
+            padding-bottom: 4rem;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 3rem;
+            background-color: var(--bg-light);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--border-color);
+        }
+
+        h2 {
+            font-family: var(--heading-font);
+            color: var(--text-color);
+            font-size: 2.2rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            position: relative;
+            padding-bottom: 0.8rem;
+        }
+
+        h2::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100px;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            border-radius: 2px;
+        }
+
+        p {
+            margin-bottom: 1.8rem;
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            line-height: 1.8;
+        }
+
+        .section {
+            margin-bottom: 4rem;
+        }
+
+        .section:last-child {
+            margin-bottom: 0;
+        }
+
+        /* Card Grid */
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 2rem;
+            margin-top: 2.5rem;
+        }
+
+        .card {
+            background-color: var(--bg-card);
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: var(--shadow);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid var(--border-color);
+        }
+
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: var(--glow);
+        }
+
+        .card-content {
+            padding: 1.5rem;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card-title {
+            font-family: var(--heading-font);
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin-bottom: 0.8rem;
+            color: var(--text-color);
+        }
+
+        .card-description {
+            color: var(--text-muted);
+            margin-bottom: 1.5rem;
+            flex-grow: 1;
+        }
+
+        .card-link {
+            display: inline-block;
+            padding: 0.8rem 1.5rem;
+            background-color: var(--primary-color);
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            font-weight: 500;
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+            text-align: center;
+        }
+
+        .card-link:hover {
+            background-color: var(--primary-dark);
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.5);
+        }
+
+        /* Coming Soon Section */
+        .coming-soon {
+            background-color: var(--bg-lighter);
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            text-align: center;
+            border: 1px dashed var(--border-color);
+        }
+
+        .coming-soon h3 {
+            font-family: var(--heading-font);
+            color: var(--text-color);
+            margin-bottom: 1rem;
+        }
+
+        .coming-soon p {
+            color: var(--text-muted);
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* Footer */
+        footer {
+            background-color: var(--bg-color);
+            color: white;
+            padding: 3rem 0;
+            text-align: center;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .footer-content p {
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 0;
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 3rem;
+            }
+
+            .hero p {
+                font-size: 1.2rem;
+            }
+
+            .container {
+                padding: 2rem;
+            }
+
+            h2 {
+                font-size: 1.8rem;
+            }
+
+            .card-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="shapes">
+            <div class="shape shape-1"></div>
+            <div class="shape shape-2"></div>
+            <div class="shape shape-3"></div>
+        </div>
+        <div class="hero-content">
+            <h1>SOLID Principles & Design Patterns</h1>
+            <p>Master the art of writing clean, maintainable, and scalable code through interactive examples and visual demonstrations</p>
+            <a href="#solid-principles" class="cta-button">Explore the Principles</a>
+        </div>
+    </section>
+
+    <div class="main-content">
+        <div class="container">
+            <div class="section" id="introduction">
+                <h2>Welcome to the Interactive Guide</h2>
+                <p>Dive into the fundamental concepts of software design with this interactive showcase. Whether you're a beginner or an experienced developer, this resource will help you understand and apply the SOLID principles and essential Design Patterns through clear explanations, practical examples, and engaging demonstrations.</p>
+                <p>Each principle and pattern is presented with both theoretical explanations and interactive examples that allow you to see the concepts in action, making complex ideas more accessible and easier to grasp.</p>
+            </div>
+
+            <div class="section" id="solid-principles">
+                <h2>SOLID Principles</h2>
+                <p>The SOLID principles are five design principles that help developers create more maintainable, understandable, and flexible software. Explore each principle through our interactive demonstrations:</p>
+                
+                <div class="card-grid">
+                    <div class="card">
+                        <div class="card-content">
+                            <h3 class="card-title">Single Responsibility Principle</h3>
+                            <p class="card-description">A class should have only one reason to change, meaning it should have only one job or responsibility.</p>
+                            <a href="./solid/01_single_responsibility/index.html" class="card-link">Learn More</a>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-content">
+                            <h3 class="card-title">Open/Closed Principle</h3>
+                            <p class="card-description">Software entities should be open for extension but closed for modification.</p>
+                            <a href="./solid/02_open_closed/index.html" class="card-link">Learn More</a>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-content">
+                            <h3 class="card-title">Liskov Substitution Principle</h3>
+                            <p class="card-description">Objects of a superclass should be replaceable with objects of subclasses without affecting the correctness of the program.</p>
+                            <a href="./solid/03_liskov_substitution/index.html" class="card-link">Learn More</a>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-content">
+                            <h3 class="card-title">Interface Segregation Principle</h3>
+                            <p class="card-description">No client should be forced to depend on methods it does not use. Many client-specific interfaces are better than one general-purpose interface.</p>
+                            <a href="./solid/04_interface_segregation/index.html" class="card-link">Learn More</a>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-content">
+                            <h3 class="card-title">Dependency Inversion Principle</h3>
+                            <p class="card-description">High-level modules should not depend on low-level modules. Both should depend on abstractions. Abstractions should not depend on details.</p>
+                            <a href="./solid/05_dependency_inversion/index.html" class="card-link">Learn More</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section" id="design-patterns">
+                <h2>Design Patterns</h2>
+                <p>Design patterns are typical solutions to common problems in software design. Each pattern is like a blueprint that you can customize to solve a particular design problem in your code.</p>
+                
+                <div class="coming-soon">
+                    <h3>Coming Soon!</h3>
+                    <p>We're currently developing interactive examples for Creational, Structural, and Behavioral design patterns. Check back soon for updates!</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="footer-content">
+            <p>&copy; 2025 Osama Zinhom. All rights reserved.</p>
+        </div>
+    </footer>
+
+</body>
+</html>

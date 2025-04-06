@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Singleton Pattern</title>
+    <style>
+        /* Modern, clean styling */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap');
+        
+        :root {
+            --primary-color: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary-color: #10b981;
+            --accent-color: #f97316;
+            --text-color: #1f2937;
+            --bg-color: #f9fafb;
+            --card-bg: #ffffff;
+            --code-bg: #f8fafc;
+            --border-color: #e2e8f0;
+            --button-hover: #4338ca;
+            --output-bg: #f1f5f9;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+            padding: 0;
+            margin: 0;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+            padding: 3rem 0;
+            text-align: center;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+        }
+
+        h2 {
+            font-size: 1.8rem;
+            margin: 2rem 0 1rem;
+            color: var(--primary-dark);
+            font-weight: 600;
+        }
+
+        h3 {
+            font-size: 1.4rem;
+            margin: 1.5rem 0 1rem;
+            color: var(--primary-dark);
+            font-weight: 600;
+        }
+
+        p {
+            margin-bottom: 1rem;
+            font-size: 1.05rem;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        pre {
+            background-color: var(--code-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 1.25rem;
+            margin: 1.5rem 0;
+            overflow-x: auto;
+            position: relative;
+        }
+
+        code {
+            font-family: 'Fira Code', Consolas, Monaco, 'Andale Mono', monospace;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            color: var(--text-color);
+        }
+
+        .code-header {
+            padding: 0.5rem 1rem;
+            background-color: #e5e7eb;
+            border-top-left-radius: 6px;
+            border-top-right-radius: 6px;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.85rem;
+            color: #4b5563;
+            border: 1px solid var(--border-color);
+            border-bottom: none;
+        }
+
+        .code-container {
+            margin: 1.5rem 0;
+        }
+
+        .code-container pre {
+            margin-top: 0;
+            border-top-left-radius: 0;
+            border-top-right-radius: 0;
+        }
+
+        .interactive-demo {
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            padding: 2rem;
+            margin: 2rem 0;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        .demo-title {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .demo-icon {
+            background-color: var(--primary-color);
+            color: white;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            margin-right: 0.75rem;
+            font-weight: bold;
+        }
+
+        .demo-controls {
+            margin-bottom: 1.5rem;
+        }
+
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 0.75rem 1.5rem;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        button:hover {
+            background-color: var(--button-hover);
+        }
+
+        button:active {
+            transform: translateY(1px);
+        }
+        
+        .btn-icon {
+            margin-right: 0.5rem;
+            font-size: 1.1rem;
+        }
+
+        .counter {
+            display: inline-block;
+            background-color: rgba(255, 255, 255, 0.3);
+            border-radius: 12px;
+            padding: 0.15rem 0.5rem;
+            font-size: 0.8rem;
+            margin-left: 0.75rem;
+        }
+
+        .output-container {
+            background-color: var(--output-bg);
+            border-radius: 6px;
+            padding: 1.5rem;
+            min-height: 100px;
+            margin-top: 1.5rem;
+            font-family: 'Fira Code', monospace;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .output-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .output-title {
+            font-weight: 600;
+            color: #4b5563;
+        }
+
+        .output-content {
+            min-height: 60px;
+            line-height: 1.6;
+        }
+
+        .highlight {
+            background-color: rgba(99, 102, 241, 0.1);
+            padding: 0.15rem 0.35rem;
+            border-radius: 4px;
+            color: var(--primary-dark);
+            font-weight: 500;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.35rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            margin-right: 0.5rem;
+        }
+        
+        .instance-id {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+
+        .instance-info {
+            display: inline-flex;
+            align-items: center;
+            margin: 0.5rem 0;
+            padding: 0.5rem 1rem;
+            background-color: white;
+            border-radius: 6px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .instance-section {
+            margin-top: 0.5rem;
+        }
+
+        .instance-title {
+            font-weight: 500;
+            margin-right: 1rem;
+            color: #4b5563;
+        }
+
+        .instance-value {
+            font-family: 'Fira Code', monospace;
+            color: var(--primary-dark);
+        }
+
+        .explanation {
+            padding: 1.5rem;
+            background-color: #fffbeb;
+            border-left: 4px solid var(--accent-color);
+            border-radius: 0 6px 6px 0;
+            margin: 1.5rem 0;
+        }
+
+        ul, ol {
+            margin-left: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 3rem;
+            padding: 2rem 0;
+            background-color: #f3f4f6;
+            color: #6b7280;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-top: 1rem;
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s ease;
+        }
+
+        .back-link:hover {
+            color: var(--primary-dark);
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Singleton Pattern</h1>
+            <p>Ensure a class has only one instance and provide a global point of access to it</p>
+        </div>
+    </header>
+
+    <div class="container">
+        <section class="card">
+            <h2>What is the Singleton Pattern?</h2>
+            <p>The Singleton Pattern is a creational design pattern that ensures a class has only one instance while providing a global point of access to this instance. It's one of the simplest design patterns and involves only a single class which is responsible for creating its own instance.</p>
+            
+            <div class="explanation">
+                <h3>When to use it:</h3>
+                <ul>
+                    <li>When exactly one instance of a class is needed throughout the application</li>
+                    <li>When the instance should be accessible at a well-known access point</li>
+                    <li>When lazy initialization or efficient resource usage is required</li>
+                </ul>
+                <h3>Common examples:</h3>
+                <ul>
+                    <li>Configuration managers</li>
+                    <li>Database connection pools</li>
+                    <li>Logger instances</li>
+                    <li>File managers</li>
+                    <li>Thread pools</li>
+                </ul>
+            </div>
+        </section>
+
+        <section class="card">
+            <h2>Implementation</h2>
+            <p>Here's how to implement the Singleton pattern in JavaScript:</p>
+            
+            <div class="code-container">
+                <div class="code-header">JavaScript ES6 Implementation</div>
+                <pre><code class="language-javascript">class Singleton {
+    constructor() {
+        // Check if an instance already exists
+        if (Singleton.instance) {
+            return Singleton.instance;
+        }
+
+        // Initialize properties
+        this.id = Math.random().toString(36).substring(2, 10);
+        this.timestamp = new Date().toISOString();
+        this.data = { counter: 0 };
+
+        // Store the instance
+        Singleton.instance = this;
+    }
+
+    // Static method to get the instance
+    static getInstance() {
+        // Create an instance if it doesn't exist yet
+        if (!Singleton.instance) {
+            Singleton.instance = new Singleton();
+        }
+        
+        return Singleton.instance;
+    }
+
+    // Instance methods
+    incrementCounter() {
+        this.data.counter += 1;
+        return this.data.counter;
+    }
+
+    getInfo() {
+        return {
+            id: this.id,
+            timestamp: this.timestamp,
+            counter: this.data.counter
+        };
+    }
+}</code></pre>
+            </div>
+
+            <h3>Alternative Implementation (Module Pattern)</h3>
+            <div class="code-container">
+                <div class="code-header">Using Closure (Module Pattern)</div>
+                <pre><code class="language-javascript">const DatabaseConnection = (function() {
+    // Private instance variable
+    let instance;
+    
+    // Private constructor function
+    function createInstance() {
+        const id = Math.random().toString(36).substring(2, 10);
+        const timestamp = new Date().toISOString();
+        
+        // The actual instance object
+        const connectionObject = {
+            id: id,
+            timestamp: timestamp,
+            connectionStatus: 'Closed',
+            
+            connect: function() {
+                this.connectionStatus = 'Open';
+                return `Connected to database with ID: ${this.id}`;
+            },
+            
+            disconnect: function() {
+                this.connectionStatus = 'Closed';
+                return 'Database connection closed';
+            },
+            
+            getStatus: function() {
+                return `Connection ${this.connectionStatus} (ID: ${this.id})`;
+            }
+        };
+        
+        return connectionObject;
+    }
+    
+    // The public API
+    return {
+        // This is the only way to get the instance
+        getInstance: function() {
+            if (!instance) {
+                instance = createInstance();
+            }
+            return instance;
+        }
+    };
+})();</code></pre>
+            </div>
+        </section>
+
+        <section class="interactive-demo">
+            <div class="demo-title">
+                <div class="demo-icon">▶</div>
+                <h2>Interactive Demo</h2>
+            </div>
+            
+            <p>This demo shows how the Singleton pattern works by creating multiple instances of the <code>Singleton</code> class. Click the buttons to see how the same instance is returned each time.</p>
+            
+            <div class="demo-controls">
+                <button id="getInstanceBtn">
+                    <span class="btn-icon">⚙️</span>
+                    Get Singleton Instance
+                    <span class="counter" id="instanceCounter">0</span>
+                </button>
+                
+                <button id="resetBtn">
+                    <span class="btn-icon">🔄</span>
+                    Reset Demo
+                </button>
+            </div>
+            
+            <div class="output-container">
+                <div class="output-header">
+                    <div class="output-title">Output Console</div>
+                </div>
+                <div class="output-content" id="output">
+                    <p>Click "Get Singleton Instance" to see the Singleton pattern in action.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="card">
+            <h2>Key Points</h2>
+            <ul>
+                <li><strong>Single Instance:</strong> A singleton class can have only one instance throughout the application lifecycle.</li>
+                <li><strong>Global Access Point:</strong> Provides a static method or property to access the singleton instance.</li>
+                <li><strong>Lazy Initialization:</strong> The instance is typically created only when it's first requested.</li>
+                <li><strong>No Parameters:</strong> The getInstance method typically requires no parameters, since it always returns the same instance.</li>
+            </ul>
+            
+            <h3>Advantages</h3>
+            <ul>
+                <li>Ensures a class has just a single instance</li>
+                <li>Provides a global access point to that instance</li>
+                <li>Protects the instance from being overwritten</li>
+                <li>Controls resource sharing efficiently</li>
+                <li>Reduces the need for global variables</li>
+            </ul>
+            
+            <h3>Disadvantages</h3>
+            <ul>
+                <li>Makes unit testing more difficult</li>
+                <li>Violates the Single Responsibility Principle (creation and business logic)</li>
+                <li>Can introduce global state issues if overused</li>
+                <li>Requires special treatment in a multithreaded environment</li>
+                <li>Can hide dependencies rather than making them explicit</li>
+            </ul>
+        </section>
+    </div>
+
+    <footer>
+        <div class="container">
+            <p>Part of the Interactive Design Patterns and SOLID Principles Showcase</p>
+            <a href="../../../index.html" class="back-link">← Back to Main Page</a>
+        </div>
+    </footer>
+
+    <script>
+        // Singleton class implementation
+        class Singleton {
+            constructor() {
+                // Check if an instance already exists
+                if (Singleton.instance) {
+                    return Singleton.instance;
+                }
+
+                // Initialize the instance
+                this.id = Math.random().toString(36).substring(2, 10);
+                this.timestamp = new Date().toISOString();
+                this.data = { counter: 0 };
+
+                // Store the instance
+                Singleton.instance = this;
+            }
+
+            // Static method to get the instance
+            static getInstance() {
+                if (!Singleton.instance) {
+                    Singleton.instance = new Singleton();
+                }
+                return Singleton.instance;
+            }
+
+            // Instance methods
+            incrementCounter() {
+                this.data.counter += 1;
+                return this.data.counter;
+            }
+
+            getInfo() {
+                return {
+                    id: this.id,
+                    timestamp: this.timestamp,
+                    counter: this.data.counter
+                };
+            }
+        }
+
+        // UI interaction code
+        document.addEventListener('DOMContentLoaded', function() {
+            const getInstanceBtn = document.getElementById('getInstanceBtn');
+            const resetBtn = document.getElementById('resetBtn');
+            const output = document.getElementById('output');
+            const instanceCounter = document.getElementById('instanceCounter');
+            
+            let clickCount = 0;
+            
+            // Function to get and display the singleton instance
+            function getSingletonInstance() {
+                clickCount++;
+                instanceCounter.textContent = clickCount;
+                
+                // Get the singleton instance
+                const instance = Singleton.getInstance();
+                instance.incrementCounter();
+                const info = instance.getInfo();
+                
+                // Clear output if it's the first click
+                if (clickCount === 1) {
+                    output.innerHTML = '';
+                }
+                
+                // Create instance info element
+                const instanceInfo = document.createElement('div');
+                instanceInfo.className = 'instance-info';
+                
+                // Set the content of the instance info
+                instanceInfo.innerHTML = `
+                    <div class="badge instance-id">Instance #${clickCount}</div>
+                    <div class="instance-section">
+                        <span class="instance-title">ID:</span>
+                        <span class="instance-value">${info.id}</span>
+                    </div>
+                    <div class="instance-section">
+                        <span class="instance-title">Counter:</span>
+                        <span class="instance-value">${info.counter}</span>
+                    </div>
+                `;
+                
+                // Add instance info to output
+                output.appendChild(instanceInfo);
+                
+                // Add a message if it's not the first click
+                if (clickCount > 1) {
+                    const message = document.createElement('p');
+                    message.innerHTML = `<strong>Note:</strong> Same instance ID as before! This demonstrates the Singleton pattern working.`;
+                    message.style.marginTop = '1rem';
+                    message.style.color = '#10b981';
+                    output.appendChild(message);
+                }
+            }
+            
+            // Function to reset the demo
+            function resetDemo() {
+                // Reset the UI
+                clickCount = 0;
+                instanceCounter.textContent = clickCount;
+                output.innerHTML = '<p>Demo reset. Click "Get Singleton Instance" to start again.</p>';
+                
+                // Reset the singleton instance
+                Singleton.instance = null;
+            }
+            
+            // Attach event listeners
+            getInstanceBtn.addEventListener('click', getSingletonInstance);
+            resetBtn.addEventListener('click', resetDemo);
+        });
+    </script>
+</body>
+</html>
