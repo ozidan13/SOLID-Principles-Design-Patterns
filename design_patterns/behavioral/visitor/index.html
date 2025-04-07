@@ -1,0 +1,1603 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visitor Pattern</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #3b82f6; /* Vibrant blue */
+            --primary-dark: #2563eb;
+            --primary-light: #60a5fa;
+            --secondary-color: #10b981; /* Green */
+            --secondary-dark: #059669;
+            --accent-color: #8b5cf6; /* Purple */
+            --accent-color-good: #059669; /* Green for good examples */
+            --accent-color-bad: #ef4444; /* Red for bad examples */
+            --text-color: #e2e8f0;
+            --text-muted: #94a3b8;
+            --bg-color: #0f172a; /* Dark blue background */
+            --bg-light: #1e293b;
+            --bg-lighter: #334155;
+            --bg-card: #1e293b;
+            --border-color: #334155;
+            --code-bg: #0f172a;
+            --code-text: #e2e8f0;
+            --heading-font: 'Poppins', sans-serif;
+            --body-font: 'Inter', sans-serif;
+            --border-radius: 8px;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2), 0 2px 4px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
+            --glow: 0 0 15px rgba(59, 130, 246, 0.5);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--body-font);
+            line-height: 1.7;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+        }
+        
+        .hero {
+            position: relative;
+            min-height: 40vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            text-align: center;
+            overflow: hidden;
+            background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
+            padding: 3rem 1rem;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2000 1500"><rect fill="%23000000" width="2000" height="1500"/><defs><circle stroke="%23222" vector-effect="non-scaling-stroke" id="a" fill="none" stroke-width="5" r="315"/></defs><g transform="translate(1000 750)"><use stroke="%233b82f6" href="%23a" transform="rotate(60 0 0) scale(0.4 0.4)"/><use stroke="%233b82f6" href="%23a" transform="rotate(120 0 0) scale(0.5 0.5)"/><use stroke="%233b82f6" href="%23a" transform="rotate(180 0 0) scale(0.6 0.6)"/><use stroke="%233b82f6" href="%23a" transform="rotate(240 0 0) scale(0.7 0.7)"/><use stroke="%233b82f6" href="%23a" transform="rotate(300 0 0) scale(0.8 0.8)"/></g></svg>');
+            background-size: cover;
+            opacity: 0.1;
+            animation: pulse 15s ease-in-out infinite alternate;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 0.1; }
+            50% { transform: scale(1.05); opacity: 0.15; }
+            100% { transform: scale(1); opacity: 0.1; }
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 10;
+            max-width: 800px;
+        }
+
+        .hero h1 {
+            font-family: var(--heading-font);
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            text-shadow: 0 0 30px rgba(59, 130, 246, 0.5);
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Shapes animation */
+        .shapes {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            overflow: hidden;
+        }
+
+        .shape {
+            position: absolute;
+            opacity: 0.2;
+            animation: float 15s infinite linear;
+        }
+
+        .shape-1 {
+            top: 20%;
+            left: 10%;
+            width: 60px;
+            height: 60px;
+            border-radius: 41% 59% 37% 63% / 44% 67% 33% 56%;
+            background-color: #10b981;
+            animation-duration: 25s;
+            box-shadow: 0 0 30px rgba(16, 185, 129, 0.4);
+        }
+
+        .shape-2 {
+            top: 60%;
+            right: 15%;
+            width: 80px;
+            height: 80px;
+            border-radius: 73% 27% 59% 41% / 57% 43% 57% 43%;
+            background-color: #8b5cf6;
+            animation-duration: 30s;
+            animation-delay: 2s;
+            box-shadow: 0 0 30px rgba(139, 92, 246, 0.4);
+        }
+
+        @keyframes float {
+            0% {
+                transform: translate(0, 0) rotate(0deg);
+            }
+            25% {
+                transform: translate(10px, 15px) rotate(90deg);
+            }
+            50% {
+                transform: translate(5px, -10px) rotate(180deg);
+            }
+            75% {
+                transform: translate(-10px, 5px) rotate(270deg);
+            }
+            100% {
+                transform: translate(0, 0) rotate(360deg);
+            }
+        }
+
+        /* Main Content */
+        .main-content {
+            position: relative;
+            margin-top: -50px;
+            padding-bottom: 4rem;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 3rem;
+            background-color: var(--bg-light);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--border-color);
+        }
+
+        /* Typography */
+        h1, h2, h3 {
+            font-family: var(--heading-font);
+            color: var(--text-color);
+        }
+
+        h2 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-top: 3rem;
+            margin-bottom: 1.5rem;
+            color: var(--primary-light);
+        }
+
+        h3 {
+            font-size: 1.4rem;
+            font-weight: 500;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        p {
+            margin-bottom: 1.5rem;
+        }
+
+        ul, ol {
+            margin-bottom: 1.5rem;
+            padding-left: 1.5rem;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        a {
+            color: var(--primary-light);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        a:hover {
+            color: var(--primary-color);
+            text-decoration: underline;
+        }
+
+        /* Code styling */
+        pre {
+            background-color: var(--code-bg);
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            overflow-x: auto;
+            margin-bottom: 1.5rem;
+            border: 1px solid var(--border-color);
+        }
+
+        code {
+            font-family: 'Fira Code', monospace;
+            color: var(--code-text);
+            font-size: 0.9rem;
+        }
+
+        /* Content sections */
+        .content-section {
+            margin-bottom: 3rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 2rem;
+        }
+
+        .content-section:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+
+        /* Pattern navigation */
+        .pattern-nav {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 3rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .pattern-nav a {
+            padding: 0.5rem 1rem;
+            background-color: var(--bg-light);
+            border-radius: var(--border-radius);
+            border: 1px solid var(--border-color);
+            transition: all 0.3s;
+        }
+
+        .pattern-nav a:hover {
+            background-color: var(--primary-color);
+            color: white;
+            text-decoration: none;
+            border-color: var(--primary-color);
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 2rem;
+            background-color: var(--bg-light);
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        /* Responsiveness */
+        @media (max-width: 768px) {
+            .container {
+                width: 95%;
+                padding: 2rem 1.5rem;
+            }
+            
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+            
+            .pattern-nav {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="hero">
+        <div class="shapes">
+            <div class="shape shape-1"></div>
+            <div class="shape shape-2"></div>
+        </div>
+        <div class="hero-content">
+            <h1>Visitor Pattern</h1>
+            <p>Define operations to be performed on elements of an object structure without changing the classes</p>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="container">
+            <section class="content-section">
+                <h2>Introduction</h2>
+                <p>The Visitor pattern is a behavioral design pattern that lets you separate algorithms from the objects on which they operate. It allows you to add new operations to existing object structures without modifying those structures.</p>
+                <p>This pattern is particularly useful when:</p>
+                <ul>
+                    <li>You need to perform operations on all elements of a complex object structure, such as an object tree.</li>
+                    <li>You want to add new operations to classes without changing their code.</li>
+                    <li>The object structure classes rarely change, but you often need to define new operations on these classes.</li>
+                    <li>Related operations are not distributed among classes defining the object structure.</li>
+                </ul>
+            </section>
+
+            <section class="content-section">
+                <h2>Pattern Structure</h2>
+                <div class="pattern-structure">
+                    <img src="../../images/visitor-pattern.svg" alt="Visitor Pattern Structure" class="pattern-diagram">
+                </div>
+                <p>The Visitor Pattern consists of the following components:</p>
+                <ul>
+                    <li><strong>Visitor Interface:</strong> Declares a visit operation for each type of concrete element in the object structure.</li>
+                    <li><strong>Concrete Visitors:</strong> Implement the visitor interface operations. Each operation implements a fragment of the algorithm for a specific element.</li>
+                    <li><strong>Element Interface:</strong> Declares an accept method that takes a visitor as an argument.</li>
+                    <li><strong>Concrete Elements:</strong> Implement the accept method that redirects the call to the appropriate visitor method.</li>
+                    <li><strong>Object Structure:</strong> A collection or complex object structure that can enumerate its elements. May provide a high-level interface to allow the visitor to visit its elements.</li>
+                </ul>
+                <p>The key to this pattern is the "double dispatch" mechanism, where the concrete element determines which visitor method to call (through the accept method), and the concrete visitor determines what action to take on that element.</p>
+            </section>
+
+            <section class="content-section">
+                <h2>Implementation Example</h2>
+                <p>In this example, we'll implement a document processing system using the Visitor pattern. The document consists of various elements like text, images, and tables. We'll create different visitors to perform operations on these elements without modifying their classes.</p>
+
+                <h3>Step 1: Define the Element Interface and Concrete Elements</h3>
+                <pre><code>// Abstract element class
+class DocumentElement {
+    constructor() {
+        if (this.constructor === DocumentElement) {
+            throw new Error("Abstract class cannot be instantiated");
+        }
+    }
+    
+    accept(visitor) {
+        throw new Error("Method 'accept' must be implemented");
+    }
+}
+
+// Concrete element: Text
+class TextElement extends DocumentElement {
+    constructor(text) {
+        super();
+        this.text = text;
+    }
+    
+    accept(visitor) {
+        return visitor.visitText(this);
+    }
+    
+    getText() {
+        return this.text;
+    }
+    
+    getLength() {
+        return this.text.length;
+    }
+}
+
+// Concrete element: Image
+class ImageElement extends DocumentElement {
+    constructor(url, width, height, altText) {
+        super();
+        this.url = url;
+        this.width = width;
+        this.height = height;
+        this.altText = altText;
+    }
+    
+    accept(visitor) {
+        return visitor.visitImage(this);
+    }
+    
+    getUrl() {
+        return this.url;
+    }
+    
+    getDimensions() {
+        return { width: this.width, height: this.height };
+    }
+    
+    getAltText() {
+        return this.altText;
+    }
+}
+
+// Concrete element: Table
+class TableElement extends DocumentElement {
+    constructor(rows) {
+        super();
+        this.rows = rows; // 2D array of cell contents
+    }
+    
+    accept(visitor) {
+        return visitor.visitTable(this);
+    }
+    
+    getRows() {
+        return this.rows;
+    }
+}</code></pre>
+
+                <h3>Step 2: Define the Document (Object Structure)</h3>
+                <pre><code>// Document class (object structure)
+class Document {
+    constructor(title) {
+        this.title = title;
+        this.elements = [];
+    }
+    
+    addElement(element) {
+        this.elements.push(element);
+    }
+    
+    removeElement(index) {
+        if (index >= 0 && index < this.elements.length) {
+            this.elements.splice(index, 1);
+        }
+    }
+    
+    accept(visitor) {
+        visitor.visitDocument(this);
+        
+        this.elements.forEach(element => {
+            element.accept(visitor);
+        });
+        
+        visitor.endVisitDocument(this);
+        return visitor.getResult();
+    }
+}</code></pre>
+
+                <h3>Step 3: Define the Visitor Interface and Concrete Visitors</h3>
+                <pre><code>// Abstract Visitor
+class DocumentVisitor {
+    constructor() {
+        if (this.constructor === DocumentVisitor) {
+            throw new Error("Abstract class cannot be instantiated");
+        }
+    }
+    
+    visitDocument(document) {}
+    visitText(textElement) {}
+    visitImage(imageElement) {}
+    visitTable(tableElement) {}
+    endVisitDocument(document) {}
+    
+    getResult() {
+        throw new Error("Method 'getResult' must be implemented");
+    }
+}
+
+// Concrete Visitor: HTML Export
+class HtmlExportVisitor extends DocumentVisitor {
+    constructor() {
+        super();
+        this.html = "";
+    }
+    
+    visitDocument(document) {
+        this.html = `<!DOCTYPE html>
+<html>
+<head>
+    <title>${document.title}</title>
+</head>
+<body>
+    <h1>${document.title}</h1>`;
+    }
+    
+    endVisitDocument(document) {
+        this.html += `\n</body>\n</html>`;
+    }
+    
+    visitText(textElement) {
+        this.html += `\n    <p>${textElement.getText()}</p>`;
+    }
+    
+    visitImage(imageElement) {
+        this.html += `\n    <img src="${imageElement.getUrl()}" width="${imageElement.getDimensions().width}" height="${imageElement.getDimensions().height}" alt="${imageElement.getAltText()}" />`;
+    }
+    
+    visitTable(tableElement) {
+        const rows = tableElement.getRows();
+        this.html += `\n    <table>`;
+        
+        rows.forEach((row, rowIndex) => {
+            this.html += `\n        <tr>`;
+            
+            row.forEach((cell, cellIndex) => {
+                // Use th for header row
+                const cellTag = rowIndex === 0 ? 'th' : 'td';
+                this.html += `\n            <${cellTag}>${cell}</${cellTag}>`;
+            });
+            
+            this.html += `\n        </tr>`;
+        });
+        
+        this.html += `\n    </table>`;
+    }
+    
+    getResult() {
+        return this.html;
+    }
+}
+
+// Concrete Visitor: Document Statistics
+class DocumentStatsVisitor extends DocumentVisitor {
+    constructor() {
+        super();
+        this.stats = {
+            textCount: 0,
+            imageCount: 0,
+            tableCount: 0,
+            wordCount: 0,
+            characterCount: 0,
+            totalCells: 0
+        };
+    }
+    
+    visitText(textElement) {
+        this.stats.textCount++;
+        this.stats.characterCount += textElement.getLength();
+        
+        // Count words
+        const words = textElement.getText().split(/\s+/).filter(word => word.length > 0);
+        this.stats.wordCount += words.length;
+    }
+    
+    visitImage(imageElement) {
+        this.stats.imageCount++;
+        // Add alt text words to word count if available
+        if (imageElement.getAltText()) {
+            const words = imageElement.getAltText().split(/\s+/).filter(word => word.length > 0);
+            this.stats.wordCount += words.length;
+            this.stats.characterCount += imageElement.getAltText().length;
+        }
+    }
+    
+    visitTable(tableElement) {
+        this.stats.tableCount++;
+        
+        const rows = tableElement.getRows();
+        let cellCount = 0;
+        let cellTextLength = 0;
+        let cellWordCount = 0;
+        
+        rows.forEach(row => {
+            row.forEach(cell => {
+                cellCount++;
+                cellTextLength += String(cell).length;
+                const words = String(cell).split(/\s+/).filter(word => word.length > 0);
+                cellWordCount += words.length;
+            });
+        });
+        
+        this.stats.totalCells += cellCount;
+        this.stats.characterCount += cellTextLength;
+        this.stats.wordCount += cellWordCount;
+    }
+    
+    getResult() {
+        return this.stats;
+    }
+}
+
+// Concrete Visitor: Spell Check
+class SpellCheckVisitor extends DocumentVisitor {
+    constructor(dictionary) {
+        super();
+        // Simplified dictionary is just an array of correctly spelled words
+        this.dictionary = dictionary;
+        this.misspelledWords = [];
+        this.currentElement = ""; // Keep track of which element we're checking
+    }
+    
+    visitDocument(document) {
+        this.currentElement = "document title";
+        this._checkSpelling(document.title);
+    }
+    
+    visitText(textElement) {
+        this.currentElement = "text";
+        this._checkSpelling(textElement.getText());
+    }
+    
+    visitImage(imageElement) {
+        this.currentElement = "image alt text";
+        this._checkSpelling(imageElement.getAltText());
+    }
+    
+    visitTable(tableElement) {
+        this.currentElement = "table";
+        const rows = tableElement.getRows();
+        
+        rows.forEach((row, rowIndex) => {
+            row.forEach((cell, colIndex) => {
+                this.currentElement = `table cell [${rowIndex},${colIndex}]`;
+                this._checkSpelling(String(cell));
+            });
+        });
+    }
+    
+    _checkSpelling(text) {
+        // Extract words, excluding punctuation
+        const words = text.split(/\s+/)
+                         .map(word => word.replace(/[^\w]/g, ''))
+                         .filter(word => word.length > 0);
+        
+        // Check each word against our dictionary
+        words.forEach(word => {
+            const normalizedWord = word.toLowerCase();
+            if (!this.dictionary.includes(normalizedWord)) {
+                this.misspelledWords.push({
+                    word: word,
+                    location: this.currentElement
+                });
+            }
+        });
+    }
+    
+    getResult() {
+        return this.misspelledWords;
+    }
+}</code></pre>
+
+                <h3>Step 4: Client Code</h3>
+                <pre><code>// Create a document
+const doc = new Document("Sample Document");
+
+// Add elements
+doc.addElement(new TextElement("This is a sample document to demonstrate the Visitor pattern."));
+doc.addElement(new ImageElement("image.jpg", 800, 600, "A sample image"));
+doc.addElement(new TableElement([
+    ["Header 1", "Header 2", "Header 3"],
+    ["Row 1, Cell 1", "Row 1, Cell 2", "Row 1, Cell 3"],
+    ["Row 2, Cell 1", "Row 2, Cell 2", "Row 2, Cell 3"]
+]));
+doc.addElement(new TextElement("The Visitor pattern allows you to add new operations to existing object structures without modifying them."));
+
+// Use visitors
+const htmlVisitor = new HtmlExportVisitor();
+const htmlOutput = doc.accept(htmlVisitor);
+console.log("HTML Output:", htmlOutput);
+
+const statsVisitor = new DocumentStatsVisitor();
+const stats = doc.accept(statsVisitor);
+console.log("Document Statistics:", stats);
+
+// Simple dictionary for spell checking
+const dictionary = [
+    "this", "is", "a", "sample", "document", "to", "demonstrate", "the", 
+    "visitor", "pattern", "image", "header", "row", "cell", "allows", 
+    "you", "add", "new", "operations", "existing", "object", "structures", 
+    "without", "modifying", "them"
+];
+const spellCheckVisitor = new SpellCheckVisitor(dictionary);
+const misspelledWords = doc.accept(spellCheckVisitor);
+console.log("Misspelled Words:", misspelledWords);</code></pre>
+
+                <h3>Pattern Analysis</h3>
+                <p>In this example, we've implemented the Visitor pattern for a document processing system:</p>
+                <ul>
+                    <li>The <strong>Element interface</strong> is represented by the <code>DocumentElement</code> abstract class.</li>
+                    <li>The <strong>Concrete Elements</strong> are <code>TextElement</code>, <code>ImageElement</code>, and <code>TableElement</code>.</li>
+                    <li>The <strong>Visitor interface</strong> is represented by the <code>DocumentVisitor</code> abstract class.</li>
+                    <li>The <strong>Concrete Visitors</strong> are <code>HtmlExportVisitor</code>, <code>DocumentStatsVisitor</code>, and <code>SpellCheckVisitor</code>.</li>
+                    <li>The <strong>Object Structure</strong> is the <code>Document</code> class.</li>
+                </ul>
+                <p>The pattern allows us to:</p>
+                <ul>
+                    <li>Add new operations (visitors) like HTML export, statistics collection, and spell checking without modifying the document elements.</li>
+                    <li>Keep related operations together in visitor classes rather than spreading them across the element classes.</li>
+                    <li>Apply operations to the entire document structure with a single method call.</li>
+                </ul>
+            </section>
+
+            <section class="content-section">
+                <h2>Interactive Demo</h2>
+                <p>Build your own document using the Visitor pattern. Add different elements to your document and then apply various visitors to see the pattern in action.</p>
+                
+                <div class="demo-container">
+                    <div class="demo-controls">
+                        <h3>Document Builder</h3>
+                        <div class="control-group">
+                            <label for="document-title">Document Title:</label>
+                            <input type="text" id="document-title" value="My Document">
+                        </div>
+                        
+                        <h4>Add Element</h4>
+                        <div class="control-tabs">
+                            <button class="tab-button active" data-tab="text-tab">Text</button>
+                            <button class="tab-button" data-tab="image-tab">Image</button>
+                            <button class="tab-button" data-tab="table-tab">Table</button>
+                        </div>
+                        
+                        <div class="tab-content active" id="text-tab">
+                            <div class="control-group">
+                                <label for="text-content">Text Content:</label>
+                                <textarea id="text-content" rows="3">Enter your text here...</textarea>
+                            </div>
+                            <button id="add-text">Add Text Element</button>
+                        </div>
+                        
+                        <div class="tab-content" id="image-tab">
+                            <div class="control-group">
+                                <label for="image-url">Image URL:</label>
+                                <input type="text" id="image-url" value="https://via.placeholder.com/300x200">
+                            </div>
+                            <div class="control-group">
+                                <label for="image-width">Width:</label>
+                                <input type="number" id="image-width" value="300">
+                            </div>
+                            <div class="control-group">
+                                <label for="image-height">Height:</label>
+                                <input type="number" id="image-height" value="200">
+                            </div>
+                            <div class="control-group">
+                                <label for="image-alt">Alt Text:</label>
+                                <input type="text" id="image-alt" value="Sample image">
+                            </div>
+                            <button id="add-image">Add Image Element</button>
+                        </div>
+                        
+                        <div class="tab-content" id="table-tab">
+                            <div class="control-group">
+                                <label for="table-rows">Rows:</label>
+                                <input type="number" id="table-rows" value="3" min="1" max="5">
+                            </div>
+                            <div class="control-group">
+                                <label for="table-cols">Columns:</label>
+                                <input type="number" id="table-cols" value="3" min="1" max="5">
+                            </div>
+                            <div class="table-builder-container">
+                                <table id="table-builder">
+                                    <!-- Will be filled dynamically -->
+                                </table>
+                            </div>
+                            <button id="add-table">Add Table Element</button>
+                        </div>
+                    </div>
+                    
+                    <div class="document-view">
+                        <h3>Document Structure</h3>
+                        <div id="document-elements">
+                            <!-- Will show the document elements -->
+                        </div>
+                        
+                        <h3>Apply Visitors</h3>
+                        <div class="visitor-buttons">
+                            <button id="apply-html">HTML Export</button>
+                            <button id="apply-stats">Document Stats</button>
+                            <button id="apply-spell">Spell Check</button>
+                        </div>
+                        
+                        <div id="visitor-result">
+                            <!-- Results will be displayed here -->
+                            <p>Apply a visitor to see results here...</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <style>
+                    .demo-container {
+                        display: grid;
+                        grid-template-columns: 1fr 1fr;
+                        gap: 20px;
+                        margin-top: 20px;
+                    }
+                    
+                    @media (max-width: 768px) {
+                        .demo-container {
+                            grid-template-columns: 1fr;
+                        }
+                    }
+                    
+                    .demo-controls, .document-view {
+                        background-color: var(--bg-lighter);
+                        border-radius: 8px;
+                        padding: 15px;
+                    }
+                    
+                    .control-group {
+                        margin-bottom: 10px;
+                    }
+                    
+                    label {
+                        display: block;
+                        margin-bottom: 5px;
+                    }
+                    
+                    input, textarea {
+                        width: 100%;
+                        padding: 8px;
+                        border-radius: 4px;
+                        border: 1px solid var(--border-color);
+                        background-color: var(--bg-color);
+                        color: var(--text-color);
+                    }
+                    
+                    .control-tabs {
+                        display: flex;
+                        margin-bottom: 10px;
+                    }
+                    
+                    .tab-button {
+                        padding: 8px 12px;
+                        border: 1px solid var(--border-color);
+                        background-color: var(--bg-light);
+                        color: var(--text-color);
+                        cursor: pointer;
+                    }
+                    
+                    .tab-button.active {
+                        background-color: var(--primary-color);
+                        color: white;
+                        border-color: var(--primary-color);
+                    }
+                    
+                    .tab-content {
+                        display: none;
+                        padding: 10px;
+                        border: 1px solid var(--border-color);
+                        border-radius: 0 4px 4px 4px;
+                        background-color: var(--bg-light);
+                    }
+                    
+                    .tab-content.active {
+                        display: block;
+                    }
+                    
+                    button {
+                        padding: 8px 12px;
+                        background-color: var(--primary-color);
+                        color: white;
+                        border: none;
+                        border-radius: 4px;
+                        cursor: pointer;
+                        margin-top: 5px;
+                    }
+                    
+                    button:hover {
+                        background-color: var(--primary-dark);
+                    }
+                    
+                    .table-builder-container {
+                        margin-top: 10px;
+                        overflow-x: auto;
+                    }
+                    
+                    #table-builder {
+                        width: 100%;
+                        border-collapse: collapse;
+                    }
+                    
+                    #table-builder td {
+                        border: 1px solid var(--border-color);
+                        padding: 8px;
+                    }
+                    
+                    #table-builder input {
+                        width: 100%;
+                        border: none;
+                        padding: 4px;
+                        background-color: transparent;
+                        color: var(--text-color);
+                    }
+                    
+                    #document-elements {
+                        margin-bottom: 20px;
+                        border: 1px solid var(--border-color);
+                        border-radius: 4px;
+                        padding: 10px;
+                        min-height: 100px;
+                        background-color: var(--bg-light);
+                    }
+                    
+                    .element-item {
+                        padding: 8px;
+                        margin-bottom: 5px;
+                        border-radius: 4px;
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                    }
+                    
+                    .element-item.text {
+                        background-color: rgba(59, 130, 246, 0.2);
+                    }
+                    
+                    .element-item.image {
+                        background-color: rgba(16, 185, 129, 0.2);
+                    }
+                    
+                    .element-item.table {
+                        background-color: rgba(139, 92, 246, 0.2);
+                    }
+                    
+                    .remove-element {
+                        background-color: #ef4444;
+                        color: white;
+                        border: none;
+                        border-radius: 4px;
+                        cursor: pointer;
+                        padding: 2px 6px;
+                        font-size: 12px;
+                    }
+                    
+                    .visitor-buttons {
+                        display: flex;
+                        gap: 10px;
+                        margin-bottom: 15px;
+                        flex-wrap: wrap;
+                    }
+                    
+                    #visitor-result {
+                        border: 1px solid var(--border-color);
+                        border-radius: 4px;
+                        padding: 10px;
+                        min-height: 200px;
+                        background-color: var(--bg-light);
+                        overflow: auto;
+                    }
+                    
+                    .html-result {
+                        font-family: monospace;
+                        white-space: pre-wrap;
+                        font-size: 12px;
+                    }
+                    
+                    .stats-result {
+                        display: grid;
+                        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+                        gap: 10px;
+                    }
+                    
+                    .stat-item {
+                        background-color: var(--bg-lighter);
+                        padding: 10px;
+                        border-radius: 4px;
+                        text-align: center;
+                    }
+                    
+                    .stat-value {
+                        font-size: 24px;
+                        font-weight: bold;
+                        color: var(--primary-color);
+                    }
+                    
+                    .stat-label {
+                        font-size: 12px;
+                        color: var(--text-muted);
+                    }
+                    
+                    .spelling-result {
+                        font-family: monospace;
+                    }
+                    
+                    .misspelled {
+                        background-color: rgba(239, 68, 68, 0.2);
+                        padding: 5px;
+                        margin: 5px 0;
+                        border-radius: 4px;
+                    }
+                </style>
+                
+                <script>
+                    document.addEventListener("DOMContentLoaded", function() {
+                        // -------------------- Classes --------------------
+                        // Abstract base class for document elements
+                        class DocumentElement {
+                            constructor() {
+                                if (this.constructor === DocumentElement) {
+                                    throw new Error("Abstract class cannot be instantiated");
+                                }
+                            }
+                            
+                            accept(visitor) {
+                                throw new Error("Method 'accept' must be implemented");
+                            }
+                        }
+
+                        // Concrete element - Text
+                        class TextElement extends DocumentElement {
+                            constructor(text) {
+                                super();
+                                this.text = text;
+                            }
+                            
+                            accept(visitor) {
+                                return visitor.visitText(this);
+                            }
+                            
+                            getText() {
+                                return this.text;
+                            }
+                            
+                            getLength() {
+                                return this.text.length;
+                            }
+                        }
+
+                        // Concrete element - Image
+                        class ImageElement extends DocumentElement {
+                            constructor(url, width, height, altText) {
+                                super();
+                                this.url = url;
+                                this.width = width;
+                                this.height = height;
+                                this.altText = altText;
+                            }
+                            
+                            accept(visitor) {
+                                return visitor.visitImage(this);
+                            }
+                            
+                            getUrl() {
+                                return this.url;
+                            }
+                            
+                            getDimensions() {
+                                return { width: this.width, height: this.height };
+                            }
+                            
+                            getAltText() {
+                                return this.altText;
+                            }
+                        }
+
+                        // Concrete element - Table
+                        class TableElement extends DocumentElement {
+                            constructor(rows) {
+                                super();
+                                this.rows = rows;
+                            }
+                            
+                            accept(visitor) {
+                                return visitor.visitTable(this);
+                            }
+                            
+                            getRows() {
+                                return this.rows;
+                            }
+                        }
+
+                        // Main document class that contains elements
+                        class Document {
+                            constructor(title) {
+                                this.title = title;
+                                this.elements = [];
+                            }
+                            
+                            addElement(element) {
+                                this.elements.push(element);
+                            }
+                            
+                            removeElement(index) {
+                                if (index >= 0 && index < this.elements.length) {
+                                    this.elements.splice(index, 1);
+                                }
+                            }
+                            
+                            accept(visitor) {
+                                visitor.visitDocument(this);
+                                
+                                this.elements.forEach(element => {
+                                    element.accept(visitor);
+                                });
+                                
+                                visitor.endVisitDocument(this);
+                                return visitor.getResult();
+                            }
+                            
+                            getElements() {
+                                return this.elements;
+                            }
+                        }
+
+                        // Abstract Visitor interface
+                        class DocumentVisitor {
+                            constructor() {
+                                if (this.constructor === DocumentVisitor) {
+                                    throw new Error("Abstract class cannot be instantiated");
+                                }
+                            }
+                            
+                            visitDocument(document) {}
+                            visitText(textElement) {}
+                            visitImage(imageElement) {}
+                            visitTable(tableElement) {}
+                            endVisitDocument(document) {}
+                            
+                            getResult() {
+                                throw new Error("Method 'getResult' must be implemented");
+                            }
+                        }
+
+                        // Concrete visitor - HTML Export
+                        class HtmlExportVisitor extends DocumentVisitor {
+                            constructor() {
+                                super();
+                                this.html = "";
+                            }
+                            
+                            visitDocument(document) {
+                                this.html = `<!DOCTYPE html>
+<html>
+<head>
+    <title>${document.title}</title>
+</head>
+<body>
+    <h1>${document.title}</h1>`;
+                            }
+                            
+                            endVisitDocument(document) {
+                                this.html += `\n</body>\n</html>`;
+                            }
+                            
+                            visitText(textElement) {
+                                this.html += `\n    <p>${textElement.getText()}</p>`;
+                            }
+                            
+                            visitImage(imageElement) {
+                                this.html += `\n    <img src="${imageElement.getUrl()}" width="${imageElement.getDimensions().width}" height="${imageElement.getDimensions().height}" alt="${imageElement.getAltText()}" />`;
+                            }
+                            
+                            visitTable(tableElement) {
+                                const rows = tableElement.getRows();
+                                this.html += `\n    <table>`;
+                                
+                                rows.forEach((row, rowIndex) => {
+                                    this.html += `\n        <tr>`;
+                                    
+                                    row.forEach((cell, cellIndex) => {
+                                        // Use th for header row
+                                        const cellTag = rowIndex === 0 ? 'th' : 'td';
+                                        this.html += `\n            <${cellTag}>${cell}</${cellTag}>`;
+                                    });
+                                    
+                                    this.html += `\n        </tr>`;
+                                });
+                                
+                                this.html += `\n    </table>`;
+                            }
+                            
+                            getResult() {
+                                return this.html;
+                            }
+                        }
+
+                        // Concrete visitor - Document Stats
+                        class DocumentStatsVisitor extends DocumentVisitor {
+                            constructor() {
+                                super();
+                                this.stats = {
+                                    textCount: 0,
+                                    imageCount: 0,
+                                    tableCount: 0,
+                                    wordCount: 0,
+                                    characterCount: 0,
+                                    totalCells: 0
+                                };
+                            }
+                            
+                            visitText(textElement) {
+                                this.stats.textCount++;
+                                this.stats.characterCount += textElement.getLength();
+                                
+                                // Count words
+                                const words = textElement.getText().split(/\s+/).filter(word => word.length > 0);
+                                this.stats.wordCount += words.length;
+                            }
+                            
+                            visitImage(imageElement) {
+                                this.stats.imageCount++;
+                                // Add alt text words to word count if available
+                                if (imageElement.getAltText()) {
+                                    const words = imageElement.getAltText().split(/\s+/).filter(word => word.length > 0);
+                                    this.stats.wordCount += words.length;
+                                    this.stats.characterCount += imageElement.getAltText().length;
+                                }
+                            }
+                            
+                            visitTable(tableElement) {
+                                this.stats.tableCount++;
+                                
+                                const rows = tableElement.getRows();
+                                let cellCount = 0;
+                                let cellTextLength = 0;
+                                let cellWordCount = 0;
+                                
+                                rows.forEach(row => {
+                                    row.forEach(cell => {
+                                        cellCount++;
+                                        cellTextLength += String(cell).length;
+                                        const words = String(cell).split(/\s+/).filter(word => word.length > 0);
+                                        cellWordCount += words.length;
+                                    });
+                                });
+                                
+                                this.stats.totalCells += cellCount;
+                                this.stats.characterCount += cellTextLength;
+                                this.stats.wordCount += cellWordCount;
+                            }
+                            
+                            getResult() {
+                                return this.stats;
+                            }
+                        }
+
+                        // Concrete visitor - Spell Check
+                        class SpellCheckVisitor extends DocumentVisitor {
+                            constructor() {
+                                super();
+                                // Simple dictionary for demo purposes
+                                this.dictionary = [
+                                    "this", "is", "a", "sample", "document", "to", "demonstrate", "the", 
+                                    "visitor", "pattern", "image", "header", "row", "cell", "allows", 
+                                    "you", "add", "new", "operations", "existing", "object", "structures", 
+                                    "without", "modifying", "them", "my", "enter", "your", "text", "here",
+                                    "sample", "placeholder", "width", "height", "alt", "url"
+                                ];
+                                this.misspelledWords = [];
+                                this.currentElement = "";
+                            }
+                            
+                            visitDocument(document) {
+                                this.currentElement = "document title";
+                                this._checkSpelling(document.title);
+                            }
+                            
+                            visitText(textElement) {
+                                this.currentElement = "text";
+                                this._checkSpelling(textElement.getText());
+                            }
+                            
+                            visitImage(imageElement) {
+                                this.currentElement = "image alt text";
+                                this._checkSpelling(imageElement.getAltText());
+                            }
+                            
+                            visitTable(tableElement) {
+                                this.currentElement = "table";
+                                const rows = tableElement.getRows();
+                                
+                                rows.forEach((row, rowIndex) => {
+                                    row.forEach((cell, colIndex) => {
+                                        this.currentElement = `table cell [${rowIndex},${colIndex}]`;
+                                        this._checkSpelling(String(cell));
+                                    });
+                                });
+                            }
+                            
+                            _checkSpelling(text) {
+                                // Extract words, excluding punctuation
+                                const words = text.split(/\s+/)
+                                    .map(word => word.replace(/[^\w]/g, ''))
+                                    .filter(word => word.length > 0);
+                                
+                                // Check each word against our dictionary
+                                words.forEach(word => {
+                                    const normalizedWord = word.toLowerCase();
+                                    if (!this.dictionary.includes(normalizedWord)) {
+                                        this.misspelledWords.push({
+                                            word: word,
+                                            location: this.currentElement
+                                        });
+                                    }
+                                });
+                            }
+                            
+                            getResult() {
+                                return this.misspelledWords;
+                            }
+                        }
+
+                        // -------------------- UI Logic -------------------- 
+                        const doc = new Document("My Document");
+                        
+                        // Tab switching
+                        document.querySelectorAll('.tab-button').forEach(button => {
+                            button.addEventListener('click', function() {
+                                // Remove active class from all tabs
+                                document.querySelectorAll('.tab-button').forEach(b => b.classList.remove('active'));
+                                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                                
+                                // Add active class to current tab
+                                this.classList.add('active');
+                                document.getElementById(this.dataset.tab).classList.add('active');
+                            });
+                        });
+                        
+                        // Update document title
+                        document.getElementById('document-title').addEventListener('input', function() {
+                            doc.title = this.value;
+                        });
+                        
+                        // Add text element
+                        document.getElementById('add-text').addEventListener('click', function() {
+                            const text = document.getElementById('text-content').value;
+                            const element = new TextElement(text);
+                            doc.addElement(element);
+                            updateDocumentView();
+                        });
+                        
+                        // Add image element
+                        document.getElementById('add-image').addEventListener('click', function() {
+                            const url = document.getElementById('image-url').value;
+                            const width = parseInt(document.getElementById('image-width').value);
+                            const height = parseInt(document.getElementById('image-height').value);
+                            const altText = document.getElementById('image-alt').value;
+                            
+                            const element = new ImageElement(url, width, height, altText);
+                            doc.addElement(element);
+                            updateDocumentView();
+                        });
+                        
+                        // Setup table builder
+                        function setupTableBuilder() {
+                            const rows = parseInt(document.getElementById('table-rows').value);
+                            const cols = parseInt(document.getElementById('table-cols').value);
+                            const tableBuilder = document.getElementById('table-builder');
+                            
+                            // Clear existing table
+                            tableBuilder.innerHTML = '';
+                            
+                            // Create table cells
+                            for (let i = 0; i < rows; i++) {
+                                const tr = document.createElement('tr');
+                                
+                                for (let j = 0; j < cols; j++) {
+                                    const td = document.createElement('td');
+                                    const input = document.createElement('input');
+                                    input.type = 'text';
+                                    input.value = i === 0 ? `Header ${j+1}` : `Cell ${i},${j}`;
+                                    input.dataset.row = i;
+                                    input.dataset.col = j;
+                                    
+                                    td.appendChild(input);
+                                    tr.appendChild(td);
+                                }
+                                
+                                tableBuilder.appendChild(tr);
+                            }
+                        }
+                        
+                        // Setup initial table
+                        setupTableBuilder();
+                        
+                        // Update table builder when rows/cols change
+                        document.getElementById('table-rows').addEventListener('change', setupTableBuilder);
+                        document.getElementById('table-cols').addEventListener('change', setupTableBuilder);
+                        
+                        // Add table element
+                        document.getElementById('add-table').addEventListener('click', function() {
+                            const rows = parseInt(document.getElementById('table-rows').value);
+                            const cols = parseInt(document.getElementById('table-cols').value);
+                            const tableData = [];
+                            
+                            // Get data from inputs
+                            for (let i = 0; i < rows; i++) {
+                                const rowData = [];
+                                
+                                for (let j = 0; j < cols; j++) {
+                                    const input = document.querySelector(`input[data-row="${i}"][data-col="${j}"]`);
+                                    rowData.push(input.value);
+                                }
+                                
+                                tableData.push(rowData);
+                            }
+                            
+                            const element = new TableElement(tableData);
+                            doc.addElement(element);
+                            updateDocumentView();
+                        });
+                        
+                        // Update document view
+                        function updateDocumentView() {
+                            const container = document.getElementById('document-elements');
+                            container.innerHTML = '';
+                            
+                            // Display document title
+                            const titleElement = document.createElement('div');
+                            titleElement.className = 'element-item';
+                            titleElement.style.backgroundColor = 'rgba(14, 165, 233, 0.2)';
+                            titleElement.textContent = `Document Title: ${doc.title}`;
+                            container.appendChild(titleElement);
+                            
+                            // Display elements
+                            doc.getElements().forEach((element, index) => {
+                                const itemElement = document.createElement('div');
+                                let content = '';
+                                let className = '';
+                                
+                                if (element instanceof TextElement) {
+                                    content = `Text: ${element.getText().substring(0, 40)}${element.getText().length > 40 ? '...' : ''}`;
+                                    className = 'text';
+                                } else if (element instanceof ImageElement) {
+                                    content = `Image: ${element.getUrl()} (${element.getDimensions().width}x${element.getDimensions().height})`;
+                                    className = 'image';
+                                } else if (element instanceof TableElement) {
+                                    const rows = element.getRows();
+                                    content = `Table: ${rows.length} rows x ${rows[0].length} columns`;
+                                    className = 'table';
+                                }
+                                
+                                itemElement.className = `element-item ${className}`;
+                                
+                                const contentSpan = document.createElement('span');
+                                contentSpan.textContent = content;
+                                
+                                const removeButton = document.createElement('button');
+                                removeButton.className = 'remove-element';
+                                removeButton.textContent = 'Remove';
+                                removeButton.addEventListener('click', function() {
+                                    doc.removeElement(index);
+                                    updateDocumentView();
+                                });
+                                
+                                itemElement.appendChild(contentSpan);
+                                itemElement.appendChild(removeButton);
+                                container.appendChild(itemElement);
+                            });
+                        }
+                        
+                        // Initial document view
+                        updateDocumentView();
+                        
+                        // Apply HTML Export visitor
+                        document.getElementById('apply-html').addEventListener('click', function() {
+                            const visitor = new HtmlExportVisitor();
+                            const result = doc.accept(visitor);
+                            
+                            const resultContainer = document.getElementById('visitor-result');
+                            resultContainer.innerHTML = '';
+                            
+                            const htmlResult = document.createElement('div');
+                            htmlResult.className = 'html-result';
+                            htmlResult.textContent = result;
+                            resultContainer.appendChild(htmlResult);
+                        });
+                        
+                        // Apply Stats visitor
+                        document.getElementById('apply-stats').addEventListener('click', function() {
+                            const visitor = new DocumentStatsVisitor();
+                            const stats = doc.accept(visitor);
+                            
+                            const resultContainer = document.getElementById('visitor-result');
+                            resultContainer.innerHTML = '';
+                            
+                            const statsResult = document.createElement('div');
+                            statsResult.className = 'stats-result';
+                            
+                            // Create stat items
+                            for (const [key, value] of Object.entries(stats)) {
+                                const statItem = document.createElement('div');
+                                statItem.className = 'stat-item';
+                                
+                                const statValue = document.createElement('div');
+                                statValue.className = 'stat-value';
+                                statValue.textContent = value;
+                                
+                                const statLabel = document.createElement('div');
+                                statLabel.className = 'stat-label';
+                                statLabel.textContent = key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
+                                
+                                statItem.appendChild(statValue);
+                                statItem.appendChild(statLabel);
+                                statsResult.appendChild(statItem);
+                            }
+                            
+                            resultContainer.appendChild(statsResult);
+                        });
+                        
+                        // Apply Spell Check visitor
+                        document.getElementById('apply-spell').addEventListener('click', function() {
+                            const visitor = new SpellCheckVisitor();
+                            const misspelledWords = doc.accept(visitor);
+                            
+                            const resultContainer = document.getElementById('visitor-result');
+                            resultContainer.innerHTML = '';
+                            
+                            const spellResult = document.createElement('div');
+                            spellResult.className = 'spelling-result';
+                            
+                            if (misspelledWords.length === 0) {
+                                spellResult.textContent = "No spelling errors found.";
+                            } else {
+                                const title = document.createElement('h4');
+                                title.textContent = `Found ${misspelledWords.length} potential spelling errors:`;
+                                spellResult.appendChild(title);
+                                
+                                misspelledWords.forEach(item => {
+                                    const wordElement = document.createElement('div');
+                                    wordElement.className = 'misspelled';
+                                    wordElement.textContent = `"${item.word}" in ${item.location}`;
+                                    spellResult.appendChild(wordElement);
+                                });
+                            }
+                            
+                            resultContainer.appendChild(spellResult);
+                        });
+                    });
+                </script>
+            </section>
+
+            <section class="content-section">
+                <h2>Benefits and Trade-offs</h2>
+                <h3>Benefits</h3>
+                <ul>
+                    <li><strong>Open/Closed Principle:</strong> You can introduce new operations that work with existing object structures without modifying their classes.</li>
+                    <li><strong>Single Responsibility Principle:</strong> Related behaviors are grouped together in visitor classes rather than scattered across the element classes.</li>
+                    <li><strong>Accumulation of State:</strong> Visitors can maintain state as they traverse the object structure, allowing for complex operations that involve multiple elements.</li>
+                    <li><strong>Clean Element Interfaces:</strong> Elements can focus on their core functionality without being burdened with every operation that might be performed on them.</li>
+                </ul>
+                
+                <h3>Trade-offs</h3>
+                <ul>
+                    <li><strong>Element Interface Violation:</strong> Visitors often need access to the concrete elements' internal data, which might violate encapsulation.</li>
+                    <li><strong>Element Hierarchy Changes:</strong> Adding new element types requires updating all existing visitors, making the pattern less flexible when element hierarchies frequently change.</li>
+                    <li><strong>Complexity:</strong> The double dispatch mechanism can be difficult to understand for developers not familiar with the pattern.</li>
+                    <li><strong>Maintenance Cost:</strong> For large object structures with many element types, the number of visitor methods can grow substantially.</li>
+                </ul>
+            </section>
+            
+            <section class="content-section">
+                <h2>When to Use</h2>
+                <p>Consider using the Visitor pattern when:</p>
+                <ul>
+                    <li>You need to perform operations on all elements of a complex object structure, such as a composite object tree.</li>
+                    <li>You need to clean up the business logic of auxiliary behaviors that aren't essential to classes in the object structure.</li>
+                    <li>The behaviors you need to add operate on classes with different interfaces.</li>
+                    <li>You expect to add new operations frequently, but the object structure rarely changes by adding new element types.</li>
+                    <li>You want to collect information about an object structure by traversing it.</li>
+                </ul>
+                
+                <p>The Visitor pattern is less appropriate when:</p>
+                <ul>
+                    <li>The object structure classes change frequently, as this would require updating all visitor classes.</li>
+                    <li>The behaviors are core to the element classes and shouldn't be extracted.</li>
+                    <li>The operations you're performing don't need to accumulate state across the entire structure.</li>
+                    <li>The business logic is simple enough that separating it into visitors adds unnecessary complexity.</li>
+                </ul>
+            </section>
+            
+            <section class="content-section">
+                <h2>Real-World Applications</h2>
+                <ul>
+                    <li><strong>Document Processing:</strong> Apply different operations (rendering, printing, validation, exporting) to document elements (text, images, tables) without modifying their classes.</li>
+                    <li><strong>Compilers and Interpreters:</strong> Perform various operations (type checking, optimization, code generation) on abstract syntax trees.</li>
+                    <li><strong>UI Framework:</strong> Apply operations like rendering, event handling, and accessibility checking to UI component hierarchies.</li>
+                    <li><strong>File System Operations:</strong> Implement operations like size calculation, permission checking, or searching across directory and file hierarchies.</li>
+                    <li><strong>Object Serialization:</strong> Convert different types of objects to XML, JSON, or other formats without adding serialization code to each class.</li>
+                    <li><strong>Static Code Analysis:</strong> Apply different checks and transformations to code syntax trees.</li>
+                </ul>
+            </section>
+            
+            <section class="content-section">
+                <h2>Related Patterns</h2>
+                <ul>
+                    <li><strong>Iterator Pattern:</strong> Both patterns traverse object structures, but Iterator manages the traversal, while Visitor defines operations.</li>
+                    <li><strong>Composite Pattern:</strong> Visitor patterns are often applied to Composite structures.</li>
+                    <li><strong>Command Pattern:</strong> Like Visitor, Command can represent operations as objects, but with different intents.</li>
+                </ul>
+            </section>
+            
+            <div class="pattern-nav">
+                <a href="../memento/index.html" class="previous">← Memento Pattern</a>
+                <a href="../../index.html">Back to Patterns</a>
+                <a href="../../creational/singleton/index.html" class="next">Singleton Pattern →</a>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>Design Patterns & SOLID Principles Showcase</p>
+    </footer>
+</body>
+</html> 

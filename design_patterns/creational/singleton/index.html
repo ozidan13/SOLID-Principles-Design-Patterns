@@ -479,7 +479,7 @@
     </section>
 
     <div class="main-content">
-        <div class="container">
+    <div class="container">
             <a href="../../../index.html" class="back-link">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M19 12H5M12 19l-7-7 7-7"/>
@@ -497,7 +497,7 @@
                 <li>To control access to a shared resource, such as a database or a file</li>
                 <li>When a single point of coordination is needed (like a registry or a manager)</li>
                 <li>To reduce resource usage when one object is sufficient</li>
-            </ul>
+                </ul>
             <p>The regular constructor call always creates a new object, so we need a mechanism to ensure only one instance exists and provide global access to it.</p>
 
             <div class="visualization">
@@ -642,11 +642,11 @@ clientCode();</code></pre>
                         Instance 1: <span id="instance-1-id">Not created yet</span><br>
                         Instance 2: <span id="instance-2-id">Not created yet</span><br>
                         Log Count: <span id="log-count">0</span>
-                    </div>
-                    
+            </div>
+            
                     <div class="logger-container" id="logger-output">
                         <!-- Log entries will appear here -->
-                    </div>
+                </div>
                 </div>
             </div>
 
@@ -657,7 +657,7 @@ clientCode();</code></pre>
                 <li>For shared resources like a configuration manager, connection pool, or cache</li>
                 <li>For coordinating actions across the system</li>
             </ul>
-
+            
             <h2>Benefits</h2>
             <ul>
                 <li>Ensures a class has only one instance</li>
@@ -674,7 +674,7 @@ clientCode();</code></pre>
                 <li><strong>Tight Coupling:</strong> Classes that use a singleton are tightly coupled to it, which can hinder extensibility.</li>
                 <li><strong>Dependency Hiding:</strong> Singletons can hide dependencies, making it harder to understand and maintain code.</li>
             </ul>
-
+            
             <h2>Real-World Uses</h2>
             <ul>
                 <li>Database connection pools</li>

@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="800" height="500" xmlns="http://www.w3.org/2000/svg">
+    <!-- Background -->
+    <rect width="800" height="500" fill="#1e293b" rx="8" ry="8"/>
+
+    <!-- Arrow marker definition -->
+    <defs>
+        <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+            <polygon points="0 0, 10 3.5, 0 7" fill="#94a3b8"/>
+        </marker>
+        <marker id="inheritance-arrowhead" markerWidth="10" markerHeight="7" refX="0" refY="3.5" orient="auto">
+            <polygon points="10 0, 0 3.5, 10 7" fill="#94a3b8"/>
+        </marker>
+    </defs>
+
+    <!-- Abstract Class -->
+    <rect x="300" y="50" width="200" height="180" fill="#334155" stroke="#3b82f6" stroke-width="2" rx="8" ry="8"/>
+    <text x="400" y="80" font-family="Arial" font-size="16" fill="#ffffff" text-anchor="middle" font-weight="bold">AbstractClass</text>
+    <line x1="300" y1="90" x2="500" y2="90" stroke="#3b82f6" stroke-width="2"/>
+    
+    <!-- Methods in Abstract Class -->
+    <text x="310" y="115" font-family="Arial" font-size="14" fill="#60a5fa">+ templateMethod()</text>
+    <line x1="310" y1="125" x2="490" y2="125" stroke="#60a5fa" stroke-width="1" stroke-dasharray="2"/>
+    <text x="310" y="145" font-family="Arial" font-size="14" fill="#60a5fa"># primitiveOperation1()</text>
+    <text x="310" y="165" font-family="Arial" font-size="14" fill="#60a5fa" font-style="italic"># primitiveOperation2()</text>
+    <text x="310" y="185" font-family="Arial" font-size="14" fill="#60a5fa">+ hookMethod()</text>
+    <text x="310" y="205" font-family="Arial" font-size="14" fill="#60a5fa">+ concreteOperation()</text>
+
+    <!-- Concrete Class A -->
+    <rect x="150" y="300" width="200" height="140" fill="#334155" stroke="#10b981" stroke-width="2" rx="8" ry="8"/>
+    <text x="250" y="330" font-family="Arial" font-size="16" fill="#ffffff" text-anchor="middle" font-weight="bold">ConcreteClassA</text>
+    <line x1="150" y1="340" x2="350" y2="340" stroke="#10b981" stroke-width="2"/>
+    
+    <!-- Methods in Concrete Class A -->
+    <text x="160" y="365" font-family="Arial" font-size="14" fill="#10b981"># primitiveOperation1()</text>
+    <text x="160" y="385" font-family="Arial" font-size="14" fill="#10b981"># primitiveOperation2()</text>
+    <text x="160" y="405" font-family="Arial" font-size="14" fill="#10b981">+ hookMethod()</text>
+
+    <!-- Concrete Class B -->
+    <rect x="450" y="300" width="200" height="140" fill="#334155" stroke="#10b981" stroke-width="2" rx="8" ry="8"/>
+    <text x="550" y="330" font-family="Arial" font-size="16" fill="#ffffff" text-anchor="middle" font-weight="bold">ConcreteClassB</text>
+    <line x1="450" y1="340" x2="650" y2="340" stroke="#10b981" stroke-width="2"/>
+    
+    <!-- Methods in Concrete Class B -->
+    <text x="460" y="365" font-family="Arial" font-size="14" fill="#10b981"># primitiveOperation1()</text>
+    <text x="460" y="385" font-family="Arial" font-size="14" fill="#10b981"># primitiveOperation2()</text>
+
+    <!-- Inheritance Arrows -->
+    <line x1="250" y1="300" x2="350" y2="230" stroke="#94a3b8" stroke-width="2" marker-start="url(#inheritance-arrowhead)"/>
+    <line x1="550" y1="300" x2="450" y2="230" stroke="#94a3b8" stroke-width="2" marker-start="url(#inheritance-arrowhead)"/>
+
+    <!-- Template Method Pseudo-code -->
+    <rect x="580" y="50" width="180" height="180" fill="#334155" stroke="#8b5cf6" stroke-width="2" rx="8" ry="8"/>
+    <text x="670" y="80" font-family="Arial" font-size="14" fill="#ffffff" text-anchor="middle" font-weight="bold">templateMethod()</text>
+    <line x1="580" y1="90" x2="760" y2="90" stroke="#8b5cf6" stroke-width="2"/>
+    
+    <!-- Pseudocode in Template Method -->
+    <text x="590" y="115" font-family="monospace" font-size="12" fill="#e2e8f0">primitiveOperation1()</text>
+    <text x="590" y="135" font-family="monospace" font-size="12" fill="#e2e8f0">primitiveOperation2()</text>
+    <text x="590" y="155" font-family="monospace" font-size="12" fill="#e2e8f0">concreteOperation()</text>
+    <text x="590" y="175" font-family="monospace" font-size="12" fill="#e2e8f0">if (hookMethod())</text>
+    <text x="590" y="195" font-family="monospace" font-size="12" fill="#e2e8f0">  doSomething()</text>
+
+    <!-- Connection between Template Method and Class -->
+    <line x1="500" y1="140" x2="580" y2="140" stroke="#8b5cf6" stroke-width="2" marker-end="url(#arrowhead)" stroke-dasharray="5,5"/>
+
+    <!-- Legend -->
+    <rect x="50" y="50" width="180" height="110" fill="#334155" stroke="#60a5fa" stroke-width="1" rx="8" ry="8"/>
+    <text x="140" y="80" font-family="Arial" font-size="14" fill="#ffffff" text-anchor="middle" font-weight="bold">Legend</text>
+    <line x1="50" y1="90" x2="230" y2="90" stroke="#60a5fa" stroke-width="1"/>
+    
+    <rect x="60" y="110" width="12" height="12" fill="none" stroke="#60a5fa" stroke-width="1"/>
+    <text x="80" y="120" font-family="Arial" font-size="12" fill="#60a5fa">Abstract Method</text>
+    
+    <rect x="60" y="130" width="12" height="12" fill="none" stroke="#10b981" stroke-width="1"/>
+    <text x="80" y="140" font-family="Arial" font-size="12" fill="#10b981">Concrete Method</text>
+    
+    <!-- Notes -->
+    <rect x="40" y="425" width="720" height="60" fill="#334155" stroke="#60a5fa" stroke-width="1" rx="8" ry="8" stroke-dasharray="5,5"/>
+    <text x="400" y="455" font-family="Arial" font-size="14" fill="#ffffff" text-anchor="middle" font-style="italic">
+        Template Method defines the skeleton of an algorithm, delegating some steps to subclasses.
+        Subclasses redefine certain steps without changing the algorithm's structure.
+    </text>
+</svg> 

@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="800" height="500" xmlns="http://www.w3.org/2000/svg">
+    <!-- Background -->
+    <rect width="800" height="500" fill="#1e293b" rx="8" ry="8"/>
+
+    <!-- Arrow marker definition -->
+    <defs>
+        <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+            <polygon points="0 0, 10 3.5, 0 7" fill="#94a3b8"/>
+        </marker>
+        <marker id="relationship-arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+            <polygon points="0 0, 10 3.5, 0 7" fill="#10b981"/>
+        </marker>
+        <marker id="inheritance-arrowhead" markerWidth="10" markerHeight="7" refX="0" refY="3.5" orient="auto">
+            <polygon points="10 0, 0 3.5, 10 7" fill="#94a3b8"/>
+        </marker>
+    </defs>
+
+    <!-- Handler Interface -->
+    <rect x="300" y="50" width="200" height="120" fill="#334155" stroke="#3b82f6" stroke-width="2" rx="8" ry="8"/>
+    <text x="400" y="80" font-family="Arial" font-size="16" fill="#ffffff" text-anchor="middle" font-weight="bold">«interface»</text>
+    <text x="400" y="100" font-family="Arial" font-size="16" fill="#ffffff" text-anchor="middle" font-weight="bold">Handler</text>
+    <line x1="300" y1="110" x2="500" y2="110" stroke="#3b82f6" stroke-width="2"/>
+    
+    <!-- Methods in Handler Interface -->
+    <text x="320" y="135" font-family="Arial" font-size="14" fill="#60a5fa">+ setNext(h: Handler): Handler</text>
+    <text x="320" y="155" font-family="Arial" font-size="14" fill="#60a5fa">+ handle(request): void</text>
+
+    <!-- BaseHandler Class -->
+    <rect x="300" y="200" width="200" height="120" fill="#334155" stroke="#10b981" stroke-width="2" rx="8" ry="8"/>
+    <text x="400" y="230" font-family="Arial" font-size="16" fill="#ffffff" text-anchor="middle" font-weight="bold">BaseHandler</text>
+    <line x1="300" y1="240" x2="500" y2="240" stroke="#10b981" stroke-width="2"/>
+    
+    <!-- Fields and Methods in BaseHandler -->
+    <text x="320" y="265" font-family="Arial" font-size="14" fill="#10b981">- next: Handler</text>
+    <line x1="320" y1="275" x2="480" y2="275" stroke="#10b981" stroke-width="1" stroke-dasharray="2"/>
+    <text x="320" y="295" font-family="Arial" font-size="14" fill="#10b981">+ setNext(h: Handler): Handler</text>
+    <text x="320" y="315" font-family="Arial" font-size="14" fill="#10b981">+ handle(request): void</text>
+
+    <!-- ConcreteHandler1 -->
+    <rect x="100" y="350" width="180" height="100" fill="#334155" stroke="#10b981" stroke-width="2" rx="8" ry="8"/>
+    <text x="190" y="380" font-family="Arial" font-size="16" fill="#ffffff" text-anchor="middle" font-weight="bold">ConcreteHandler1</text>
+    <line x1="100" y1="390" x2="280" y2="390" stroke="#10b981" stroke-width="2"/>
+    
+    <!-- Methods in ConcreteHandler1 -->
+    <text x="120" y="415" font-family="Arial" font-size="14" fill="#10b981">+ handle(request): void</text>
+
+    <!-- ConcreteHandler2 -->
+    <rect x="310" y="350" width="180" height="100" fill="#334155" stroke="#10b981" stroke-width="2" rx="8" ry="8"/>
+    <text x="400" y="380" font-family="Arial" font-size="16" fill="#ffffff" text-anchor="middle" font-weight="bold">ConcreteHandler2</text>
+    <line x1="310" y1="390" x2="490" y2="390" stroke="#10b981" stroke-width="2"/>
+    
+    <!-- Methods in ConcreteHandler2 -->
+    <text x="330" y="415" font-family="Arial" font-size="14" fill="#10b981">+ handle(request): void</text>
+
+    <!-- ConcreteHandler3 -->
+    <rect x="520" y="350" width="180" height="100" fill="#334155" stroke="#10b981" stroke-width="2" rx="8" ry="8"/>
+    <text x="610" y="380" font-family="Arial" font-size="16" fill="#ffffff" text-anchor="middle" font-weight="bold">ConcreteHandler3</text>
+    <line x1="520" y1="390" x2="700" y2="390" stroke="#10b981" stroke-width="2"/>
+    
+    <!-- Methods in ConcreteHandler3 -->
+    <text x="540" y="415" font-family="Arial" font-size="14" fill="#10b981">+ handle(request): void</text>
+
+    <!-- Implementation arrows -->
+    <line x1="400" y1="200" x2="400" y2="170" stroke="#94a3b8" stroke-width="2" marker-start="url(#inheritance-arrowhead)"/>
+    <line x1="190" y1="350" x2="360" y2="320" stroke="#94a3b8" stroke-width="2" marker-start="url(#inheritance-arrowhead)"/>
+    <line x1="400" y1="350" x2="400" y2="320" stroke="#94a3b8" stroke-width="2" marker-start="url(#inheritance-arrowhead)"/>
+    <line x1="610" y1="350" x2="440" y2="320" stroke="#94a3b8" stroke-width="2" marker-start="url(#inheritance-arrowhead)"/>
+    
+    <!-- Chain relationship arrows -->
+    <line x1="280" y1="400" x2="310" y2="400" stroke="#10b981" stroke-width="2" marker-end="url(#relationship-arrowhead)"/>
+    <line x1="490" y1="400" x2="520" y2="400" stroke="#10b981" stroke-width="2" marker-end="url(#relationship-arrowhead)"/>
+    
+    <!-- Client -->
+    <rect x="50" y="200" width="150" height="60" fill="#334155" stroke="#8b5cf6" stroke-width="2" rx="8" ry="8"/>
+    <text x="125" y="235" font-family="Arial" font-size="16" fill="#ffffff" text-anchor="middle" font-weight="bold">Client</text>
+    
+    <!-- Client relationship -->
+    <line x1="125" y1="260" x2="125" y2="350" stroke="#8b5cf6" stroke-width="2" marker-end="url(#arrowhead)" stroke-dasharray="5,5"/>
+    <line x1="150" y1="230" x2="300" y2="230" stroke="#8b5cf6" stroke-width="2" marker-end="url(#arrowhead)" stroke-dasharray="5,5"/>
+    
+    <!-- Request flow -->
+    <path d="M 70,270 Q 50,320 70,350 Q 90,380 100,400" fill="none" stroke="#ef4444" stroke-width="2" stroke-dasharray="5,5" marker-end="url(#arrowhead)"/>
+    <text x="40" y="330" font-family="Arial" font-size="12" fill="#ef4444" text-anchor="middle">request</text>
+    
+    <!-- Main explanation -->
+    <rect x="80" y="460" width="640" height="30" fill="#334155" stroke="#60a5fa" stroke-width="1" rx="8" ry="8" fill-opacity="0.3"/>
+    <text x="400" y="480" font-family="Arial" font-size="14" fill="#ffffff" text-anchor="middle" font-style="italic">
+        The Chain of Responsibility pattern passes a request along a chain of handlers until one handles it
+    </text>
+</svg> 

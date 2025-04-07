@@ -1,0 +1,135 @@
+<svg width="1000" height="720" xmlns="http://www.w3.org/2000/svg">
+    <!-- Background -->
+    <rect width="1000" height="720" fill="#0f172a" />
+    
+    <!-- Arrow marker definitions -->
+    <defs>
+        <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+            <polygon points="0 0, 10 3.5, 0 7" fill="#3b82f6" />
+        </marker>
+        <marker id="arrowhead-red" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+            <polygon points="0 0, 10 3.5, 0 7" fill="#ef4444" />
+        </marker>
+        <marker id="arrowhead-green" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+            <polygon points="0 0, 10 3.5, 0 7" fill="#10b981" />
+        </marker>
+    </defs>
+    
+    <!-- Title -->
+    <text x="500" y="50" fill="#3b82f6" font-family="Arial" font-size="32" text-anchor="middle" font-weight="bold">Visitor Pattern</text>
+    
+    <!-- Classes -->
+    <!-- Visitor -->
+    <rect x="150" y="100" width="250" height="130" rx="5" fill="#1e293b" stroke="#3b82f6" stroke-width="2" />
+    <line x1="150" y1="140" x2="400" y2="140" stroke="#3b82f6" stroke-width="2" />
+    <line x1="150" y1="180" x2="400" y2="180" stroke="#3b82f6" stroke-width="1" />
+    <text x="275" y="125" fill="#3b82f6" font-family="Arial" font-size="18" text-anchor="middle" font-weight="bold">«interface»</text>
+    <text x="275" y="150" fill="#e2e8f0" font-family="Arial" font-size="18" text-anchor="middle" font-weight="bold">Visitor</text>
+    <text x="160" y="200" fill="#e2e8f0" font-family="Arial" font-size="14">+ visitConcreteElementA(elementA)</text>
+    <text x="160" y="220" fill="#e2e8f0" font-family="Arial" font-size="14">+ visitConcreteElementB(elementB)</text>
+
+    <!-- Concrete Visitor 1 -->
+    <rect x="50" y="300" width="200" height="120" rx="5" fill="#1e293b" stroke="#3b82f6" stroke-width="2" />
+    <line x1="50" y1="330" x2="250" y2="330" stroke="#3b82f6" stroke-width="2" />
+    <line x1="50" y1="370" x2="250" y2="370" stroke="#3b82f6" stroke-width="1" />
+    <text x="150" y="320" fill="#e2e8f0" font-family="Arial" font-size="16" text-anchor="middle" font-weight="bold">ConcreteVisitor1</text>
+    <text x="60" y="390" fill="#e2e8f0" font-family="Arial" font-size="14">+ visitConcreteElementA()</text>
+    <text x="60" y="410" fill="#e2e8f0" font-family="Arial" font-size="14">+ visitConcreteElementB()</text>
+
+    <!-- Concrete Visitor 2 -->
+    <rect x="300" y="300" width="200" height="120" rx="5" fill="#1e293b" stroke="#3b82f6" stroke-width="2" />
+    <line x1="300" y1="330" x2="500" y2="330" stroke="#3b82f6" stroke-width="2" />
+    <line x1="300" y1="370" x2="500" y2="370" stroke="#3b82f6" stroke-width="1" />
+    <text x="400" y="320" fill="#e2e8f0" font-family="Arial" font-size="16" text-anchor="middle" font-weight="bold">ConcreteVisitor2</text>
+    <text x="310" y="390" fill="#e2e8f0" font-family="Arial" font-size="14">+ visitConcreteElementA()</text>
+    <text x="310" y="410" fill="#e2e8f0" font-family="Arial" font-size="14">+ visitConcreteElementB()</text>
+
+    <!-- Element -->
+    <rect x="600" y="100" width="250" height="120" rx="5" fill="#1e293b" stroke="#10b981" stroke-width="2" />
+    <line x1="600" y1="140" x2="850" y2="140" stroke="#10b981" stroke-width="2" />
+    <line x1="600" y1="180" x2="850" y2="180" stroke="#10b981" stroke-width="1" />
+    <text x="725" y="125" fill="#10b981" font-family="Arial" font-size="18" text-anchor="middle" font-weight="bold">«interface»</text>
+    <text x="725" y="150" fill="#e2e8f0" font-family="Arial" font-size="18" text-anchor="middle" font-weight="bold">Element</text>
+    <text x="610" y="200" fill="#e2e8f0" font-family="Arial" font-size="14">+ accept(visitor: Visitor)</text>
+
+    <!-- Concrete Element A -->
+    <rect x="550" y="300" width="200" height="120" rx="5" fill="#1e293b" stroke="#10b981" stroke-width="2" />
+    <line x1="550" y1="330" x2="750" y2="330" stroke="#10b981" stroke-width="2" />
+    <line x1="550" y1="370" x2="750" y2="370" stroke="#10b981" stroke-width="1" />
+    <text x="650" y="320" fill="#e2e8f0" font-family="Arial" font-size="16" text-anchor="middle" font-weight="bold">ConcreteElementA</text>
+    <text x="560" y="390" fill="#e2e8f0" font-family="Arial" font-size="14">+ accept(visitor: Visitor)</text>
+    <text x="560" y="410" fill="#e2e8f0" font-family="Arial" font-size="14">+ operationA()</text>
+
+    <!-- Concrete Element B -->
+    <rect x="800" y="300" width="200" height="120" rx="5" fill="#1e293b" stroke="#10b981" stroke-width="2" />
+    <line x1="800" y1="330" x2="1000" y2="330" stroke="#10b981" stroke-width="2" />
+    <line x1="800" y1="370" x2="1000" y2="370" stroke="#10b981" stroke-width="1" />
+    <text x="900" y="320" fill="#e2e8f0" font-family="Arial" font-size="16" text-anchor="middle" font-weight="bold">ConcreteElementB</text>
+    <text x="810" y="390" fill="#e2e8f0" font-family="Arial" font-size="14">+ accept(visitor: Visitor)</text>
+    <text x="810" y="410" fill="#e2e8f0" font-family="Arial" font-size="14">+ operationB()</text>
+
+    <!-- Object Structure -->
+    <rect x="600" y="480" width="250" height="100" rx="5" fill="#1e293b" stroke="#8b5cf6" stroke-width="2" />
+    <line x1="600" y1="520" x2="850" y2="520" stroke="#8b5cf6" stroke-width="2" />
+    <text x="725" y="505" fill="#e2e8f0" font-family="Arial" font-size="16" text-anchor="middle" font-weight="bold">ObjectStructure</text>
+    <text x="610" y="545" fill="#e2e8f0" font-family="Arial" font-size="14">+ getElements()</text>
+    <text x="610" y="565" fill="#e2e8f0" font-family="Arial" font-size="14">+ addElement(element)</text>
+
+    <!-- Client -->
+    <rect x="200" y="480" width="150" height="60" rx="5" fill="#1e293b" stroke="#ef4444" stroke-width="2" />
+    <line x1="200" y1="520" x2="350" y2="520" stroke="#ef4444" stroke-width="2" />
+    <text x="275" y="505" fill="#e2e8f0" font-family="Arial" font-size="16" text-anchor="middle" font-weight="bold">Client</text>
+
+    <!-- Inheritance Arrows -->
+    <line x1="150" y1="300" x2="275" y2="230" stroke="#3b82f6" stroke-width="1.5" marker-end="url(#arrowhead)" />
+    <line x1="400" y1="300" x2="275" y2="230" stroke="#3b82f6" stroke-width="1.5" marker-end="url(#arrowhead)" />
+    <line x1="650" y1="300" x2="725" y2="220" stroke="#10b981" stroke-width="1.5" marker-end="url(#arrowhead-green)" />
+    <line x1="900" y1="300" x2="725" y2="220" stroke="#10b981" stroke-width="1.5" marker-end="url(#arrowhead-green)" />
+
+    <!-- Relationship Arrows -->
+    <line x1="275" y1="510" x2="400" y2="510" stroke="#ef4444" stroke-width="1.5" marker-end="url(#arrowhead-red)" />
+    <text x="350" y="500" fill="#ef4444" font-family="Arial" font-size="14">creates</text>
+    
+    <line x1="275" y1="480" x2="275" y2="440" stroke="#ef4444" stroke-width="1.5" marker-end="url(#arrowhead-red)" />
+    <text x="290" y="460" fill="#ef4444" font-family="Arial" font-size="14">creates</text>
+    
+    <line x1="350" y1="510" x2="600" y2="510" stroke="#ef4444" stroke-width="1.5" marker-end="url(#arrowhead-red)" />
+    <text x="475" y="500" fill="#ef4444" font-family="Arial" font-size="14">uses</text>
+    
+    <line x1="725" y1="480" x2="725" y2="440" stroke="#8b5cf6" stroke-width="1.5" marker-end="url(#arrowhead)" stroke-dasharray="5,5" />
+    <text x="750" y="460" fill="#8b5cf6" font-family="Arial" font-size="14">contains</text>
+
+    <!-- Double Dispatch Flow -->
+    <!-- Implementation Code Examples -->
+    <rect x="50" y="585" width="900" height="115" rx="5" fill="#1e293b" stroke="#3b82f6" stroke-width="1" />
+
+    <!-- Example 1: Element's accept() method -->
+    <text x="70" y="605" fill="#10b981" font-family="Consolas, monospace" font-size="12" font-weight="bold">// ConcreteElementA</text>
+    <text x="70" y="625" fill="#e2e8f0" font-family="Consolas, monospace" font-size="12">accept(visitor) {</text>
+    <text x="95" y="645" fill="#3b82f6" font-family="Consolas, monospace" font-size="12">visitor.visitConcreteElementA(this);</text>
+    <text x="70" y="665" fill="#e2e8f0" font-family="Consolas, monospace" font-size="12">}</text>
+
+    <!-- Example 2: Double Dispatch -->
+    <text x="350" y="605" fill="#10b981" font-family="Consolas, monospace" font-size="12" font-weight="bold">// Client code</text>
+    <text x="350" y="625" fill="#e2e8f0" font-family="Consolas, monospace" font-size="12">for (const element of objectStructure.getElements()) {</text>
+    <text x="375" y="645" fill="#3b82f6" font-family="Consolas, monospace" font-size="12">element.accept(visitor);</text>
+    <text x="350" y="665" fill="#e2e8f0" font-family="Consolas, monospace" font-size="12">}</text>
+
+    <!-- Example 3: Visitor Implementation -->
+    <text x="630" y="605" fill="#10b981" font-family="Consolas, monospace" font-size="12" font-weight="bold">// ConcreteVisitor1</text>
+    <text x="630" y="625" fill="#e2e8f0" font-family="Consolas, monospace" font-size="12">visitConcreteElementA(elementA) {</text>
+    <text x="655" y="645" fill="#3b82f6" font-family="Consolas, monospace" font-size="12">elementA.operationA();</text>
+    <text x="655" y="665" fill="#3b82f6" font-family="Consolas, monospace" font-size="12">// Visitor-specific processing for Element A</text>
+    <text x="630" y="685" fill="#e2e8f0" font-family="Consolas, monospace" font-size="12">}</text>
+
+    <!-- Flow explanation -->
+    <path d="M220,645 Q270,645 300,625 Q330,605 360,625" stroke="#ef4444" stroke-width="1.5" fill="none" marker-end="url(#arrowhead-red)" />
+    <path d="M550,645 Q575,645 600,625" stroke="#ef4444" stroke-width="1.5" fill="none" marker-end="url(#arrowhead-red)" />
+    
+    <!-- Explanation text -->
+    <text x="260" y="615" fill="#e2e8f0" font-family="Arial" font-size="10" text-anchor="middle">1. Double</text>
+    <text x="260" y="630" fill="#e2e8f0" font-family="Arial" font-size="10" text-anchor="middle">Dispatch</text>
+    
+    <text x="575" y="615" fill="#e2e8f0" font-family="Arial" font-size="10" text-anchor="middle">2. Visitor</text>
+    <text x="575" y="630" fill="#e2e8f0" font-family="Arial" font-size="10" text-anchor="middle">Execute</text>
+</svg> 
