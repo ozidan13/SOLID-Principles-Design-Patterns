@@ -483,44 +483,32 @@ class HtmlExportVisitor extends DocumentVisitor {
     }
     
     visitDocument(document) {
-        this.html = `<!DOCTYPE html>
-<html>
-<head>
-    <title>${document.title}</title>
-</head>
-<body>
-    <h1>${document.title}</h1>`;
-    }
-    
-    endVisitDocument(document) {
-        this.html += `\n</body>\n</html>`;
+        this.html = `<h1>${document.title}</h1>\n`;
     }
     
     visitText(textElement) {
-        this.html += `\n    <p>${textElement.getText()}</p>`;
+        this.html += `<p>${textElement.getText()}</p>\n`;
     }
     
     visitImage(imageElement) {
-        this.html += `\n    <img src="${imageElement.getUrl()}" width="${imageElement.getDimensions().width}" height="${imageElement.getDimensions().height}" alt="${imageElement.getAltText()}" />`;
+        const { width, height } = imageElement.getDimensions();
+        this.html += `<img src="${imageElement.getUrl()}" width="${width}" height="${height}" alt="${imageElement.getAltText()}">\n`;
     }
     
     visitTable(tableElement) {
-        const rows = tableElement.getRows();
-        this.html += `\n    <table>`;
+        this.html += "<table>\n";
         
-        rows.forEach((row, rowIndex) => {
-            this.html += `\n        <tr>`;
+        tableElement.getRows().forEach(row => {
+            this.html += "  <tr>\n";
             
-            row.forEach((cell, cellIndex) => {
-                // Use th for header row
-                const cellTag = rowIndex === 0 ? 'th' : 'td';
-                this.html += `\n            <${cellTag}>${cell}</${cellTag}>`;
+            row.forEach(cell => {
+                this.html += `    <td>${cell}</td>\n`;
             });
             
-            this.html += `\n        </tr>`;
+            this.html += "  </tr>\n";
         });
         
-        this.html += `\n    </table>`;
+        this.html += "</table>\n";
     }
     
     getResult() {
@@ -590,10 +578,16 @@ class DocumentStatsVisitor extends DocumentVisitor {
 
 // Concrete Visitor: Spell Check
 class SpellCheckVisitor extends DocumentVisitor {
-    constructor(dictionary) {
+    constructor() {
         super();
         // Simplified dictionary is just an array of correctly spelled words
-        this.dictionary = dictionary;
+        this.dictionary = [
+            "this", "is", "a", "sample", "document", "to", "demonstrate", "the", 
+            "visitor", "pattern", "image", "header", "row", "cell", "allows", 
+            "you", "add", "new", "operations", "existing", "object", "structures", 
+            "without", "modifying", "them", "my", "document", "enter", "your", "text", 
+            "here", "no", "spelling", "errors", "found"
+        ];
         this.misspelledWords = [];
         this.currentElement = ""; // Keep track of which element we're checking
     }
@@ -628,8 +622,8 @@ class SpellCheckVisitor extends DocumentVisitor {
     _checkSpelling(text) {
         // Extract words, excluding punctuation
         const words = text.split(/\s+/)
-                         .map(word => word.replace(/[^\w]/g, ''))
-                         .filter(word => word.length > 0);
+                     .map(word => word.replace(/[^\w]/g, ''))
+                     .filter(word => word.length > 0);
         
         // Check each word against our dictionary
         words.forEach(word => {
@@ -646,7 +640,7 @@ class SpellCheckVisitor extends DocumentVisitor {
     getResult() {
         return this.misspelledWords;
     }
-}</code></pre>
+}
 
                 <h3>Step 4: Client Code</h3>
                 <pre><code>// Create a document
@@ -671,14 +665,8 @@ const statsVisitor = new DocumentStatsVisitor();
 const stats = doc.accept(statsVisitor);
 console.log("Document Statistics:", stats);
 
-// Simple dictionary for spell checking
-const dictionary = [
-    "this", "is", "a", "sample", "document", "to", "demonstrate", "the", 
-    "visitor", "pattern", "image", "header", "row", "cell", "allows", 
-    "you", "add", "new", "operations", "existing", "object", "structures", 
-    "without", "modifying", "them"
-];
-const spellCheckVisitor = new SpellCheckVisitor(dictionary);
+// Use spell checker with built-in dictionary
+const spellCheckVisitor = new SpellCheckVisitor();
 const misspelledWords = doc.accept(spellCheckVisitor);
 console.log("Misspelled Words:", misspelledWords);</code></pre>
 
@@ -989,30 +977,25 @@ console.log("Misspelled Words:", misspelledWords);</code></pre>
                 </style>
                 
                 <script>
-                    document.addEventListener("DOMContentLoaded", function() {
-                        // -------------------- Classes --------------------
-                        // Abstract base class for document elements
+                    document.addEventListener('DOMContentLoaded', function() {
+                        // Abstract class for document elements
                         class DocumentElement {
                             constructor() {
                                 if (this.constructor === DocumentElement) {
-                                    throw new Error("Abstract class cannot be instantiated");
+                                    throw new Error("Abstract class cannot be instantiated.");
                                 }
                             }
                             
                             accept(visitor) {
-                                throw new Error("Method 'accept' must be implemented");
+                                throw new Error("Method 'accept' must be implemented.");
                             }
                         }
-
-                        // Concrete element - Text
+                        
+                        // Concrete elements
                         class TextElement extends DocumentElement {
                             constructor(text) {
                                 super();
                                 this.text = text;
-                            }
-                            
-                            accept(visitor) {
-                                return visitor.visitText(this);
                             }
                             
                             getText() {
@@ -1022,20 +1005,19 @@ console.log("Misspelled Words:", misspelledWords);</code></pre>
                             getLength() {
                                 return this.text.length;
                             }
+                            
+                            accept(visitor) {
+                                return visitor.visitText(this);
+                            }
                         }
-
-                        // Concrete element - Image
+                        
                         class ImageElement extends DocumentElement {
                             constructor(url, width, height, altText) {
                                 super();
                                 this.url = url;
                                 this.width = width;
                                 this.height = height;
-                                this.altText = altText;
-                            }
-                            
-                            accept(visitor) {
-                                return visitor.visitImage(this);
+                                this.altText = altText || "";
                             }
                             
                             getUrl() {
@@ -1049,25 +1031,28 @@ console.log("Misspelled Words:", misspelledWords);</code></pre>
                             getAltText() {
                                 return this.altText;
                             }
+                            
+                            accept(visitor) {
+                                return visitor.visitImage(this);
+                            }
                         }
-
-                        // Concrete element - Table
+                        
                         class TableElement extends DocumentElement {
                             constructor(rows) {
                                 super();
                                 this.rows = rows;
                             }
                             
-                            accept(visitor) {
-                                return visitor.visitTable(this);
-                            }
-                            
                             getRows() {
                                 return this.rows;
                             }
+                            
+                            accept(visitor) {
+                                return visitor.visitTable(this);
+                            }
                         }
-
-                        // Main document class that contains elements
+                        
+                        // Document class
                         class Document {
                             constructor(title) {
                                 this.title = title;
@@ -1084,27 +1069,22 @@ console.log("Misspelled Words:", misspelledWords);</code></pre>
                                 }
                             }
                             
-                            accept(visitor) {
-                                visitor.visitDocument(this);
-                                
-                                this.elements.forEach(element => {
-                                    element.accept(visitor);
-                                });
-                                
-                                visitor.endVisitDocument(this);
-                                return visitor.getResult();
-                            }
-                            
                             getElements() {
                                 return this.elements;
                             }
+                            
+                            accept(visitor) {
+                                visitor.visitDocument(this);
+                                this.elements.forEach(element => element.accept(visitor));
+                                return visitor.getResult();
+                            }
                         }
-
-                        // Abstract Visitor interface
+                        
+                        // Abstract visitor class
                         class DocumentVisitor {
                             constructor() {
                                 if (this.constructor === DocumentVisitor) {
-                                    throw new Error("Abstract class cannot be instantiated");
+                                    throw new Error("Abstract class cannot be instantiated.");
                                 }
                             }
                             
@@ -1112,14 +1092,13 @@ console.log("Misspelled Words:", misspelledWords);</code></pre>
                             visitText(textElement) {}
                             visitImage(imageElement) {}
                             visitTable(tableElement) {}
-                            endVisitDocument(document) {}
                             
                             getResult() {
-                                throw new Error("Method 'getResult' must be implemented");
+                                throw new Error("Method 'getResult' must be implemented.");
                             }
                         }
-
-                        // Concrete visitor - HTML Export
+                        
+                        // Concrete Visitor: HTML Export
                         class HtmlExportVisitor extends DocumentVisitor {
                             constructor() {
                                 super();
@@ -1127,52 +1106,40 @@ console.log("Misspelled Words:", misspelledWords);</code></pre>
                             }
                             
                             visitDocument(document) {
-                                this.html = `<!DOCTYPE html>
-<html>
-<head>
-    <title>${document.title}</title>
-</head>
-<body>
-    <h1>${document.title}</h1>`;
-                            }
-                            
-                            endVisitDocument(document) {
-                                this.html += `\n</body>\n</html>`;
+                                this.html = `<h1>${document.title}</h1>\n`;
                             }
                             
                             visitText(textElement) {
-                                this.html += `\n    <p>${textElement.getText()}</p>`;
+                                this.html += `<p>${textElement.getText()}</p>\n`;
                             }
                             
                             visitImage(imageElement) {
-                                this.html += `\n    <img src="${imageElement.getUrl()}" width="${imageElement.getDimensions().width}" height="${imageElement.getDimensions().height}" alt="${imageElement.getAltText()}" />`;
+                                const { width, height } = imageElement.getDimensions();
+                                this.html += `<img src="${imageElement.getUrl()}" width="${width}" height="${height}" alt="${imageElement.getAltText()}">\n`;
                             }
                             
                             visitTable(tableElement) {
-                                const rows = tableElement.getRows();
-                                this.html += `\n    <table>`;
+                                this.html += "<table>\n";
                                 
-                                rows.forEach((row, rowIndex) => {
-                                    this.html += `\n        <tr>`;
+                                tableElement.getRows().forEach(row => {
+                                    this.html += "  <tr>\n";
                                     
-                                    row.forEach((cell, cellIndex) => {
-                                        // Use th for header row
-                                        const cellTag = rowIndex === 0 ? 'th' : 'td';
-                                        this.html += `\n            <${cellTag}>${cell}</${cellTag}>`;
+                                    row.forEach(cell => {
+                                        this.html += `    <td>${cell}</td>\n`;
                                     });
                                     
-                                    this.html += `\n        </tr>`;
+                                    this.html += "  </tr>\n";
                                 });
                                 
-                                this.html += `\n    </table>`;
+                                this.html += "</table>\n";
                             }
                             
                             getResult() {
                                 return this.html;
                             }
                         }
-
-                        // Concrete visitor - Document Stats
+                        
+                        // Concrete Visitor: Document Statistics
                         class DocumentStatsVisitor extends DocumentVisitor {
                             constructor() {
                                 super();
@@ -1231,21 +1198,21 @@ console.log("Misspelled Words:", misspelledWords);</code></pre>
                                 return this.stats;
                             }
                         }
-
-                        // Concrete visitor - Spell Check
+                        
+                        // Concrete Visitor: Spell Check
                         class SpellCheckVisitor extends DocumentVisitor {
                             constructor() {
                                 super();
-                                // Simple dictionary for demo purposes
+                                // Simplified dictionary is just an array of correctly spelled words
                                 this.dictionary = [
                                     "this", "is", "a", "sample", "document", "to", "demonstrate", "the", 
                                     "visitor", "pattern", "image", "header", "row", "cell", "allows", 
                                     "you", "add", "new", "operations", "existing", "object", "structures", 
-                                    "without", "modifying", "them", "my", "enter", "your", "text", "here",
-                                    "sample", "placeholder", "width", "height", "alt", "url"
+                                    "without", "modifying", "them", "my", "document", "enter", "your", "text", 
+                                    "here", "no", "spelling", "errors", "found"
                                 ];
                                 this.misspelledWords = [];
-                                this.currentElement = "";
+                                this.currentElement = ""; // Keep track of which element we're checking
                             }
                             
                             visitDocument(document) {
@@ -1278,8 +1245,8 @@ console.log("Misspelled Words:", misspelledWords);</code></pre>
                             _checkSpelling(text) {
                                 // Extract words, excluding punctuation
                                 const words = text.split(/\s+/)
-                                    .map(word => word.replace(/[^\w]/g, ''))
-                                    .filter(word => word.length > 0);
+                                            .map(word => word.replace(/[^\w]/g, ''))
+                                            .filter(word => word.length > 0);
                                 
                                 // Check each word against our dictionary
                                 words.forEach(word => {
