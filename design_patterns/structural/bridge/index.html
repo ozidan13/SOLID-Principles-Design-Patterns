@@ -1,0 +1,972 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bridge Pattern</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #3b82f6; /* Vibrant blue */
+            --primary-dark: #2563eb;
+            --primary-light: #60a5fa;
+            --secondary-color: #10b981; /* Green */
+            --secondary-dark: #059669;
+            --accent-color: #8b5cf6; /* Purple */
+            --accent-color-good: #059669; /* Green for good examples */
+            --accent-color-bad: #ef4444; /* Red for bad examples */
+            --text-color: #e2e8f0;
+            --text-muted: #94a3b8;
+            --bg-color: #0f172a; /* Dark blue background */
+            --bg-light: #1e293b;
+            --bg-lighter: #334155;
+            --bg-card: #1e293b;
+            --border-color: #334155;
+            --code-bg: #0f172a;
+            --code-text: #e2e8f0;
+            --heading-font: 'Poppins', sans-serif;
+            --body-font: 'Inter', sans-serif;
+            --border-radius: 8px;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2), 0 2px 4px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
+            --glow: 0 0 15px rgba(59, 130, 246, 0.5);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--body-font);
+            line-height: 1.7;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+        }
+
+        /* Hero Section */
+        .hero {
+            position: relative;
+            min-height: 40vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            text-align: center;
+            overflow: hidden;
+            background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
+            padding: 3rem 1rem;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2000 1500"><rect fill="%23000000" width="2000" height="1500"/><defs><circle stroke="%23222" vector-effect="non-scaling-stroke" id="a" fill="none" stroke-width="5" r="315"/></defs><g transform="translate(1000 750)"><use stroke="%233b82f6" href="%23a" transform="rotate(60 0 0) scale(0.4 0.4)"/><use stroke="%233b82f6" href="%23a" transform="rotate(120 0 0) scale(0.5 0.5)"/><use stroke="%233b82f6" href="%23a" transform="rotate(180 0 0) scale(0.6 0.6)"/><use stroke="%233b82f6" href="%23a" transform="rotate(240 0 0) scale(0.7 0.7)"/><use stroke="%233b82f6" href="%23a" transform="rotate(300 0 0) scale(0.8 0.8)"/></g></svg>');
+            background-size: cover;
+            opacity: 0.1;
+            animation: pulse 15s ease-in-out infinite alternate;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 0.1; }
+            50% { transform: scale(1.05); opacity: 0.15; }
+            100% { transform: scale(1); opacity: 0.1; }
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 10;
+            max-width: 800px;
+        }
+
+        .hero h1 {
+            font-family: var(--heading-font);
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            text-shadow: 0 0 30px rgba(59, 130, 246, 0.5);
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Shapes animation */
+        .shapes {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            overflow: hidden;
+        }
+
+        .shape {
+            position: absolute;
+            opacity: 0.2;
+            animation: float 15s infinite linear;
+        }
+
+        .shape-1 {
+            top: 20%;
+            left: 10%;
+            width: 60px;
+            height: 60px;
+            border-radius: 41% 59% 37% 63% / 44% 67% 33% 56%;
+            background-color: #10b981;
+            animation-duration: 25s;
+            box-shadow: 0 0 30px rgba(16, 185, 129, 0.4);
+        }
+
+        .shape-2 {
+            top: 60%;
+            right: 15%;
+            width: 80px;
+            height: 80px;
+            border-radius: 73% 27% 59% 41% / 57% 43% 57% 43%;
+            background-color: #8b5cf6;
+            animation-duration: 30s;
+            animation-delay: 2s;
+            box-shadow: 0 0 30px rgba(139, 92, 246, 0.4);
+        }
+
+        @keyframes float {
+            0% {
+                transform: translate(0, 0) rotate(0deg);
+            }
+            25% {
+                transform: translate(10px, 15px) rotate(90deg);
+            }
+            50% {
+                transform: translate(5px, -10px) rotate(180deg);
+            }
+            75% {
+                transform: translate(-10px, 5px) rotate(270deg);
+            }
+            100% {
+                transform: translate(0, 0) rotate(360deg);
+            }
+        }
+
+        /* Main Content */
+        .main-content {
+            position: relative;
+            margin-top: -50px;
+            padding-bottom: 4rem;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 3rem;
+            background-color: var(--bg-light);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--border-color);
+        }
+
+        /* Back link */
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            margin-bottom: 2rem;
+            color: var(--primary-light);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+        
+        .back-link:hover {
+            color: var(--primary-color);
+            text-shadow: 0 0 8px rgba(59, 130, 246, 0.5);
+        }
+
+        .back-link svg {
+            margin-right: 0.5rem;
+        }
+
+        /* Typography */
+        h1, h2, h3 {
+            font-family: var(--heading-font);
+            color: var(--text-color);
+        }
+
+        h1.page-title {
+            font-size: 2.5rem;
+            font-weight: 600;
+            margin-bottom: 2rem;
+            position: relative;
+            padding-bottom: 1rem;
+        }
+
+        h1.page-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100px;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            border-radius: 2px;
+        }
+
+        h2 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-top: 3rem;
+            margin-bottom: 1.5rem;
+            color: var(--primary-light);
+        }
+
+        h3 {
+            font-size: 1.4rem;
+            font-weight: 500;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        p, li {
+            margin-bottom: 1.5rem;
+            color: var(--text-muted);
+            font-size: 1.05rem;
+            line-height: 1.8;
+        }
+
+        ul, ol {
+            padding-left: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        strong {
+            color: var(--text-color);
+            font-weight: 600;
+        }
+
+        /* Code styling */
+        code {
+            background-color: var(--code-bg);
+            padding: 0.2em 0.4em;
+            border-radius: 4px;
+            font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+            font-size: 0.9em;
+            color: #f87171;
+            border: 1px solid var(--border-color);
+        }
+
+        pre {
+            background-color: var(--code-bg);
+            color: var(--code-text);
+            padding: 1.5rem;
+            border-radius: var(--border-radius);
+            overflow-x: auto;
+            margin: 2rem 0;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            border: 1px solid var(--border-color);
+        }
+
+        pre code {
+            background: none;
+            padding: 0;
+            color: inherit;
+            font-size: inherit;
+            border: none;
+        }
+
+        /* Examples */
+        .example {
+            border: 1px solid var(--border-color);
+            padding: 2rem;
+            margin: 2.5rem 0;
+            border-radius: var(--border-radius);
+            background-color: var(--bg-light);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .visualization {
+            display: flex;
+            justify-content: center;
+            margin: 2rem 0;
+            overflow-x: auto;
+            padding: 1rem;
+        }
+
+        .visualization svg {
+            max-width: 100%;
+        }
+
+        /* Interactive Demo */
+        .interactive-demo {
+            background-color: var(--bg-lighter);
+            padding: 2rem;
+            margin: 3rem 0;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-color);
+        }
+
+        .interactive-demo h3 {
+            margin-top: 0;
+            color: var(--primary-light);
+        }
+
+        /* Form elements */
+        label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            color: var(--text-color);
+        }
+
+        input, select, button {
+            font-family: var(--body-font);
+            font-size: 1rem;
+            padding: 0.75rem 1rem;
+            border-radius: var(--border-radius);
+            border: 1px solid var(--border-color);
+            margin-bottom: 1rem;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+        }
+
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s, box-shadow 0.2s;
+        }
+
+        button:hover {
+            background-color: var(--primary-dark);
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.5);
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        .output {
+            background-color: var(--bg-color);
+            border: 1px solid var(--border-color);
+            padding: 1.5rem;
+            border-radius: var(--border-radius);
+            min-height: 60px;
+            font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+            white-space: pre-wrap;
+            margin-top: 1.5rem;
+            color: var(--text-color);
+        }
+
+        /* Canvas for drawing */
+        .canvas-container {
+            width: 100%;
+            margin: 1rem 0;
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            overflow: hidden;
+        }
+
+        canvas {
+            background-color: var(--bg-color);
+            width: 100%;
+            display: block;
+        }
+
+        /* Footer */
+        footer {
+            background-color: var(--bg-color);
+            color: white;
+            padding: 3rem 0;
+            text-align: center;
+            margin-top: 4rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .footer-content p {
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 0;
+        }
+
+        /* Controls for demo */
+        .demo-controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .control-group {
+            flex: 1;
+            min-width: 200px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="shapes">
+            <div class="shape shape-1"></div>
+            <div class="shape shape-2"></div>
+        </div>
+        <div class="hero-content">
+            <h1>Bridge Pattern</h1>
+            <p>Decouple an abstraction from its implementation so that the two can vary independently</p>
+        </div>
+    </section>
+
+    <div class="main-content">
+        <div class="container">
+            <a href="../../../index.html" class="back-link">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M19 12H5M12 19l-7-7 7-7"/>
+                </svg>
+                Back to Overview
+            </a>
+
+            <h1 class="page-title">Bridge Pattern</h1>
+
+            <p>The <strong>Bridge Pattern</strong> separates an abstraction from its implementation so that both can vary independently. It's a structural design pattern that helps you split a large class or a set of closely related classes into two separate hierarchies—abstraction and implementation—which can be developed independently of each other.</p>
+            
+            <p>Think of it as building a bridge between two sides: abstractions (what the client sees) and implementations (how things are done behind the scenes).</p>
+
+            <h2>Problem</h2>
+            <p>Imagine you're developing a shape rendering system. You have different shapes (circle, square) and different rendering methods (vector, raster). If you create a class for each combination, you end up with an explosion of classes: VectorCircle, RasterCircle, VectorSquare, RasterSquare, etc. Adding a new shape or rendering method requires adding multiple new classes.</p>
+
+            <div class="visualization">
+                <svg width="800" height="350" viewBox="0 0 800 350">
+                    <!-- Background -->
+                    <rect x="0" y="0" width="800" height="350" fill="transparent" />
+                    
+                    <!-- Abstraction -->
+                    <rect x="100" y="50" width="140" height="60" rx="5" fill="#3b82f6" />
+                    <text x="170" y="85" font-family="sans-serif" font-size="16" text-anchor="middle" fill="white">Abstraction</text>
+                    
+                    <!-- Refined Abstractions -->
+                    <rect x="50" y="150" width="120" height="60" rx="5" fill="#60a5fa" />
+                    <text x="110" y="185" font-family="sans-serif" font-size="14" text-anchor="middle" fill="white">Refined Abstraction A</text>
+                    
+                    <rect x="200" y="150" width="120" height="60" rx="5" fill="#60a5fa" />
+                    <text x="260" y="185" font-family="sans-serif" font-size="14" text-anchor="middle" fill="white">Refined Abstraction B</text>
+                    
+                    <!-- Implementation -->
+                    <rect x="550" y="50" width="140" height="60" rx="5" fill="#10b981" />
+                    <text x="620" y="85" font-family="sans-serif" font-size="16" text-anchor="middle" fill="white">Implementation</text>
+                    
+                    <!-- Concrete Implementations -->
+                    <rect x="480" y="150" width="120" height="60" rx="5" fill="#34d399" />
+                    <text x="540" y="185" font-family="sans-serif" font-size="14" text-anchor="middle" fill="white">Concrete Impl. X</text>
+                    
+                    <rect x="630" y="150" width="120" height="60" rx="5" fill="#34d399" />
+                    <text x="690" y="185" font-family="sans-serif" font-size="14" text-anchor="middle" fill="white">Concrete Impl. Y</text>
+                    
+                    <!-- Bridge -->
+                    <path d="M240 80 L550 80" stroke="#ffffff" stroke-width="2" stroke-dasharray="10,5" />
+                    <text x="395" y="70" font-family="sans-serif" font-size="14" text-anchor="middle" fill="white">Bridge</text>
+                    
+                    <!-- Inheritance Lines -->
+                    <path d="M170 110 L110 150" stroke="#ffffff" stroke-width="2" marker-end="url(#arrowhead)" />
+                    <path d="M170 110 L260 150" stroke="#ffffff" stroke-width="2" marker-end="url(#arrowhead)" />
+                    
+                    <path d="M620 110 L540 150" stroke="#ffffff" stroke-width="2" marker-end="url(#arrowhead)" />
+                    <path d="M620 110 L690 150" stroke="#ffffff" stroke-width="2" marker-end="url(#arrowhead)" />
+                    
+                    <!-- Example Arrows -->
+                    <path d="M110 210 L110 250 L400 250 L540 210" stroke="#8b5cf6" stroke-width="2" stroke-dasharray="5,5" marker-end="url(#arrowhead)" />
+                    <text x="270" y="270" font-family="sans-serif" font-size="12" text-anchor="middle" fill="#a78bfa">Can use any implementation</text>
+                    
+                    <path d="M540 210 L540 280 L400 280 L260 210" stroke="#8b5cf6" stroke-width="2" stroke-dasharray="5,5" marker-end="url(#arrowhead)" />
+                    <text x="430" y="300" font-family="sans-serif" font-size="12" text-anchor="middle" fill="#a78bfa">Can be used by any abstraction</text>
+                    
+                    <!-- Arrowhead marker -->
+                    <defs>
+                        <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                            <polygon points="0 0, 10 3.5, 0 7" fill="#ffffff" />
+                        </marker>
+                    </defs>
+                </svg>
+            </div>
+
+            <h2>Components</h2>
+            <ul>
+                <li><strong>Abstraction:</strong> Defines the interface for the "control" part of two class hierarchies and maintains a reference to the Implementation.</li>
+                <li><strong>Refined Abstraction:</strong> Extends the Abstraction interface.</li>
+                <li><strong>Implementation:</strong> Defines the interface for the "implementation" part of the class hierarchies.</li>
+                <li><strong>Concrete Implementation:</strong> Implements the Implementation interface.</li>
+            </ul>
+
+            <h2>Implementation Example</h2>
+            <p>Let's implement a drawing application that can draw different shapes using different rendering methods:</p>
+
+            <pre><code>// Implementation interface
+class Renderer {
+    renderCircle(radius) {
+        // This method should be implemented by concrete renderers
+    }
+    
+    renderSquare(side) {
+        // This method should be implemented by concrete renderers
+    }
+}
+
+// Concrete Implementations
+class VectorRenderer extends Renderer {
+    renderCircle(radius) {
+        return `Drawing a circle of radius ${radius} using vector graphics`;
+    }
+    
+    renderSquare(side) {
+        return `Drawing a square with side ${side} using vector graphics`;
+    }
+}
+
+class RasterRenderer extends Renderer {
+    renderCircle(radius) {
+        return `Drawing a circle of radius ${radius} using raster pixels`;
+    }
+    
+    renderSquare(side) {
+        return `Drawing a square with side ${side} using raster pixels`;
+    }
+}
+
+// Abstraction
+class Shape {
+    constructor(renderer) {
+        this.renderer = renderer;
+    }
+    
+    draw() {
+        // This method should be implemented by refined abstractions
+    }
+    
+    resize(percentage) {
+        // This method should be implemented by refined abstractions
+    }
+}
+
+// Refined Abstractions
+class Circle extends Shape {
+    constructor(renderer, radius) {
+        super(renderer);
+        this.radius = radius;
+    }
+    
+    draw() {
+        return this.renderer.renderCircle(this.radius);
+    }
+    
+    resize(percentage) {
+        this.radius *= percentage / 100;
+        return this;
+    }
+}
+
+class Square extends Shape {
+    constructor(renderer, side) {
+        super(renderer);
+        this.side = side;
+    }
+    
+    draw() {
+        return this.renderer.renderSquare(this.side);
+    }
+    
+    resize(percentage) {
+        this.side *= percentage / 100;
+        return this;
+    }
+}</code></pre>
+
+            <p>With this pattern, we can:</p>
+            <ul>
+                <li>Add new shapes without changing the rendering code</li>
+                <li>Add new rendering methods without changing the shape code</li>
+                <li>Create any combination of shapes and renderers</li>
+            </ul>
+
+            <div class="interactive-demo">
+                <h3>Interactive Demo: Shape Rendering Bridge</h3>
+                <p>Experiment with different shapes and rendering methods to see the Bridge pattern in action.</p>
+                
+                <div class="demo-controls">
+                    <div class="control-group">
+                        <label for="shape-type">Shape:</label>
+                        <select id="shape-type">
+                            <option value="circle">Circle</option>
+                            <option value="square">Square</option>
+                        </select>
+                        
+                        <label for="shape-size">Size:</label>
+                        <input type="range" id="shape-size" min="10" max="100" value="50">
+                    </div>
+                    
+                    <div class="control-group">
+                        <label for="renderer-type">Renderer:</label>
+                        <select id="renderer-type">
+                            <option value="vector">Vector</option>
+                            <option value="raster">Raster</option>
+                        </select>
+                        
+                        <label>
+                            <input type="checkbox" id="show-grid" checked>
+                            Show Renderer Grid
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="canvas-container">
+                    <canvas id="drawing-canvas" height="200"></canvas>
+                </div>
+                
+                <div class="output" id="drawing-output">// Drawing instructions will appear here</div>
+                
+                <button onclick="resizeShape()">Resize Shape +20%</button>
+            </div>
+
+            <h2>When to Use</h2>
+            <ul>
+                <li>When you want to avoid a permanent binding between an abstraction and its implementation</li>
+                <li>When both the abstractions and their implementations should be extensible through subclasses</li>
+                <li>When changes in the implementation should not impact the client code</li>
+                <li>When you have a proliferation of classes resulting from multiple orthogonal dimensions of variation</li>
+            </ul>
+
+            <h2>Benefits</h2>
+            <ul>
+                <li>Decouples interface from implementation</li>
+                <li>Improves extensibility (can extend both abstractions and implementations independently)</li>
+                <li>Hides implementation details from the client</li>
+                <li>Follows the Open/Closed Principle: open for extension, closed for modification</li>
+            </ul>
+
+            <h2>Real-World Uses</h2>
+            <ul>
+                <li>GUI frameworks that separate visual elements from platform-specific code</li>
+                <li>Database access layers that decouple business logic from database implementation</li>
+                <li>Device drivers that separate device-independent code from hardware-specific code</li>
+                <li>Cross-platform applications that need to function on multiple operating systems</li>
+            </ul>
+        </div>
+    </div>
+
+    <footer>
+        <div class="footer-content">
+            <p>&copy; 2025 Design Patterns Interactive Guide</p>
+        </div>
+    </footer>
+
+    <script>
+        // Implementation
+        class Renderer {
+            // Base renderer
+            setContext(context) {
+                this.context = context;
+            }
+            
+            renderCircle(x, y, radius) {
+                // To be implemented by subclasses
+            }
+            
+            renderSquare(x, y, side) {
+                // To be implemented by subclasses
+            }
+            
+            clear(width, height) {
+                // To be implemented by subclasses
+            }
+        }
+
+        // Concrete Implementations
+        class VectorRenderer extends Renderer {
+            renderCircle(x, y, radius) {
+                this.context.strokeStyle = '#3b82f6';
+                this.context.lineWidth = 2;
+                this.context.beginPath();
+                this.context.arc(x, y, radius, 0, Math.PI * 2);
+                this.context.stroke();
+                
+                // Draw vector control points
+                this.context.fillStyle = '#3b82f6';
+                this.context.beginPath();
+                this.context.arc(x, y - radius, 3, 0, Math.PI * 2);
+                this.context.fill();
+                
+                this.context.beginPath();
+                this.context.arc(x + radius, y, 3, 0, Math.PI * 2);
+                this.context.fill();
+                
+                this.context.beginPath();
+                this.context.arc(x, y + radius, 3, 0, Math.PI * 2);
+                this.context.fill();
+                
+                this.context.beginPath();
+                this.context.arc(x - radius, y, 3, 0, Math.PI * 2);
+                this.context.fill();
+                
+                return `Drawing a circle at (${x},${y}) with radius ${radius} using vector graphics`;
+            }
+            
+            renderSquare(x, y, side) {
+                const halfSide = side / 2;
+                
+                this.context.strokeStyle = '#3b82f6';
+                this.context.lineWidth = 2;
+                this.context.beginPath();
+                this.context.rect(x - halfSide, y - halfSide, side, side);
+                this.context.stroke();
+                
+                // Draw vector control points
+                this.context.fillStyle = '#3b82f6';
+                
+                // Corners
+                this.context.beginPath();
+                this.context.arc(x - halfSide, y - halfSide, 3, 0, Math.PI * 2);
+                this.context.fill();
+                
+                this.context.beginPath();
+                this.context.arc(x + halfSide, y - halfSide, 3, 0, Math.PI * 2);
+                this.context.fill();
+                
+                this.context.beginPath();
+                this.context.arc(x + halfSide, y + halfSide, 3, 0, Math.PI * 2);
+                this.context.fill();
+                
+                this.context.beginPath();
+                this.context.arc(x - halfSide, y + halfSide, 3, 0, Math.PI * 2);
+                this.context.fill();
+                
+                return `Drawing a square at (${x},${y}) with side ${side} using vector graphics`;
+            }
+            
+            clear(width, height) {
+                this.context.clearRect(0, 0, width, height);
+                
+                // Draw vector grid if enabled
+                if (document.getElementById('show-grid').checked) {
+                    this.context.strokeStyle = '#334155';
+                    this.context.lineWidth = 0.5;
+                    
+                    // Draw grid lines
+                    this.context.beginPath();
+                    for (let i = 0; i <= width; i += 20) {
+                        this.context.moveTo(i, 0);
+                        this.context.lineTo(i, height);
+                    }
+                    for (let i = 0; i <= height; i += 20) {
+                        this.context.moveTo(0, i);
+                        this.context.lineTo(width, i);
+                    }
+                    this.context.stroke();
+                }
+            }
+        }
+
+        class RasterRenderer extends Renderer {
+            renderCircle(x, y, radius) {
+                this.context.fillStyle = '#10b981';
+                
+                // Draw pixelated circle
+                const pixelSize = 4;
+                for (let px = -radius; px <= radius; px += pixelSize) {
+                    for (let py = -radius; py <= radius; py += pixelSize) {
+                        const distance = Math.sqrt(px * px + py * py);
+                        if (distance <= radius) {
+                            this.context.fillRect(x + px, y + py, pixelSize, pixelSize);
+                        }
+                    }
+                }
+                
+                return `Drawing a circle at (${x},${y}) with radius ${radius} using raster pixels`;
+            }
+            
+            renderSquare(x, y, side) {
+                const halfSide = side / 2;
+                const pixelSize = 4;
+                
+                this.context.fillStyle = '#10b981';
+                
+                // Draw pixelated square
+                for (let px = -halfSide; px < halfSide; px += pixelSize) {
+                    for (let py = -halfSide; py < halfSide; py += pixelSize) {
+                        this.context.fillRect(x + px, y + py, pixelSize, pixelSize);
+                    }
+                }
+                
+                return `Drawing a square at (${x},${y}) with side ${side} using raster pixels`;
+            }
+            
+            clear(width, height) {
+                this.context.clearRect(0, 0, width, height);
+                
+                // Draw pixel grid if enabled
+                if (document.getElementById('show-grid').checked) {
+                    this.context.fillStyle = '#334155';
+                    
+                    // Draw pixel grid
+                    const pixelSize = 4;
+                    for (let x = 0; x < width; x += pixelSize * 2) {
+                        for (let y = 0; y < height; y += pixelSize * 2) {
+                            this.context.fillRect(x, y, 1, 1);
+                        }
+                    }
+                }
+            }
+        }
+
+        // Abstraction
+        class Shape {
+            constructor(renderer, x, y) {
+                this.renderer = renderer;
+                this.x = x;
+                this.y = y;
+            }
+            
+            draw() {
+                // To be implemented by subclasses
+            }
+            
+            resize(percentage) {
+                // To be implemented by subclasses
+            }
+        }
+
+        // Refined Abstractions
+        class Circle extends Shape {
+            constructor(renderer, x, y, radius) {
+                super(renderer, x, y);
+                this.radius = radius;
+            }
+            
+            draw() {
+                return this.renderer.renderCircle(this.x, this.y, this.radius);
+            }
+            
+            resize(percentage) {
+                this.radius *= percentage;
+                return this;
+            }
+        }
+
+        class Square extends Shape {
+            constructor(renderer, x, y, side) {
+                super(renderer, x, y);
+                this.side = side;
+            }
+            
+            draw() {
+                return this.renderer.renderSquare(this.x, this.y, this.side);
+            }
+            
+            resize(percentage) {
+                this.side *= percentage;
+                return this;
+            }
+        }
+
+        // Interactive demo logic
+        let currentShape;
+        let currentRenderer;
+        const canvas = document.getElementById('drawing-canvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Initialize canvas size
+        function resizeCanvas() {
+            const container = canvas.parentElement;
+            canvas.width = container.clientWidth;
+            redraw();
+        }
+        
+        // Create shape based on UI selection
+        function createShape() {
+            const shapeType = document.getElementById('shape-type').value;
+            const rendererType = document.getElementById('renderer-type').value;
+            const size = parseInt(document.getElementById('shape-size').value);
+            
+            // Create renderer
+            if (rendererType === 'vector') {
+                currentRenderer = new VectorRenderer();
+            } else {
+                currentRenderer = new RasterRenderer();
+            }
+            currentRenderer.setContext(ctx);
+            
+            // Create shape with the renderer
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            
+            if (shapeType === 'circle') {
+                currentShape = new Circle(currentRenderer, centerX, centerY, size);
+            } else {
+                currentShape = new Square(currentRenderer, centerX, centerY, size);
+            }
+            
+            redraw();
+        }
+        
+        // Redraw the canvas
+        function redraw() {
+            if (!currentShape || !currentRenderer) {
+                createShape();
+                return;
+            }
+            
+            // Clear and draw background grid
+            currentRenderer.clear(canvas.width, canvas.height);
+            
+            // Draw shape
+            const drawingOutput = document.getElementById('drawing-output');
+            const result = currentShape.draw();
+            drawingOutput.textContent = result;
+        }
+        
+        // Resize the shape
+        function resizeShape() {
+            if (currentShape) {
+                currentShape.resize(1.2); // Increase by 20%
+                redraw();
+            }
+        }
+        
+        // Event listeners
+        window.addEventListener('resize', resizeCanvas);
+        document.getElementById('shape-type').addEventListener('change', createShape);
+        document.getElementById('renderer-type').addEventListener('change', createShape);
+        document.getElementById('shape-size').addEventListener('input', createShape);
+        document.getElementById('show-grid').addEventListener('change', redraw);
+        
+        // Initialize
+        resizeCanvas();
+    </script>
+</body>
+</html> 
