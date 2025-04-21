@@ -7,6 +7,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Favicon links -->
+    <link rel="icon" href="/assets/logo.svg" type="image/svg+xml">
     <style>
         :root {
             --primary-color: #3b82f6; /* Vibrant blue */
@@ -108,6 +110,18 @@
             opacity: 0;
             transform: translateY(30px);
             animation: fadeInUp 1.2s forwards 0.3s cubic-bezier(0.17, 0.67, 0.83, 0.67);
+        }
+
+        .logo {
+            width: 120px;
+            height: 120px;
+            margin-bottom: 2rem;
+            filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.3));
+            transition: transform var(--transition-medium);
+        }
+
+        .logo:hover {
+            transform: rotate(10deg) scale(1.05);
         }
 
         @keyframes fadeInUp {
@@ -316,6 +330,7 @@
             position: relative;
             margin-top: -100px;
             padding-bottom: 4rem;
+            padding-top: 70px;
         }
         
         /* Scroll Animation Classes */
@@ -773,9 +788,115 @@
                 grid-template-columns: 1fr;
             }
         }
+
+        /* Header and Navigation Styles */
+        .main-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            background-color: rgba(15, 23, 42, 0.9);
+            backdrop-filter: blur(8px);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            padding: 1rem 0;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo-link {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            color: white;
+            font-family: var(--heading-font);
+            font-weight: 600;
+            font-size: 1.2rem;
+        }
+
+        .header-logo {
+            width: 40px;
+            height: 40px;
+            margin-right: 1rem;
+            transition: transform 0.3s ease;
+        }
+
+        .logo-link:hover .header-logo {
+            transform: rotate(10deg);
+        }
+
+        .main-nav ul {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        .main-nav a {
+            color: var(--text-color);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease, text-shadow 0.3s ease;
+            position: relative;
+        }
+
+        .main-nav a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background-color: var(--primary-color);
+            transition: width 0.3s ease;
+        }
+
+        .main-nav a:hover {
+            color: white;
+            text-shadow: 0 0 8px rgba(59, 130, 246, 0.5);
+        }
+
+        .main-nav a:hover::after {
+            width: 100%;
+        }
+
+        /* Container styles update for header */
+        .main-header .container {
+            padding: 0 2rem;
+            background-color: transparent;
+            border-radius: 0;
+            box-shadow: none;
+            border: none;
+        }
+
+        .main-header .container::before {
+            display: none;
+        }
     </style>
 </head>
 <body>
+    <!-- Header with Navigation -->
+    <header class="main-header">
+        <div class="container">
+            <div class="header-content">
+                <a href="index.html" class="logo-link">
+                    <img src="assets/logo.svg" alt="Logo" class="header-logo">
+                    <span>Design Patterns & SOLID</span>
+                </a>
+                <nav class="main-nav">
+                    <ul>
+                        <li><a href="#solid-principles">SOLID</a></li>
+                        <li><a href="#design-patterns">Design Patterns</a></li>
+                        <li><a href="#about">About</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+
     <!-- Hero Section -->
     <section class="hero">
         <div class="shapes">
@@ -786,6 +907,7 @@
             <div class="shape shape-5"></div>
         </div>
         <div class="hero-content">
+            <img src="assets/logo.svg" alt="Logo" class="logo">
             <h1>SOLID Principles & Design Patterns</h1>
             <p>Master the art of writing clean, maintainable, and scalable code through interactive examples and visual demonstrations</p>
             <a href="#solid-principles" class="cta-button">Explore the Principles</a>
