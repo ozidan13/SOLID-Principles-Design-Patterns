@@ -1369,34 +1369,7 @@
         const hero = document.querySelector('.hero');
         const shapes = document.querySelectorAll('.shape');
         
-        document.addEventListener('mousemove', (e) => {
-            if (!hero.classList.contains('active')) {
-                hero.classList.add('active');
-            }
-            
-            const x = e.clientX / window.innerWidth;
-            const y = e.clientY / window.innerHeight;
-            
-            // Subtle movement for the hero background
-            hero.style.transform = `perspective(1000px) rotateX(${y * 2 - 1}deg) rotateY(${x * 2 - 1}deg)`;
-            
-            // Move shapes in opposite directions for depth effect
-            shapes.forEach((shape, index) => {
-                const factor = (index + 1) * 0.8;
-                const shapeX = (x - 0.5) * factor * 20;
-                const shapeY = (y - 0.5) * factor * 20;
-                shape.style.transform = `translate(${shapeX}px, ${shapeY}px)`;
-            });
-        });
         
-        // Reset transform when mouse leaves hero
-        hero.addEventListener('mouseleave', () => {
-            hero.style.transform = '';
-            hero.classList.remove('active');
-            shapes.forEach(shape => {
-                shape.style.transform = '';
-            });
-        });
         
         // Scroll animations
         const sections = document.querySelectorAll('.section');
