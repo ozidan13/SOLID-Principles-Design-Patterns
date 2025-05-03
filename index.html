@@ -57,14 +57,12 @@
             position: relative;
             min-height: 100vh;
             display: flex;
-            flex-direction: column;
             justify-content: center;
             align-items: center;
             color: white;
-            text-align: center;
             overflow: hidden;
-            background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
-            perspective: 1000px;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            padding: 2rem 0;
         }
 
         .hero::before {
@@ -74,255 +72,335 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2000 1500"><rect fill="%23000000" width="2000" height="1500"/><defs><circle stroke="%23222" vector-effect="non-scaling-stroke" id="a" fill="none" stroke-width="5" r="315"/></defs><g transform="translate(1000 750)"><use stroke="%233b82f6" href="%23a" transform="rotate(60 0 0) scale(0.4 0.4)"/><use stroke="%233b82f6" href="%23a" transform="rotate(120 0 0) scale(0.5 0.5)"/><use stroke="%233b82f6" href="%23a" transform="rotate(180 0 0) scale(0.6 0.6)"/><use stroke="%233b82f6" href="%23a" transform="rotate(240 0 0) scale(0.7 0.7)"/><use stroke="%233b82f6" href="%23a" transform="rotate(300 0 0) scale(0.8 0.8)"/></g></svg>');
-            background-size: cover;
-            opacity: 0.15;
-            animation: pulse 15s ease-in-out infinite alternate;
+            background: radial-gradient(circle at 25% 25%, rgba(99, 102, 241, 0.05) 0%, transparent 50%),
+                        radial-gradient(circle at 75% 75%, rgba(79, 70, 229, 0.05) 0%, transparent 50%);
+            opacity: 1;
         }
 
-        .hero::after {
-            content: '';
+        .floating-shape {
             position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: radial-gradient(circle at center, transparent 30%, var(--bg-color) 100%);
-            pointer-events: none;
+            border-radius: 50%;
+            opacity: 0.06;
+            filter: blur(40px);
         }
 
-        @keyframes pulse {
-            0% { transform: scale(1); opacity: 0.15; }
-            50% { transform: scale(1.05); opacity: 0.2; }
-            100% { transform: scale(1); opacity: 0.15; }
+        .shape-1 {
+            top: 10%;
+            left: 10%;
+            width: 300px;
+            height: 300px;
+            background: #4f46e5;
         }
-        
-        /* Parallax effect on mouse move */
-        .hero.active {
-            transition: transform 0.1s ease-out;
+
+        .shape-2 {
+            top: 60%;
+            left: 15%;
+            width: 200px;
+            height: 200px;
+            background: #7c3aed;
+        }
+
+        .shape-3 {
+            top: 20%;
+            right: 15%;
+            width: 250px;
+            height: 250px;
+            background: #3b82f6;
+        }
+
+        .shape-4 {
+            bottom: 15%;
+            right: 20%;
+            width: 180px;
+            height: 180px;
+            background: #8b5cf6;
+        }
+
+        .hero-container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 10;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 2rem;
         }
 
         .hero-content {
-            position: relative;
-            z-index: 10;
-            max-width: 800px;
-            padding: 0 2rem;
-            opacity: 0;
-            transform: translateY(30px);
-            animation: fadeInUp 1.2s forwards 0.3s cubic-bezier(0.17, 0.67, 0.83, 0.67);
-        }
-
-        .logo {
-            width: 120px;
-            height: 120px;
-            margin-bottom: 2rem;
-            filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.3));
-            transition: transform var(--transition-medium);
-        }
-
-        .logo:hover {
-            transform: rotate(10deg) scale(1.05);
-        }
-
-        @keyframes fadeInUp {
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            flex: 1;
+            max-width: 600px;
+            text-align: left;
+            padding: 2rem 0;
+            opacity: 1;
         }
 
         .hero h1 {
             font-family: var(--heading-font);
-            font-size: 4.5rem;
-            font-weight: 700;
+            font-size: 4rem;
+            font-weight: 800;
             margin-bottom: 1.5rem;
-            background: linear-gradient(90deg, #ffffff 0%, #93c5fd 100%);
+            line-height: 1.1;
+            position: relative;
+            background: linear-gradient(90deg, #ffffff, #d1d5db);
             background-clip: text;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            line-height: 1.2;
-            text-shadow: 0 0 30px rgba(59, 130, 246, 0.5);
-            position: relative;
-            overflow: hidden;
+            text-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
 
-        .hero h1::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-            transform: translateX(-100%);
-            animation: shimmer 5s infinite;
-        }
-
-        @keyframes shimmer {
-            0% { transform: translateX(-100%); }
-            20% { transform: translateX(100%); }
-            100% { transform: translateX(100%); }
+        .hero h2 {
+            font-family: var(--heading-font);
+            font-size: 2rem;
+            font-weight: 500;
+            margin-bottom: 1.5rem;
+            color: var(--text-color);
+            line-height: 1.3;
         }
 
         .hero p {
             font-family: var(--body-font);
-            font-size: 1.5rem;
+            font-size: 1.25rem;
             font-weight: 400;
-            margin-bottom: 2.5rem;
-            color: rgba(255, 255, 255, 0.9);
-            max-width: 600px;
-            margin-left: auto;
-            margin-right: auto;
-            opacity: 0.9;
-            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            margin-bottom: 2rem;
+            color: var(--text-muted);
+            line-height: 1.7;
+        }
+        
+        .hero p strong {
+            color: var(--text-color);
+            font-weight: 600;
         }
 
-        .cta-button {
-            display: inline-block;
-            background-color: var(--secondary-color);
-            color: white;
+        .hero-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
             font-family: var(--body-font);
             font-weight: 600;
-            font-size: 1.1rem;
-            padding: 1.1rem 2.8rem;
+            font-size: 1rem;
+            padding: 0.9rem 1.8rem;
             border-radius: 50px;
             text-decoration: none;
             transition: all var(--transition-medium);
-            box-shadow: 0 0 20px rgba(16, 185, 129, 0.5);
             position: relative;
             overflow: hidden;
             z-index: 1;
         }
 
-        .cta-button::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
+        .btn-primary {
+            background: linear-gradient(90deg, var(--primary-color), var(--primary-dark));
+            color: white;
+            box-shadow: 0 5px 15px rgba(59, 130, 246, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: none;
+            box-shadow: 0 8px 20px rgba(59, 130, 246, 0.4);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--text-color);
+            border: 2px solid var(--primary-color);
+        }
+
+        .btn-outline:hover {
+            background: rgba(59, 130, 246, 0.1);
+            transform: none;
+            box-shadow: 0 5px 15px rgba(59, 130, 246, 0.2);
+        }
+
+        .btn-whatsapp {
+            background: linear-gradient(90deg, #25D366, #128C7E);
+            color: white;
+            box-shadow: 0 5px 15px rgba(37, 211, 102, 0.3);
+        }
+
+        .btn-whatsapp:hover {
+            transform: none;
+            box-shadow: 0 8px 20px rgba(37, 211, 102, 0.4);
+        }
+
+        .feature-icons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+        }
+
+        .feature-icon {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .feature-icon svg {
+            width: 20px;
+            height: 20px;
+            fill: var(--primary-light);
+        }
+
+        .hero-image {
+            flex: 1;
+            max-width: 500px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            opacity: 1;
+        }
+
+        .hero-illustration {
             width: 100%;
-            height: 100%;
-            background: linear-gradient(120deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-            transform: translateX(-100%);
-            transition: transform 0.6s;
-            z-index: -1;
+            height: auto;
+            filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.2));
         }
 
-        .cta-button:hover {
-            background-color: var(--secondary-dark);
-            transform: translateY(-3px) scale(1.03);
-            box-shadow: 0 0 30px rgba(16, 185, 129, 0.8);
-            letter-spacing: 0.5px;
-        }
-        
-        .cta-button:hover::before {
-            transform: translateX(100%);
-        }
-        
-        .cta-button:active {
-            transform: translateY(-1px);
-            box-shadow: 0 0 15px rgba(16, 185, 129, 0.6);
-        }
-
-        /* Floating shapes animation */
-        .shapes {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            overflow: hidden;
-            pointer-events: none;
-        }
-
-        .shape {
-            position: absolute;
-            opacity: 0.2;
-            animation: float 15s infinite ease-in-out;
-            backdrop-filter: blur(5px);
-            transition: all var(--transition-medium);
-        }
-
-        .shape-1 {
-            top: 20%;
-            left: 10%;
-            width: 120px;
-            height: 120px;
-            border-radius: 41% 59% 37% 63% / 44% 67% 33% 56%;
-            background: linear-gradient(135deg, var(--secondary-color), var(--secondary-dark));
-            animation-duration: 25s;
-            box-shadow: 0 0 30px rgba(16, 185, 129, 0.4);
-            animation-delay: 0s;
-        }
-
-        .shape-2 {
-            top: 60%;
-            right: 15%;
-            width: 180px;
-            height: 180px;
-            border-radius: 73% 27% 59% 41% / 57% 43% 57% 43%;
-            background: linear-gradient(135deg, var(--accent-color), var(--accent-light));
-            animation-duration: 30s;
-            animation-delay: 2s;
-            box-shadow: 0 0 30px rgba(139, 92, 246, 0.4);
-        }
-
-        .shape-3 {
-            bottom: 15%;
-            left: 25%;
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #f97316, #fb923c);
-            animation-duration: 20s;
-            animation-delay: 4s;
-            box-shadow: 0 0 30px rgba(249, 115, 22, 0.4);
-        }
-        
-        .shape-4 {
-            bottom: 30%;
-            right: 25%;
-            width: 70px;
-            height: 70px;
-            border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
-            background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
-            animation-duration: 18s;
-            animation-delay: 1s;
-            box-shadow: 0 0 30px rgba(59, 130, 246, 0.4);
-        }
-        
-        .shape-5 {
-            top: 40%;
-            left: 30%;
-            width: 60px;
-            height: 60px;
-            border-radius: 63% 37% 54% 46% / 55% 48% 52% 45%;
-            background: linear-gradient(135deg, #ec4899, #f472b6);
-            animation-duration: 22s;
-            animation-delay: 3s;
-            box-shadow: 0 0 30px rgba(236, 72, 153, 0.4);
-        }
-
-        @keyframes float {
-            0% {
-                transform: translate(0, 0) rotate(0deg) scale(1);
+        /* Responsive adjustments */
+        @media (max-width: 992px) {
+            .hero-container {
+                flex-direction: column;
+                padding-top: 2rem;
             }
-            25% {
-                transform: translate(15px, 20px) rotate(90deg) scale(1.05);
+            
+            .hero-content, .hero-image {
+                max-width: 100%;
+                text-align: center;
+                padding: 1rem 0;
             }
-            50% {
-                transform: translate(5px, -15px) rotate(180deg) scale(0.95);
+            
+            .hero-buttons {
+                justify-content: center;
             }
-            75% {
-                transform: translate(-15px, 10px) rotate(270deg) scale(1.05);
+            
+            .feature-icons {
+                justify-content: center;
             }
-            100% {
-                transform: translate(0, 0) rotate(360deg) scale(1);
+            
+            .hero h1 {
+                font-size: 3.5rem;
+            }
+            
+            .hero h2 {
+                font-size: 1.8rem;
             }
         }
-        
-        .hero:hover .shape {
-            animation-play-state: paused;
-            opacity: 0.25;
+
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.8rem;
+            }
+            
+            .hero h2 {
+                font-size: 1.5rem;
+            }
+            
+            .hero p {
+                font-size: 1.1rem;
+            }
+            
+            .btn {
+                padding: 0.8rem 1.5rem;
+                font-size: 0.9rem;
+            }
+            
+            .container {
+                padding: 1.5rem;
+            }
+
+            h2 {
+                font-size: 1.8rem;
+            }
+
+            .card-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            /* Improve responsive header */
+            .main-header {
+                padding: 0.8rem 0;
+            }
+            
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .main-nav ul {
+                gap: 1.2rem;
+            }
+            
+            .logo-link {
+                font-size: 1.1rem;
+            }
+            
+            .header-logo {
+                width: 35px;
+                height: 35px;
+            }
+        }
+
+        /* Add a new breakpoint for extra small devices */
+        @media (max-width: 480px) {
+            .hero h1 {
+                font-size: 2.2rem;
+            }
+            
+            .hero h2 {
+                font-size: 1.2rem;
+            }
+            
+            .hero p {
+                font-size: 1rem;
+            }
+            
+            .main-nav ul {
+                gap: 0.8rem;
+            }
+            
+            .main-nav a {
+                font-size: 0.9rem;
+            }
+            
+            .header-content {
+                padding: 0 0.5rem;
+            }
+            
+            .header-logo {
+                width: 30px;
+                height: 30px;
+                margin-right: 0.5rem;
+            }
+            
+            .btn {
+                padding: 0.7rem 1.4rem;
+                font-size: 0.85rem;
+            }
+            
+            .feature-icons {
+                justify-content: flex-start;
+                flex-wrap: wrap;
+            }
+            
+            .feature-icon {
+                font-size: 0.8rem;
+            }
+            
+            .feature-icon svg {
+                width: 16px;
+                height: 16px;
+            }
         }
 
         /* Main Content */
@@ -536,7 +614,6 @@
             height: 2px;
             background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
             transition: width var(--transition-medium);
-            border-radius: 2px;
         }
         
         .card:hover .card-title::after {
@@ -800,12 +877,14 @@
             backdrop-filter: blur(8px);
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
             padding: 1rem 0;
+            transition: padding 0.3s ease;
         }
 
         .header-content {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            flex-wrap: wrap;
         }
 
         .logo-link {
@@ -899,18 +978,87 @@
 
     <!-- Hero Section -->
     <section class="hero">
-        <div class="shapes">
-            <div class="shape shape-1"></div>
-            <div class="shape shape-2"></div>
-            <div class="shape shape-3"></div>
-            <div class="shape shape-4"></div>
-            <div class="shape shape-5"></div>
-        </div>
-        <div class="hero-content">
-            <img src="assets/logo.svg" alt="Logo" class="logo">
-            <h1>SOLID Principles & Design Patterns</h1>
-            <p>Master the art of writing clean, maintainable, and scalable code through interactive examples and visual demonstrations</p>
-            <a href="#solid-principles" class="cta-button">Explore the Principles</a>
+        <!-- Floating shapes for background depth -->
+        <div class="floating-shape shape-1"></div>
+        <div class="floating-shape shape-2"></div>
+        <div class="floating-shape shape-3"></div>
+        <div class="floating-shape shape-4"></div>
+        
+        <div class="hero-container">
+            <div class="hero-content">
+                <h1>Design Patterns & SOLID Principles</h1>
+                <h2>Master Software Architecture Fundamentals</h2>
+                <p>Explore interactive examples and visual guides to <strong>elevate your programming skills</strong> with essential design patterns and <strong>SOLID principles</strong> for creating <strong>maintainable, flexible code</strong>.</p>
+                
+                <div class="hero-buttons">
+                    <a href="./solid/01_single_responsibility/index.html" class="btn btn-primary">Start Learning</a>
+                    <a href="#design-patterns" class="btn btn-outline">Explore Modules</a>
+                    <a href="https://api.whatsapp.com/send/?phone=201116771405&text&type=phone_number&app_absent=0" class="btn btn-whatsapp">Get Mentorship</a>
+                </div>
+                
+                <div class="feature-icons">
+                    <div class="feature-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12.87 15.07l-2.54-2.51.03-.03c1.74-1.94 2.98-4.17 3.71-6.53H17V4h-7V2H8v2H1v1.99h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2l-4.5-12zm-2.62 7l1.62-4.33L19.12 17h-3.24z"/></svg>
+                        <span>Multi-language examples</span>
+                    </div>
+                    <div class="feature-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h4l3 3 3-3h4c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 16h-4.83l-.59.59L12 20.17l-1.59-1.59-.58-.58H5V4h14v14z"/><path d="M11 15h2v2h-2zm0-8h2v6h-2z"/></svg>
+                        <span>Interactive demos</span>
+                    </div>
+                    <div class="feature-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.56 3.91c.59.59.59 1.54 0 2.12l-3.54 3.54 1.41 1.41-7.72 7.72-6.94-6.94L11.5 4.04l1.41 1.41 3.54-3.54c.59-.59 1.54-.59 2.12 0h1.99zM5.22 15.44l3.54-3.54 1.41 1.41 3.54-3.54-1.41-1.41 2.12-2.12-2.47 1.06-2.12-2.12 1.06-2.47-2.12 2.12-1.41-1.41L4.81 6.62l7.72 7.72-7.31 1.1z"/></svg>
+                        <span>Visual learning</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="hero-image">
+                <svg class="hero-illustration" viewBox="0 0 750 500" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Abstract colorful illustration -->
+                    <path d="M156.4,339.5c31.8-2.5,59.4-26.8,80.2-48.5c28.3-29.5,40.5-47,56.1-85.1c14-34.3,20.7-75.6,2.3-111  c-18.1-34.8-55.7-58-90.4-72.3c-11.7-4.8-24.1-8.8-36.8-11.5l-0.9-0.9l-0.6,0.6c-27.7-5.8-56.6-6-82.4,3c-38.8,13.6-64,48.8-66.8,90.3c-3,43.9,17.8,88.3,33.7,128.8c5.3,13.5,10.4,27.1,14.9,40.9C77.5,309.9,111,343.8,156.4,339.5z" fill="#3b82f6" opacity="0.4"/>
+                    <path d="M356.8,350.8c20.4-38.1,56.9-67.2,96.3-81.5c39.4-14.2,84.5-13.6,123.5,1.4c35.2,13.5,68.3,38.3,81.6,74.5c12.8,34.7,4.4,73.2-13.3,104.7c-17.2,30.8-42.8,55.8-71.2,75.2c-23.6,16.1-49.5,29.2-77.5,32c-31.7,3.2-64.6-8.9-84.8-33.8c-9.6-11.8-16.3-25.7-20.8-40.3c-5.7-18.7-9-38.1-13.1-57.2C370.4,397.7,341.9,378.7,356.8,350.8z" fill="#10b981" opacity="0.5"/>
+                    <path d="M630.3,209.6c28.8,27.1,35.9,75.3,13.3,107.4c-20.1,28.6-57.4,38.8-91.4,35.9c-40.4-3.5-79.4-20.1-111.7-44.8c-30.5-23.4-55.2-53.8-67.8-89.9c-8.3-23.6-9.9-50.6,1.1-73c23.1-46.8,90.4-56.2,139.5-41.6C555.7,119.6,595.5,176.9,630.3,209.6z" fill="#8b5cf6" opacity="0.4"/>
+                    
+                    <!-- Design Pattern Hexagons -->
+                    <g transform="translate(375, 250) scale(0.85)">
+                        <!-- Central hexagon -->
+                        <polygon points="0,60 52,30 52,-30 0,-60 -52,-30 -52,30" fill="#1e293b" stroke="#3b82f6" stroke-width="2"/>
+                        
+                        <!-- Surrounding hexagons -->
+                        <polygon points="0,-120 52,-90 52,-150 0,-180 -52,-150 -52,-90" fill="#1e293b" stroke="#10b981" stroke-width="2" opacity="0.9"/>
+                        <polygon points="90,-52 142,-82 142,-142 90,-172 38,-142 38,-82" fill="#1e293b" stroke="#8b5cf6" stroke-width="2" opacity="0.85"/>
+                        <polygon points="90,52 142,22 142,-38 90,-68 38,-38 38,22" fill="#1e293b" stroke="#3b82f6" stroke-width="2" opacity="0.9"/>
+                        <polygon points="0,120 52,90 52,30 0,0 -52,30 -52,90" fill="#1e293b" stroke="#10b981" stroke-width="2" opacity="0.85"/>
+                        <polygon points="-90,52 -38,22 -38,-38 -90,-68 -142,-38 -142,22" fill="#1e293b" stroke="#8b5cf6" stroke-width="2" opacity="0.9"/>
+                        <polygon points="-90,-52 -38,-82 -38,-142 -90,-172 -142,-142 -142,-82" fill="#1e293b" stroke="#3b82f6" stroke-width="2" opacity="0.85"/>
+                        
+                        <!-- Connection lines -->
+                        <line x1="0" y1="-60" x2="0" y2="-120" stroke="#10b981" stroke-width="2" opacity="0.6"/>
+                        <line x1="45" y1="-30" x2="90" y2="-52" stroke="#8b5cf6" stroke-width="2" opacity="0.6"/>
+                        <line x1="45" y1="30" x2="90" y2="52" stroke="#3b82f6" stroke-width="2" opacity="0.6"/>
+                        <line x1="0" y1="60" x2="0" y2="120" stroke="#10b981" stroke-width="2" opacity="0.6"/>
+                        <line x1="-45" y1="30" x2="-90" y2="52" stroke="#8b5cf6" stroke-width="2" opacity="0.6"/>
+                        <line x1="-45" y1="-30" x2="-90" y2="-52" stroke="#3b82f6" stroke-width="2" opacity="0.6"/>
+                        
+                        <!-- Text labels with glow effect -->
+                        <text x="0" y="0" font-family="Poppins, sans-serif" font-size="16" fill="white" text-anchor="middle" dominant-baseline="middle" filter="url(#glow)">SOLID</text>
+                        <text x="0" y="-150" font-family="Poppins, sans-serif" font-size="12" fill="white" text-anchor="middle" dominant-baseline="middle">Creational</text>
+                        <text x="115" y="-125" font-family="Poppins, sans-serif" font-size="12" fill="white" text-anchor="middle" dominant-baseline="middle">Structural</text>
+                        <text x="115" y="25" font-family="Poppins, sans-serif" font-size="12" fill="white" text-anchor="middle" dominant-baseline="middle">Behavioral</text>
+                        <text x="0" y="150" font-family="Poppins, sans-serif" font-size="12" fill="white" text-anchor="middle" dominant-baseline="middle">Factory</text>
+                        <text x="-115" y="25" font-family="Poppins, sans-serif" font-size="12" fill="white" text-anchor="middle" dominant-baseline="middle">Observer</text>
+                        <text x="-115" y="-125" font-family="Poppins, sans-serif" font-size="12" fill="white" text-anchor="middle" dominant-baseline="middle">Singleton</text>
+                        
+                        <!-- Glow effect definition -->
+                        <defs>
+                            <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+                                <feGaussianBlur stdDeviation="2" result="blur"/>
+                                <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+                            </filter>
+                        </defs>
+                    </g>
+                </svg>
+            </div>
         </div>
     </section>
 
@@ -1177,9 +1325,9 @@
             <div class="footer-inner">
                 <p>&copy; 2025 Osama Zinhom. All rights reserved.</p>
                 <div class="footer-links">
-                    <a href="#" class="footer-link">GitHub</a>
-                    <a href="#" class="footer-link">LinkedIn</a>
-                    <a href="#" class="footer-link">Contact</a>
+                    <a href="https://github.com/ozidan" class="footer-link">GitHub</a>
+                    <a href="https://www.linkedin.com/in/ozidan/" class="footer-link">LinkedIn</a>
+                    <a href="https://api.whatsapp.com/send/?phone=201116771405&text&type=phone_number&app_absent=0" class="footer-link">Contact</a>
                 </div>
             </div>
         </div>
