@@ -1,1042 +1,401 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Prototype Pattern</title>
+    <title>Prototype Pattern | نمط النموذج الأولي</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800&family=Inter:wght@300;400;600;800&family=Fira+Code:wght@400;500&display=swap"
+        rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: { extend: { fontFamily: { sans: ['Inter'], arabic: ['Cairo'], mono: ['Fira Code'] } } }
+        }
+    </script>
     <style>
-        :root {
-            --primary-color: #3b82f6; /* Vibrant blue */
-            --primary-dark: #2563eb;
-            --primary-light: #60a5fa;
-            --secondary-color: #10b981; /* Green */
-            --secondary-dark: #059669;
-            --accent-color: #8b5cf6; /* Purple */
-            --accent-color-good: #059669; /* Green for good examples */
-            --accent-color-bad: #ef4444; /* Red for bad examples */
-            --text-color: #e2e8f0;
-            --text-muted: #94a3b8;
-            --bg-color: #0f172a; /* Dark blue background */
-            --bg-light: #1e293b;
-            --bg-lighter: #334155;
-            --bg-card: #1e293b;
-            --border-color: #334155;
-            --code-bg: #0f172a;
-            --code-text: #e2e8f0;
-            --heading-font: 'Poppins', sans-serif;
-            --body-font: 'Inter', sans-serif;
-            --border-radius: 8px;
-            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
-            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2), 0 2px 4px -1px rgba(0, 0, 0, 0.1);
-            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
-            --glow: 0 0 15px rgba(59, 130, 246, 0.5);
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
         body {
-            font-family: var(--body-font);
-            line-height: 1.7;
-            color: var(--text-color);
-            background-color: var(--bg-color);
+            background: #020617;
+            color: #E2E8F0;
         }
 
-        /* Hero Section */
-        .hero {
-            position: relative;
-            min-height: 40vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            color: white;
-            text-align: center;
-            overflow: hidden;
-            background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
-            padding: 3rem 1rem;
+        .glass-card {
+            background: rgba(15, 23, 42, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
         }
 
-        .hero::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2000 1500"><rect fill="%23000000" width="2000" height="1500"/><defs><circle stroke="%23222" vector-effect="non-scaling-stroke" id="a" fill="none" stroke-width="5" r="315"/></defs><g transform="translate(1000 750)"><use stroke="%233b82f6" href="%23a" transform="rotate(60 0 0) scale(0.4 0.4)"/><use stroke="%233b82f6" href="%23a" transform="rotate(120 0 0) scale(0.5 0.5)"/><use stroke="%233b82f6" href="%23a" transform="rotate(180 0 0) scale(0.6 0.6)"/><use stroke="%233b82f6" href="%23a" transform="rotate(240 0 0) scale(0.7 0.7)"/><use stroke="%233b82f6" href="%23a" transform="rotate(300 0 0) scale(0.8 0.8)"/></g></svg>');
-            background-size: cover;
-            opacity: 0.1;
-            animation: pulse 15s ease-in-out infinite alternate;
+        .glass-card:hover {
+            border-color: rgba(14, 165, 233, 0.4);
         }
 
-        @keyframes pulse {
-            0% { transform: scale(1); opacity: 0.1; }
-            50% { transform: scale(1.05); opacity: 0.15; }
-            100% { transform: scale(1); opacity: 0.1; }
-        }
-
-        .hero-content {
-            position: relative;
-            z-index: 10;
-            max-width: 800px;
-        }
-
-        .hero h1 {
-            font-family: var(--heading-font);
-            font-size: 3rem;
-            font-weight: 700;
-            margin-bottom: 1rem;
-            text-shadow: 0 0 30px rgba(59, 130, 246, 0.5);
-        }
-
-        .hero p {
-            font-size: 1.2rem;
-            opacity: 0.9;
-            max-width: 600px;
-            margin: 0 auto;
-        }
-
-        /* Shapes animation */
-        .shapes {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            overflow: hidden;
-        }
-
-        .shape {
-            position: absolute;
-            opacity: 0.2;
-            animation: float 15s infinite linear;
-        }
-
-        .shape-1 {
-            top: 20%;
-            left: 10%;
-            width: 60px;
-            height: 60px;
-            border-radius: 41% 59% 37% 63% / 44% 67% 33% 56%;
-            background-color: #10b981;
-            animation-duration: 25s;
-            box-shadow: 0 0 30px rgba(16, 185, 129, 0.4);
-        }
-
-        .shape-2 {
-            top: 60%;
-            right: 15%;
-            width: 80px;
-            height: 80px;
-            border-radius: 73% 27% 59% 41% / 57% 43% 57% 43%;
-            background-color: #8b5cf6;
-            animation-duration: 30s;
-            animation-delay: 2s;
-            box-shadow: 0 0 30px rgba(139, 92, 246, 0.4);
-        }
-
-        @keyframes float {
-            0% {
-                transform: translate(0, 0) rotate(0deg);
-            }
-            25% {
-                transform: translate(10px, 15px) rotate(90deg);
-            }
-            50% {
-                transform: translate(5px, -10px) rotate(180deg);
-            }
-            75% {
-                transform: translate(-10px, 5px) rotate(270deg);
-            }
-            100% {
-                transform: translate(0, 0) rotate(360deg);
-            }
-        }
-
-        /* Main Content */
-        .main-content {
-            position: relative;
-            margin-top: -50px;
-            padding-bottom: 4rem;
-        }
-
-        .container {
-            width: 90%;
-            max-width: 1000px;
-            margin: 0 auto;
-            padding: 3rem;
-            background-color: var(--bg-light);
-            border-radius: var(--border-radius);
-            box-shadow: var(--shadow-lg);
-            border: 1px solid var(--border-color);
-        }
-
-        /* Back link */
-        .back-link {
-            display: inline-flex;
-            align-items: center;
-            margin-bottom: 2rem;
-            color: var(--primary-light);
-            text-decoration: none;
-            font-weight: 500;
-            transition: color 0.2s;
-        }
-        
-        .back-link:hover {
-            color: var(--primary-color);
-            text-shadow: 0 0 8px rgba(59, 130, 246, 0.5);
-        }
-
-        .back-link svg {
-            margin-right: 0.5rem;
-        }
-
-        /* Typography */
-        h1, h2, h3 {
-            font-family: var(--heading-font);
-            color: var(--text-color);
-        }
-
-        h1.page-title {
-            font-size: 2.5rem;
-            font-weight: 600;
-            margin-bottom: 2rem;
-            position: relative;
-            padding-bottom: 1rem;
-        }
-
-        h1.page-title::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100px;
-            height: 4px;
-            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
-            border-radius: 2px;
-        }
-
-        h2 {
-            font-size: 1.8rem;
-            font-weight: 600;
-            margin-top: 3rem;
-            margin-bottom: 1.5rem;
-            color: var(--primary-light);
-        }
-
-        h3 {
-            font-size: 1.4rem;
-            font-weight: 500;
-            margin-top: 2rem;
-            margin-bottom: 1rem;
-        }
-
-        p, li {
-            margin-bottom: 1.5rem;
-            color: var(--text-muted);
-            font-size: 1.05rem;
-            line-height: 1.8;
-        }
-
-        ul, ol {
-            padding-left: 1.5rem;
-            margin-bottom: 2rem;
-        }
-
-        li {
-            margin-bottom: 0.5rem;
-        }
-
-        strong {
-            color: var(--text-color);
-            font-weight: 600;
-        }
-
-        /* Code styling */
-        code {
-            background-color: var(--code-bg);
-            padding: 0.2em 0.4em;
-            border-radius: 4px;
-            font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
-            font-size: 0.9em;
-            color: #f87171;
-            border: 1px solid var(--border-color);
+        .text-gradient {
+            background: linear-gradient(135deg, #0EA5E9, #8B5CF6);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
         pre {
-            background-color: var(--code-bg);
-            color: var(--code-text);
-            padding: 1.5rem;
-            border-radius: var(--border-radius);
-            overflow-x: auto;
-            margin: 2rem 0;
-            font-size: 0.9rem;
-            line-height: 1.6;
-            border: 1px solid var(--border-color);
+            background: #0B1221 !important;
+            border: 1px solid #1E293B;
+            border-radius: 0.75rem;
         }
 
-        pre code {
-            background: none;
-            padding: 0;
-            color: inherit;
-            font-size: inherit;
-            border: none;
-        }
-
-        /* Examples */
-        .example {
-            border: 1px solid var(--border-color);
-            padding: 2rem;
-            margin: 2.5rem 0;
-            border-radius: var(--border-radius);
-            background-color: var(--bg-light);
-            box-shadow: var(--shadow-sm);
-        }
-
-        .visualization {
-            display: flex;
-            justify-content: center;
-            margin: 2rem 0;
-            overflow-x: auto;
-            padding: 1rem;
-        }
-
-        .visualization svg {
-            max-width: 100%;
-        }
-        
-        /* Footer */
-        footer {
-            background-color: var(--bg-color);
-            color: white;
-            padding: 3rem 0;
-            text-align: center;
-            margin-top: 4rem;
-            border-top: 1px solid var(--border-color);
-        }
-
-        .footer-content {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 2rem;
-        }
-
-        .footer-content p {
-            color: rgba(255, 255, 255, 0.7);
-            margin-bottom: 0;
+        .prototype-glow {
+            box-shadow: 0 0 60px rgba(14, 165, 233, 0.3);
         }
     </style>
 </head>
+
 <body>
-    <!-- Hero Section -->
-    <section class="hero">
-        <div class="shapes">
-            <div class="shape shape-1"></div>
-            <div class="shape shape-2"></div>
-        </div>
-        <div class="hero-content">
-            <h1>Prototype Pattern</h1>
-            <p>Create new objects by copying an existing object, known as the prototype</p>
-        </div>
-    </section>
-
-    <div class="main-content">
-        <div class="container">
-            <a href="../../../index.html" class="back-link">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M19 12H5M12 19l-7-7 7-7"/>
-                </svg>
-                Back to Overview
-            </a>
-
-            <h1 class="page-title">Prototype Pattern</h1>
-
-            <p>The <strong>Prototype Pattern</strong> is a creational design pattern that lets you create new objects by copying an existing object, known as the prototype. This pattern is useful when creating a new object is more expensive than copying an existing one, or when you need to create objects with particular state configurations that might be time-consuming to set up from scratch.</p>
-
-            <h2>Problem</h2>
-            <p>Imagine you have a complex object that's expensive to create, perhaps because it requires resource-intensive operations, database access, or network requests. You need multiple instances of this object, but each might need slight variations. Creating each instance from scratch would be inefficient.</p>
-            
-            <p>Alternatively, consider a scenario where you have an object with a particular state that would be tedious to recreate manually, and you want to create a new object with that same initial state.</p>
-            
-            <div class="visualization">
-                <svg width="800" height="400" viewBox="0 0 800 400">
-                    <!-- Background -->
-                    <rect x="0" y="0" width="800" height="400" fill="transparent" />
-                    
-                    <!-- Prototype Interface -->
-                    <rect x="300" y="20" width="200" height="60" rx="5" fill="#3b82f6" stroke="#fff" stroke-width="2" stroke-dasharray="5,5" />
-                    <text x="400" y="55" font-family="sans-serif" font-size="16" text-anchor="middle" fill="white">Prototype</text>
-                    
-                    <!-- Clone Method -->
-                    <rect x="300" y="80" width="200" height="30" rx="5" fill="#334155" />
-                    <text x="400" y="100" font-family="sans-serif" font-size="14" text-anchor="middle" fill="white">clone()</text>
-                    
-                    <!-- Concrete Prototypes -->
-                    <rect x="150" y="180" width="200" height="60" rx="5" fill="#10b981" />
-                    <text x="250" y="215" font-family="sans-serif" font-size="16" text-anchor="middle" fill="white">ConcretePrototypeA</text>
-                    
-                    <rect x="450" y="180" width="200" height="60" rx="5" fill="#10b981" />
-                    <text x="550" y="215" font-family="sans-serif" font-size="16" text-anchor="middle" fill="white">ConcretePrototypeB</text>
-                    
-                    <!-- Clone Methods -->
-                    <rect x="150" y="240" width="200" height="30" rx="5" fill="#334155" />
-                    <text x="250" y="260" font-family="sans-serif" font-size="14" text-anchor="middle" fill="white">clone()</text>
-                    
-                    <rect x="450" y="240" width="200" height="30" rx="5" fill="#334155" />
-                    <text x="550" y="260" font-family="sans-serif" font-size="14" text-anchor="middle" fill="white">clone()</text>
-                    
-                    <!-- Client -->
-                    <rect x="650" y="70" width="100" height="50" rx="5" fill="#0ea5e9" />
-                    <text x="700" y="100" font-family="sans-serif" font-size="14" text-anchor="middle" fill="white">Client</text>
-                    
-                    <!-- Inheritance Lines -->
-                    <path d="M400 110 L250 180" stroke="#ffffff" stroke-width="2" marker-end="url(#arrowhead)" />
-                    <path d="M400 110 L550 180" stroke="#ffffff" stroke-width="2" marker-end="url(#arrowhead)" />
-                    
-                    <!-- Client Relationship -->
-                    <path d="M650 95 L500 50" stroke="#ffffff" stroke-width="2" marker-end="url(#arrowhead)" stroke-dasharray="5,5" />
-                    <text x="550" y="70" font-family="sans-serif" font-size="12" text-anchor="middle" fill="#0ea5e9">uses</text>
-                    
-                    <!-- Clone Results -->
-                    <rect x="150" y="320" width="80" height="40" rx="5" fill="#ef4444" />
-                    <text x="190" y="345" font-family="sans-serif" font-size="12" text-anchor="middle" fill="white">Copy A1</text>
-                    
-                    <rect x="240" y="320" width="80" height="40" rx="5" fill="#ef4444" />
-                    <text x="280" y="345" font-family="sans-serif" font-size="12" text-anchor="middle" fill="white">Copy A2</text>
-                    
-                    <rect x="450" y="320" width="80" height="40" rx="5" fill="#ef4444" />
-                    <text x="490" y="345" font-family="sans-serif" font-size="12" text-anchor="middle" fill="white">Copy B1</text>
-                    
-                    <rect x="540" y="320" width="80" height="40" rx="5" fill="#ef4444" />
-                    <text x="580" y="345" font-family="sans-serif" font-size="12" text-anchor="middle" fill="white">Copy B2</text>
-                    
-                    <!-- Clone Lines -->
-                    <path d="M250 270 L190 320" stroke="#ffffff" stroke-width="2" marker-end="url(#arrowhead)" stroke-dasharray="5,5" />
-                    <path d="M250 270 L280 320" stroke="#ffffff" stroke-width="2" marker-end="url(#arrowhead)" stroke-dasharray="5,5" />
-                    <path d="M550 270 L490 320" stroke="#ffffff" stroke-width="2" marker-end="url(#arrowhead)" stroke-dasharray="5,5" />
-                    <path d="M550 270 L580 320" stroke="#ffffff" stroke-width="2" marker-end="url(#arrowhead)" stroke-dasharray="5,5" />
-                    
-                    <text x="220" y="295" font-family="sans-serif" font-size="12" text-anchor="middle" fill="#10b981">clones</text>
-                    <text x="300" y="295" font-family="sans-serif" font-size="12" text-anchor="middle" fill="#10b981">clones</text>
-                    <text x="520" y="295" font-family="sans-serif" font-size="12" text-anchor="middle" fill="#10b981">clones</text>
-                    <text x="600" y="295" font-family="sans-serif" font-size="12" text-anchor="middle" fill="#10b981">clones</text>
-                    
-                    <!-- Arrowhead marker -->
-                    <defs>
-                        <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
-                            <polygon points="0 0, 10 3.5, 0 7" fill="#ffffff" />
-                        </marker>
-                    </defs>
-                </svg>
+    <nav class="fixed top-0 w-full z-50 glass-card">
+        <div class="container mx-auto px-6 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div
+                    class="w-10 h-10 rounded-lg bg-gradient-to-br from-cyan-500 to-purple-500 flex items-center justify-center text-white font-bold text-lg">
+                    🧬</div>
+                <span class="font-bold text-lg">Prototype<span class="text-cyan-500">Pattern</span></span>
             </div>
+            <a href="../../../index.html"
+                class="px-4 py-2 rounded-full bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 hover:bg-cyan-500 hover:text-white transition">
+                <i class="fa-solid fa-home mr-1"></i> الرئيسية
+            </a>
+        </div>
+    </nav>
 
-            <h2>Solution</h2>
-            <p>The Prototype pattern delegates the object-copying process to the actual objects being cloned. The pattern declares a common interface for all objects that support cloning. This interface lets you clone an object without coupling your code to the class of that object.</p>
-            
-            <p>Typically, such an interface contains a single <code>clone()</code> method, which returns a copy of the current object. The implementation of the <code>clone()</code> method is very similar in all classes: it creates an object of the current class and carries over all the field values from the current object to the new one.</p>
+    <header class="relative pt-32 pb-20 px-6 overflow-hidden">
+        <div class="absolute top-0 right-0 w-[500px] h-[500px] bg-cyan-500/10 rounded-full blur-[128px]"></div>
+        <div class="absolute bottom-0 left-0 w-[400px] h-[400px] bg-purple-500/10 rounded-full blur-[100px]"></div>
+        <div class="container mx-auto text-center relative z-10" data-aos="fade-up">
+            <div
+                class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-800/50 border border-slate-700 text-xs font-mono text-cyan-400 mb-6">
+                <span class="w-2 h-2 rounded-full bg-cyan-500 animate-pulse"></span>
+                CREATIONAL PATTERN
+            </div>
+            <h1 class="text-5xl md:text-7xl font-black mb-4"><span class="text-gradient">Prototype Pattern</span></h1>
+            <h2 class="text-3xl font-bold text-slate-300 font-arabic mb-6">نمط الاستنساخ</h2>
+            <div class="p-6 bg-cyan-950/30 border border-cyan-900/50 rounded-2xl max-w-3xl mx-auto">
+                <p class="font-arabic text-xl text-cyan-100/90 leading-loose">
+                    <span class="text-cyan-400 font-bold">يعني إيه؟</span>
+                    زي <span class="text-purple-400">النسخ واللصق</span> في البرامج! 📋
+                    <br>بدل ما تعمل Object جديد من الصفر - <span class="text-emerald-400">انسخ واحد موجود</span>! 🧬
+                </p>
+            </div>
+        </div>
+    </header>
 
-            <h2>Components</h2>
-            <ul>
-                <li><strong>Prototype:</strong> The interface that declares the cloning method. It's a common interface for all objects that can be cloned.</li>
-                <li><strong>Concrete Prototype:</strong> A class that implements the cloning interface, providing the actual cloning implementation.</li>
-                <li><strong>Client:</strong> Creates a new object by asking a prototype to clone itself.</li>
-            </ul>
+    <section class="py-20 px-6 bg-slate-900/30">
+        <div class="container mx-auto max-w-6xl">
+            <div class="text-center mb-16" data-aos="fade-up">
+                <span class="text-cyan-500 font-mono text-sm">THE CONCEPT</span>
+                <h2 class="text-4xl font-bold text-white mt-2">مثال استنساخ الخلايا 🧬</h2>
+            </div>
+            <div class="grid lg:grid-cols-2 gap-12 items-center">
+                <div class="glass-card p-2 rounded-2xl prototype-glow" data-aos="fade-right">
+                    <svg viewBox="0 0 500 380" class="w-full bg-[#0B1121] rounded-xl">
+                        <defs>
+                            <linearGradient id="cyanGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#0EA5E9;stop-opacity:0.8" />
+                                <stop offset="100%" style="stop-color:#8B5CF6;stop-opacity:0.6" />
+                            </linearGradient>
+                        </defs>
 
-            <h2>When to Use</h2>
-            <ul>
-                <li>When object creation is costly, and you want to avoid the expense by copying an existing object.</li>
-                <li>When your code shouldn't depend on the concrete classes of objects that you need to copy.</li>
-                <li>When you want to hide the complexity of creating new instances from the client.</li>
-                <li>When you need to create objects with particular state configurations that might be time-consuming to set up manually.</li>
-            </ul>
+                        <text x="250" y="25" text-anchor="middle" fill="#94a3b8" font-family="Cairo"
+                            font-size="12">Prototype = clone() بدل new!</text>
 
-            <h2>Benefits</h2>
-            <ul>
-                <li>You can clone objects without coupling to their concrete classes.</li>
-                <li>You can avoid repeated initialization code in favor of cloning pre-built prototypes.</li>
-                <li>You can produce complex objects more conveniently.</li>
-                <li>You get an alternative to inheritance when dealing with configuration presets for complex objects.</li>
-            </ul>
+                        <!-- Original Cell -->
+                        <g transform="translate(50,60)">
+                            <rect width="160" height="120" rx="12" fill="url(#cyanGrad)" stroke="#0ea5e9"
+                                stroke-width="2" />
+                            <text x="80" y="45" text-anchor="middle" font-size="36">🧬</text>
+                            <text x="80" y="75" text-anchor="middle" fill="white" font-weight="bold"
+                                font-size="12">Original Prototype</text>
+                            <text x="80" y="95" text-anchor="middle" fill="white" font-size="9">color: "blue"</text>
+                            <text x="80" y="110" text-anchor="middle" fill="white" font-size="9">size: 100</text>
+                        </g>
 
-            <h2>Real-World Uses</h2>
-            <ul>
-                <li>Object libraries with pre-configured objects that can be copied and modified.</li>
-                <li>Creating complex configurations (like a document with text, images, and styles) by cloning existing ones.</li>
-                <li>Game frameworks where game entity templates are cloned to create instances.</li>
-                <li>Creating identical or similar DOM elements in web applications.</li>
-                <li>Generating variations of a base model in CAD/CAM applications.</li>
-            </ul>
+                        <!-- Clone arrows -->
+                        <path d="M210 120 L280 80" stroke="#0ea5e9" stroke-width="2" marker-end="url(#arrow)" />
+                        <text x="245" y="85" fill="#0ea5e9" font-size="10">.clone()</text>
 
-            <h2>Implementation Example</h2>
-            <p>Here's an example of the Prototype pattern in JavaScript, demonstrating how different types of shapes can be cloned:</p>
+                        <path d="M210 120 L280 120" stroke="#8b5cf6" stroke-width="2" marker-end="url(#arrow)" />
+                        <text x="245" y="115" fill="#8b5cf6" font-size="10">.clone()</text>
 
-            <pre><code>// Prototype interface
-class Shape {
-    constructor() {
-        this.x = 0;
-        this.y = 0;
-        this.color = "black";
-    }
-    
-    clone() {
-        // Default implementation - create a new object and copy properties
-        const clone = Object.create(Object.getPrototypeOf(this));
-        const propNames = Object.getOwnPropertyNames(this);
-        
-        propNames.forEach(name => {
-            const desc = Object.getOwnPropertyDescriptor(this, name);
-            Object.defineProperty(clone, name, desc);
-        });
-        
-        return clone;
-    }
-}
+                        <path d="M210 120 L280 160" stroke="#10b981" stroke-width="2" marker-end="url(#arrow)" />
+                        <text x="245" y="160" fill="#10b981" font-size="10">.clone()</text>
 
-// Concrete prototype - Circle
-class Circle extends Shape {
-    constructor(radius) {
-        super();
-        this.radius = radius || 10;
-    }
-    
-    calculateArea() {
-        return Math.PI * this.radius * this.radius;
-    }
-}
+                        <!-- Clones -->
+                        <g transform="translate(290,40)">
+                            <rect width="140" height="55" rx="8" fill="#1e293b" stroke="#0ea5e9" stroke-width="2" />
+                            <text x="70" y="25" text-anchor="middle" font-size="18">🧬</text>
+                            <text x="70" y="42" text-anchor="middle" fill="#22d3ee" font-size="9">Clone 1 (blue)</text>
+                        </g>
+                        <g transform="translate(290,105)">
+                            <rect width="140" height="55" rx="8" fill="#1e293b" stroke="#8b5cf6" stroke-width="2" />
+                            <text x="70" y="25" text-anchor="middle" font-size="18">🧬</text>
+                            <text x="70" y="42" text-anchor="middle" fill="#a78bfa" font-size="9">Clone 2
+                                (purple)</text>
+                        </g>
+                        <g transform="translate(290,170)">
+                            <rect width="140" height="55" rx="8" fill="#1e293b" stroke="#10b981" stroke-width="2" />
+                            <text x="70" y="25" text-anchor="middle" font-size="18">🧬</text>
+                            <text x="70" y="42" text-anchor="middle" fill="#34d399" font-size="9">Clone 3 (green)</text>
+                        </g>
 
-// Concrete prototype - Rectangle
-class Rectangle extends Shape {
-    constructor(width, height) {
-        super();
-        this.width = width || 10;
-        this.height = height || 10;
-    }
-    
-    calculateArea() {
-        return this.width * this.height;
-    }
-}
+                        <!-- VS Section -->
+                        <rect x="50" y="250" width="180" height="80" rx="8" fill="#ef4444" fill-opacity="0.2"
+                            stroke="#ef4444" stroke-width="1" />
+                        <text x="140" y="275" text-anchor="middle" fill="#f87171" font-size="11">❌ new Object() -
+                            Expensive!</text>
+                        <text x="140" y="295" text-anchor="middle" fill="#94a3b8" font-family="Cairo" font-size="10">كل
+                            مرة نعمل Object جديد</text>
+                        <text x="140" y="310" text-anchor="middle" fill="#94a3b8" font-family="Cairo" font-size="10">من
+                            الصفر - وقت كتير!</text>
 
-// Client code
-// Create initial prototypes
-const circlePrototype = new Circle(5);
-circlePrototype.color = "red";
-circlePrototype.x = 10;
-circlePrototype.y = 10;
+                        <rect x="270" y="250" width="180" height="80" rx="8" fill="#10b981" fill-opacity="0.2"
+                            stroke="#10b981" stroke-width="1" />
+                        <text x="360" y="275" text-anchor="middle" fill="#34d399" font-size="11">✅ clone() -
+                            Fast!</text>
+                        <text x="360" y="295" text-anchor="middle" fill="#94a3b8" font-family="Cairo"
+                            font-size="10">ننسخ Object موجود</text>
+                        <text x="360" y="310" text-anchor="middle" fill="#94a3b8" font-family="Cairo"
+                            font-size="10">ونغير اللي محتاجينه بس!</text>
 
-const rectanglePrototype = new Rectangle(10, 20);
-rectanglePrototype.color = "blue";
-rectanglePrototype.x = 20;
-rectanglePrototype.y = 30;
+                        <defs>
+                            <marker id="arrow" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                                <polygon points="0 0, 10 3.5, 0 7" fill="#94a3b8" />
+                            </marker>
+                        </defs>
 
-// Create clones with modifications
-const circle1 = circlePrototype.clone();
-circle1.radius = 10;
-circle1.y = 15;
-
-const rectangle1 = rectanglePrototype.clone();
-rectangle1.width = 25;
-rectangle1.color = "green";
-
-console.log("Circle prototype - Area:", circlePrototype.calculateArea());
-console.log("Circle clone - Area:", circle1.calculateArea());
-console.log("Rectangle prototype - Area:", rectanglePrototype.calculateArea());
-console.log("Rectangle clone - Area:", rectangle1.calculateArea());</code></pre>
-
-            <p>In this example:</p>
-            <ul>
-                <li>The <code>Shape</code> class serves as the prototype interface with a <code>clone()</code> method.</li>
-                <li><code>Circle</code> and <code>Rectangle</code> are concrete prototypes that inherit from <code>Shape</code>.</li>
-                <li>We create prototype instances, and then clone them to create new objects with modified properties.</li>
-                <li>This demonstrates how we can create new objects by copying existing ones, rather than creating them from scratch.</li>
-            </ul>
-
-            <h2>Interactive Demo</h2>
-            <p>The demo below illustrates the Prototype pattern in action. It demonstrates cloning pre-configured document objects with different styles and properties, simulating a simple document editor scenario.</p>
-
-            <div class="interactive-demo">
-                <h3>Interactive Demo: Document Editor Prototype</h3>
-                <p>This demo shows how the Prototype pattern can be used in a document editor to clone document templates with different styles and content. Select a template, then clone and modify it.</p>
-                
-                <style>
-                    .demo-container {
-                        display: flex;
-                        flex-direction: column;
-                        gap: 2rem;
-                        margin-top: 1.5rem;
-                    }
-
-                    .template-section {
-                        display: flex;
-                        gap: 1rem;
-                        flex-wrap: wrap;
-                    }
-
-                    .template-card {
-                        border: 1px solid var(--border-color);
-                        border-radius: var(--border-radius);
-                        padding: 1.5rem;
-                        width: 200px;
-                        text-align: center;
-                        cursor: pointer;
-                        transition: transform 0.2s, box-shadow 0.3s;
-                        background-color: var(--bg-color);
-                    }
-
-                    .template-card:hover {
-                        transform: translateY(-5px);
-                        box-shadow: var(--shadow);
-                    }
-
-                    .template-card.selected {
-                        border-color: var(--primary-color);
-                        box-shadow: 0 0 0 2px var(--primary-color);
-                    }
-
-                    .template-title {
-                        margin-top: 0.5rem;
-                        font-weight: 600;
-                        font-size: 1.1rem;
-                    }
-
-                    .template-icon {
-                        font-size: 2.5rem;
-                        margin-bottom: 0.5rem;
-                    }
-
-                    .document-preview {
-                        border: 1px solid var(--border-color);
-                        border-radius: var(--border-radius);
-                        padding: 2rem;
-                        margin-top: 1.5rem;
-                        background-color: var(--bg-color);
-                    }
-
-                    .document-container {
-                        padding: 1.5rem;
-                        border-radius: 5px;
-                        transition: all 0.3s;
-                    }
-
-                    .document-header {
-                        font-family: var(--heading-font);
-                        font-weight: 600;
-                        margin-bottom: 1rem;
-                    }
-
-                    .document-content {
-                        font-family: var(--body-font);
-                        line-height: 1.6;
-                    }
-
-                    .document-footer {
-                        margin-top: 1.5rem;
-                        text-align: right;
-                        font-style: italic;
-                    }
-
-                    .document-date {
-                        margin-top: 0.5rem;
-                        font-size: 0.9rem;
-                    }
-
-                    .document-form {
-                        display: grid;
-                        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-                        gap: 1rem;
-                        margin-top: 1.5rem;
-                    }
-
-                    .form-group {
-                        margin-bottom: 1rem;
-                    }
-
-                    .action-buttons {
-                        display: flex;
-                        gap: 1rem;
-                        margin-top: 1.5rem;
-                    }
-
-                    .business-template {
-                        font-family: 'Arial', sans-serif;
-                        color: #333333;
-                        background-color: #ffffff;
-                    }
-
-                    .business-template .document-header {
-                        color: #1a56db;
-                        border-bottom: 2px solid #e2e8f0;
-                        padding-bottom: 0.5rem;
-                    }
-
-                    .creative-template {
-                        font-family: 'Georgia', serif;
-                        color: #ffffff;
-                        background-color: #4b5563;
-                    }
-
-                    .creative-template .document-header {
-                        color: #f59e0b;
-                        font-style: italic;
-                    }
-
-                    .technical-template {
-                        font-family: 'Courier New', monospace;
-                        color: #a5f3fc;
-                        background-color: #0f172a;
-                    }
-
-                    .technical-template .document-header {
-                        color: #2dd4bf;
-                        border-left: 3px solid #2dd4bf;
-                        padding-left: 0.5rem;
-                    }
-
-                    .clone-badge {
-                        display: inline-block;
-                        padding: 0.25rem 0.5rem;
-                        background-color: var(--primary-color);
-                        color: white;
-                        border-radius: 3px;
-                        font-size: 0.8rem;
-                        margin-left: 0.5rem;
-                        font-weight: normal;
-                    }
-                </style>
-                
-                <div class="demo-container">
-                    <div>
-                        <h4>1. Select a Document Template:</h4>
-                        <div class="template-section">
-                            <div class="template-card" id="business-template">
-                                <div class="template-icon">📄</div>
-                                <div class="template-title">Business</div>
-                            </div>
-                            <div class="template-card" id="creative-template">
-                                <div class="template-icon">🎨</div>
-                                <div class="template-title">Creative</div>
-                            </div>
-                            <div class="template-card" id="technical-template">
-                                <div class="template-icon">💻</div>
-                                <div class="template-title">Technical</div>
-                            </div>
-                        </div>
+                        <rect x="50" y="345" width="400" height="30" rx="6" fill="#1e293b" />
+                        <text x="250" y="365" text-anchor="middle" fill="#0ea5e9" font-size="11" font-weight="bold">🧬
+                            Clone = Deep Copy + Customize!</text>
+                    </svg>
+                </div>
+                <div class="space-y-6" data-aos="fade-left">
+                    <div class="glass-card p-6 rounded-xl border-r-4 border-r-cyan-500">
+                        <h3 class="text-xl font-bold text-white mb-3">🧬 Prototype</h3>
+                        <p class="text-slate-300 font-arabic text-right leading-relaxed">
+                            الـ Object الأصلي اللي عنده method <span class="text-cyan-400 font-bold">clone()</span> -
+                            بيعرف ينسخ نفسه!
+                        </p>
                     </div>
-                    
-                    <div>
-                        <h4>2. Preview:</h4>
-                        <div class="document-preview">
-                            <div class="document-container" id="document-container">
-                                <div class="document-header" id="document-header">Select a template</div>
-                                <div class="document-content" id="document-content">
-                                    The content of your document will appear here once you select a template. 
-                                    You can then clone and modify the document.
-                                </div>
-                                <div class="document-footer" id="document-footer"></div>
-                                <div class="document-date" id="document-date"></div>
-                            </div>
-                        </div>
+                    <div class="glass-card p-6 rounded-xl border-r-4 border-r-purple-500">
+                        <h3 class="text-xl font-bold text-white mb-3">📋 clone()</h3>
+                        <p class="text-slate-300 font-arabic text-right leading-relaxed">
+                            الـ Method اللي بتعمل <span class="text-purple-400 font-bold">نسخة كاملة</span> من الـ
+                            Object -
+                            Deep Copy مش Reference!
+                        </p>
                     </div>
-                    
-                    <div id="edit-section" style="display: none;">
-                        <h4>3. Modify Cloned Document:</h4>
-                        <div class="document-form">
-                            <div class="form-group">
-                                <label for="doc-title">Document Title:</label>
-                                <input type="text" id="doc-title" class="form-control">
-                            </div>
-                            <div class="form-group">
-                                <label for="doc-content">Content:</label>
-                                <textarea id="doc-content" rows="4" class="form-control"></textarea>
-                            </div>
-                            <div class="form-group">
-                                <label for="doc-author">Author:</label>
-                                <input type="text" id="doc-author" class="form-control">
-                            </div>
-                            <div class="form-group">
-                                <label for="doc-bg-color">Background Color:</label>
-                                <input type="color" id="doc-bg-color" class="form-control">
-                            </div>
-                            <div class="form-group">
-                                <label for="doc-text-color">Text Color:</label>
-                                <input type="color" id="doc-text-color" class="form-control">
-                            </div>
-                        </div>
-                        
-                        <div class="action-buttons">
-                            <button id="update-button">Update Document</button>
-                            <button id="reset-button">Reset to Original</button>
-                        </div>
+                    <div class="glass-card p-6 rounded-xl border-r-4 border-r-emerald-500">
+                        <h3 class="text-xl font-bold text-white mb-3">⚡ Performance</h3>
+                        <p class="text-slate-300 font-arabic text-right leading-relaxed">
+                            <span class="text-emerald-400 font-bold">أسرع من new</span> خصوصاً لو الـ Object معقد
+                            ومحتاج setup كتير!
+                        </p>
                     </div>
-                    
-                    <div class="action-buttons" id="clone-button-container">
-                        <button id="clone-button" disabled>Clone Document</button>
-                    </div>
-                    
-                    <div class="output" id="prototype-output">// Prototype pattern demonstration log will appear here</div>
                 </div>
             </div>
         </div>
-    </div>
+    </section>
 
-    <footer>
-        <div class="footer-content">
-            <p>&copy; 2025 Design Patterns Interactive Guide</p>
+    <section class="py-24 px-6 bg-black/20">
+        <div class="container mx-auto max-w-6xl">
+            <h2 class="text-4xl font-bold text-white mb-12 text-center" data-aos="fade-up">الكود 💻</h2>
+            <div class="bg-[#0B1221] rounded-xl overflow-hidden border border-slate-800" data-aos="fade-up">
+                <div
+                    class="flex items-center gap-2 px-4 py-2 bg-slate-900 border-b border-slate-800 text-xs text-slate-400">
+                    <span class="w-3 h-3 rounded-full bg-red-500"></span>
+                    <span class="w-3 h-3 rounded-full bg-yellow-500"></span>
+                    <span class="w-3 h-3 rounded-full bg-green-500"></span>
+                    <span class="ml-2">Prototype.js</span>
+                </div>
+                <pre class="p-4 text-sm overflow-x-auto" dir="ltr"><code>class Shape {
+  constructor(color, x, y) {
+    this.color = color;
+    this.x = x;
+    this.y = y;
+  }
+  
+  // 🧬 Clone method - Deep Copy!
+  clone() {
+    // Object.assign for shallow copy
+    // For nested objects, use structuredClone()
+    return Object.assign(
+      Object.create(Object.getPrototypeOf(this)),
+      this
+    );
+  }
+  
+  draw() {
+    return `Drawing ${this.color} shape at (${this.x}, ${this.y})`;
+  }
+}
+
+class Circle extends Shape {
+  constructor(color, x, y, radius) {
+    super(color, x, y);
+    this.radius = radius;
+  }
+  
+  draw() {
+    return `⭕ ${this.color} circle r=${this.radius} at (${this.x}, ${this.y})`;
+  }
+}</code></pre>
+            </div>
+
+            <div class="mt-8 bg-[#0B1221] rounded-xl overflow-hidden border border-slate-800" data-aos="fade-up">
+                <div
+                    class="flex items-center gap-2 px-4 py-2 bg-slate-900 border-b border-slate-800 text-xs text-slate-400">
+                    <span class="w-3 h-3 rounded-full bg-red-500"></span>
+                    <span class="w-3 h-3 rounded-full bg-yellow-500"></span>
+                    <span class="w-3 h-3 rounded-full bg-green-500"></span>
+                    <span class="ml-2">Usage.js</span>
+                </div>
+                <pre class="p-4 text-sm overflow-x-auto" dir="ltr"><code>// 🎯 Create original prototype
+const blueCircle = new Circle('blue', 10, 20, 50);
+console.log(blueCircle.draw());
+// ⭕ blue circle r=50 at (10, 20)
+
+// 🧬 Clone instead of new!
+const redCircle = blueCircle.clone();
+redCircle.color = 'red';  // Just change what you need!
+redCircle.x = 100;
+
+console.log(redCircle.draw());
+// ⭕ red circle r=50 at (100, 20)
+
+// ✅ They are separate objects!
+console.log(blueCircle === redCircle); // false
+
+// 🚀 Useful for expensive objects
+const expensiveObject = {
+  data: loadFromDatabase(), // Expensive!
+  cache: buildCache(),      // Expensive!
+  config: parseConfig()     // Expensive!
+};
+
+// Just clone when you need another one!
+const copy = Object.assign({}, expensiveObject);</code></pre>
+            </div>
         </div>
+    </section>
+
+    <section class="py-24 px-6">
+        <div class="container mx-auto max-w-4xl">
+            <h2 class="text-4xl font-bold text-white mb-8 text-center" data-aos="fade-up">جرب! 🎮</h2>
+            <div class="glass-card p-8 rounded-2xl" data-aos="fade-up">
+                <div class="text-center mb-6">
+                    <div class="flex justify-center gap-4 text-6xl mb-4" id="shapesDisplay">
+                        <span id="original">🔵</span>
+                    </div>
+                    <p id="shapeInfo" class="text-xl text-cyan-400 font-arabic">الشكل الأصلي - اضغط Clone!</p>
+                </div>
+                <div class="grid grid-cols-3 gap-3 mb-6">
+                    <button onclick="cloneShape('🔴', 'red')"
+                        class="p-4 bg-red-600 text-white rounded-xl hover:bg-red-700 transition">
+                        🔴 Clone Red
+                    </button>
+                    <button onclick="cloneShape('🟢', 'green')"
+                        class="p-4 bg-emerald-600 text-white rounded-xl hover:bg-emerald-700 transition">
+                        🟢 Clone Green
+                    </button>
+                    <button onclick="cloneShape('🟣', 'purple')"
+                        class="p-4 bg-purple-600 text-white rounded-xl hover:bg-purple-700 transition">
+                        🟣 Clone Purple
+                    </button>
+                </div>
+                <button onclick="resetShapes()"
+                    class="w-full p-3 bg-slate-700 text-white rounded-xl hover:bg-slate-600 transition mb-4">
+                    🔄 Reset
+                </button>
+                <div id="output"
+                    class="h-32 p-4 bg-slate-900 rounded-xl font-mono text-sm text-slate-300 overflow-y-auto">
+                    // Original: blueCircle = new Circle('blue', 10, 20, 50)</div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-20 px-6 bg-slate-900/30">
+        <div class="container mx-auto max-w-4xl">
+            <h2 class="text-4xl font-bold text-white mb-12 text-center" data-aos="fade-up">امتى نستخدمه؟ 🤔</h2>
+            <div class="grid md:grid-cols-2 gap-6">
+                <div class="glass-card p-6 rounded-xl" data-aos="fade-up" data-aos-delay="100">
+                    <div class="text-3xl mb-3">🎮</div>
+                    <h3 class="font-bold text-lg text-white mb-2">Game Objects</h3>
+                    <p class="text-slate-400 font-arabic text-right">bullets, enemies, particles - بنعمل clone بدل new!
+                    </p>
+                </div>
+                <div class="glass-card p-6 rounded-xl" data-aos="fade-up" data-aos-delay="200">
+                    <div class="text-3xl mb-3">📊</div>
+                    <h3 class="font-bold text-lg text-white mb-2">Complex Configurations</h3>
+                    <p class="text-slate-400 font-arabic text-right">إعدادات معقدة - ننسخها ونعدل الفرق بس!</p>
+                </div>
+                <div class="glass-card p-6 rounded-xl" data-aos="fade-up" data-aos-delay="300">
+                    <div class="text-3xl mb-3">🗄️</div>
+                    <h3 class="font-bold text-lg text-white mb-2">Database Records</h3>
+                    <p class="text-slate-400 font-arabic text-right">Records متشابهة - clone أسرع من query جديد!</p>
+                </div>
+                <div class="glass-card p-6 rounded-xl" data-aos="fade-up" data-aos-delay="400">
+                    <div class="text-3xl mb-3">🎨</div>
+                    <h3 class="font-bold text-lg text-white mb-2">UI Components</h3>
+                    <p class="text-slate-400 font-arabic text-right">Components متشابهة - ننسخها بدل ما نبنيها!</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-12 px-6">
+        <div class="container mx-auto max-w-4xl flex justify-between">
+            <a href="../builder/index.html"
+                class="px-6 py-3 glass-card rounded-xl text-slate-300 hover:text-white transition">
+                <i class="fa-solid fa-arrow-right"></i> Builder
+            </a>
+            <a href="../singleton/index.html"
+                class="px-6 py-3 bg-gradient-to-r from-cyan-500 to-purple-500 text-white font-bold rounded-xl">
+                Singleton <i class="fa-solid fa-arrow-left"></i>
+            </a>
+        </div>
+    </section>
+
+    <footer class="py-8 text-center text-slate-600 bg-black/40 border-t border-slate-800">
+        <p>Design Patterns | Eng. Osama Zinhom</p>
     </footer>
 
     <script>
-        // Document Prototype
-        class DocumentPrototype {
-            constructor(title, content, author, style) {
-                this.title = title || 'Untitled Document';
-                this.content = content || 'Empty content';
-                this.author = author || 'Unknown Author';
-                this.style = style || 'default';
-                this.created = new Date();
-                this.lastModified = new Date();
-                this.isClone = false;
-                this.cloneCount = 0;
-            }
-            
-            clone() {
-                const clone = new DocumentPrototype(
-                    this.title,
-                    this.content,
-                    this.author,
-                    this.style
-                );
-                
-                clone.created = new Date(this.created);
-                clone.lastModified = new Date();
-                clone.isClone = true;
-                clone.cloneCount = this.cloneCount + 1;
-                
-                return clone;
-            }
-            
-            getFormattedDate() {
-                return this.lastModified.toLocaleString();
-            }
-            
-            update(title, content, author) {
-                this.title = title || this.title;
-                this.content = content || this.content;
-                this.author = author || this.author;
-                this.lastModified = new Date();
-            }
+        AOS.init({ duration: 800, once: true });
+
+        let clones = [];
+        const output = document.getElementById('output');
+
+        function cloneShape(emoji, color) {
+            clones.push(emoji);
+            const display = document.getElementById('shapesDisplay');
+            display.innerHTML = `<span>🔵</span>` + clones.map(c => `<span class="animate-pulse">${c}</span>`).join('');
+
+            output.textContent += `\n\nconst ${color}Circle = blueCircle.clone();`;
+            output.textContent += `\n${color}Circle.color = '${color}';`;
+            output.textContent += `\n// ✅ Cloned! New object with ${color} color`;
+            output.scrollTop = output.scrollHeight;
+
+            document.getElementById('shapeInfo').innerHTML = `<span class="text-emerald-400">${clones.length} clones</span> من الأصلي! 🧬`;
         }
-        
-        // Document Templates (Concrete Prototypes)
-        const businessTemplate = new DocumentPrototype(
-            'Business Report',
-            'This document outlines our business strategy for the upcoming quarter. It includes market analysis, financial projections, and action plans.',
-            'Business Team',
-            'business-template'
-        );
-        
-        const creativeTemplate = new DocumentPrototype(
-            'Creative Brief',
-            'This creative brief presents the project vision, target audience, key messages, and design inspirations for our new campaign.',
-            'Creative Team',
-            'creative-template'
-        );
-        
-        const technicalTemplate = new DocumentPrototype(
-            'Technical Documentation',
-            'This documentation provides details about system architecture, component interactions, and implementation guidelines for developers.',
-            'Technical Team',
-            'technical-template'
-        );
-        
-        // Interactive Demo
-        document.addEventListener('DOMContentLoaded', function() {
-            const templateCards = document.querySelectorAll('.template-card');
-            const documentContainer = document.getElementById('document-container');
-            const documentHeader = document.getElementById('document-header');
-            const documentContent = document.getElementById('document-content');
-            const documentFooter = document.getElementById('document-footer');
-            const documentDate = document.getElementById('document-date');
-            const cloneButton = document.getElementById('clone-button');
-            const editSection = document.getElementById('edit-section');
-            const docTitleInput = document.getElementById('doc-title');
-            const docContentInput = document.getElementById('doc-content');
-            const docAuthorInput = document.getElementById('doc-author');
-            const docBgColorInput = document.getElementById('doc-bg-color');
-            const docTextColorInput = document.getElementById('doc-text-color');
-            const updateButton = document.getElementById('update-button');
-            const resetButton = document.getElementById('reset-button');
-            const outputElement = document.getElementById('prototype-output');
-            
-            let currentTemplate = null;
-            let currentDocument = null;
-            
-            // Log operations
-            function log(message) {
-                const timestamp = new Date().toLocaleTimeString();
-                outputElement.textContent += `[${timestamp}] ${message}\n`;
-                outputElement.scrollTop = outputElement.scrollHeight;
-            }
-            
-            // Initialize
-            log('Prototype pattern demo initialized. Select a template to begin.');
-            
-            // Select template
-            templateCards.forEach(card => {
-                card.addEventListener('click', function() {
-                    // Remove selected class from all cards
-                    templateCards.forEach(c => c.classList.remove('selected'));
-                    
-                    // Add selected class to clicked card
-                    this.classList.add('selected');
-                    
-                    // Get template type from card id
-                    const templateType = this.id;
-                    
-                    // Select the appropriate template
-                    switch(templateType) {
-                        case 'business-template':
-                            currentTemplate = businessTemplate;
-                            log('Selected Business template');
-                            break;
-                        case 'creative-template':
-                            currentTemplate = creativeTemplate;
-                            log('Selected Creative template');
-                            break;
-                        case 'technical-template':
-                            currentTemplate = technicalTemplate;
-                            log('Selected Technical template');
-                            break;
-                    }
-                    
-                    // Update the preview
-                    updateDocumentPreview(currentTemplate);
-                    
-                    // Enable clone button
-                    cloneButton.disabled = false;
-                    
-                    // Hide edit section
-                    editSection.style.display = 'none';
-                });
-            });
-            
-            // Clone document
-            cloneButton.addEventListener('click', function() {
-                if (!currentTemplate) return;
-                
-                currentDocument = currentTemplate.clone();
-                log(`Cloned ${currentTemplate.title}`);
-                
-                // Update preview with cloned document
-                updateDocumentPreview(currentDocument);
-                
-                // Show edit section
-                editSection.style.display = 'block';
-                
-                // Populate form fields
-                docTitleInput.value = currentDocument.title;
-                docContentInput.value = currentDocument.content;
-                docAuthorInput.value = currentDocument.author;
-                
-                // Get computed styles
-                const computedStyle = window.getComputedStyle(documentContainer);
-                docBgColorInput.value = rgbToHex(computedStyle.backgroundColor);
-                docTextColorInput.value = rgbToHex(computedStyle.color);
-            });
-            
-            // Update document
-            updateButton.addEventListener('click', function() {
-                if (!currentDocument) return;
-                
-                // Update document properties
-                currentDocument.update(
-                    docTitleInput.value,
-                    docContentInput.value,
-                    docAuthorInput.value
-                );
-                
-                log(`Updated cloned document: ${currentDocument.title}`);
-                
-                // Update preview
-                updateDocumentPreview(currentDocument);
-                
-                // Update colors
-                documentContainer.style.backgroundColor = docBgColorInput.value;
-                documentContainer.style.color = docTextColorInput.value;
-            });
-            
-            // Reset to original
-            resetButton.addEventListener('click', function() {
-                if (!currentTemplate) return;
-                
-                // Clone again from original template
-                currentDocument = currentTemplate.clone();
-                log(`Reset to original template: ${currentTemplate.title}`);
-                
-                // Update preview
-                updateDocumentPreview(currentDocument);
-                
-                // Reset form fields
-                docTitleInput.value = currentDocument.title;
-                docContentInput.value = currentDocument.content;
-                docAuthorInput.value = currentDocument.author;
-                
-                // Reset colors
-                documentContainer.style.backgroundColor = '';
-                documentContainer.style.color = '';
-                
-                // Get computed styles again
-                const computedStyle = window.getComputedStyle(documentContainer);
-                docBgColorInput.value = rgbToHex(computedStyle.backgroundColor);
-                docTextColorInput.value = rgbToHex(computedStyle.color);
-            });
-            
-            // Update document preview
-            function updateDocumentPreview(doc) {
-                if (!doc) return;
-                
-                // Clear any custom styles
-                documentContainer.style.backgroundColor = '';
-                documentContainer.style.color = '';
-                
-                // Remove all classes and add the template style class
-                documentContainer.className = 'document-container ' + doc.style;
-                
-                // Update content
-                let title = doc.title;
-                if (doc.isClone) {
-                    title += `<span class="clone-badge">Clone #${doc.cloneCount}</span>`;
-                }
-                
-                documentHeader.innerHTML = title;
-                documentContent.textContent = doc.content;
-                documentFooter.textContent = `By: ${doc.author}`;
-                documentDate.textContent = `Last modified: ${doc.getFormattedDate()}`;
-            }
-            
-            // Helper function to convert RGB to HEX
-            function rgbToHex(rgb) {
-                // Default to white if can't extract RGB
-                if (!rgb || !rgb.match) return '#ffffff';
-                
-                // Extract the r, g, b values
-                let match = rgb.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
-                if (!match) return '#ffffff';
-                
-                function hex(x) {
-                    return ("0" + parseInt(x).toString(16)).slice(-2);
-                }
-                
-                return "#" + hex(match[1]) + hex(match[2]) + hex(match[3]);
-            }
-        });
+
+        function resetShapes() {
+            clones = [];
+            document.getElementById('shapesDisplay').innerHTML = '<span id="original">🔵</span>';
+            output.textContent = '// Original: blueCircle = new Circle(\'blue\', 10, 20, 50)';
+            document.getElementById('shapeInfo').textContent = 'الشكل الأصلي - اضغط Clone!';
+        }
     </script>
 </body>
-</html> 
+
+</html>
