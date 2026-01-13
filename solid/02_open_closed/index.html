@@ -1,37 +1,32 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Open-Closed Principle</title>
+    <title>Open/Closed Principle (OCP) - مفتوح للتوسيع، مقفول للتعديل</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
     <style>
         :root {
-            --primary-color: #3b82f6; /* Vibrant blue */
-            --primary-dark: #2563eb;
-            --primary-light: #60a5fa;
-            --secondary-color: #10b981; /* Green */
-            --secondary-dark: #059669;
-            --accent-color: #ef4444; /* Red */
+            --primary-color: #10b981;
+            --primary-dark: #059669;
+            --primary-light: #34d399;
+            --secondary-color: #3b82f6;
+            --accent-color: #8b5cf6;
+            --accent-good: #10b981;
+            --accent-bad: #ef4444;
             --text-color: #e2e8f0;
             --text-muted: #94a3b8;
-            --bg-color: #0f172a; /* Dark blue background */
+            --bg-color: #0f172a;
             --bg-light: #1e293b;
             --bg-lighter: #334155;
-            --bg-card: #1e293b;
             --border-color: #334155;
-            --code-bg: #0f172a;
-            --code-text: #e2e8f0;
             --heading-font: 'Poppins', sans-serif;
             --body-font: 'Inter', sans-serif;
-            --code-font: 'Fira Code', monospace;
-            --border-radius: 8px;
-            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
-            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2), 0 2px 4px -1px rgba(0, 0, 0, 0.1);
-            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
-            --glow: 0 0 15px rgba(59, 130, 246, 0.5);
         }
 
         * {
@@ -47,673 +42,748 @@
             background-color: var(--bg-color);
         }
 
-        .container {
-            width: 90%;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 2rem;
-        }
-
-        /* Hero Section */
-        header {
-            position: relative;
-            background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
-            color: white;
-            padding: 3rem 0;
+        .hero {
+            min-height: 50vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
             text-align: center;
-            margin-bottom: -50px;
+            background: linear-gradient(135deg, #0f172a 0%, #064e3b 100%);
+            padding: 3rem 1rem;
+            position: relative;
             overflow: hidden;
         }
 
-        header::before {
+        .hero::before {
             content: '';
             position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2000 1500"><rect fill="%23000000" width="2000" height="1500"/><defs><circle stroke="%23222" vector-effect="non-scaling-stroke" id="a" fill="none" stroke-width="5" r="315"/></defs><g transform="translate(1000 750)"><use stroke="%233b82f6" href="%23a" transform="rotate(60 0 0) scale(0.4 0.4)"/><use stroke="%233b82f6" href="%23a" transform="rotate(120 0 0) scale(0.5 0.5)"/><use stroke="%233b82f6" href="%23a" transform="rotate(180 0 0) scale(0.6 0.6)"/><use stroke="%233b82f6" href="%23a" transform="rotate(240 0 0) scale(0.7 0.7)"/><use stroke="%233b82f6" href="%23a" transform="rotate(300 0 0) scale(0.8 0.8)"/></g></svg>');
-            background-size: cover;
-            opacity: 0.1;
-            animation: pulse 15s ease-in-out infinite alternate;
+            inset: 0;
+            background: radial-gradient(circle at 30% 30%, rgba(16, 185, 129, 0.1) 0%, transparent 50%);
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: rgba(16, 185, 129, 0.2);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            border-radius: 50px;
+            color: var(--primary-light);
+            font-size: 0.9rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .hero-badge span {
+            width: 8px;
+            height: 8px;
+            background: var(--primary-light);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
         }
 
         @keyframes pulse {
-            0% { transform: scale(1); opacity: 0.1; }
-            50% { transform: scale(1.05); opacity: 0.15; }
-            100% { transform: scale(1); opacity: 0.1; }
-        }
 
-        /* Shapes animation */
-        .shapes {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            overflow: hidden;
-        }
-
-        .shape {
-            position: absolute;
-            opacity: 0.2;
-            animation: float 15s infinite linear;
-        }
-
-        .shape-1 {
-            top: 20%;
-            left: 10%;
-            width: 60px;
-            height: 60px;
-            border-radius: 41% 59% 37% 63% / 44% 67% 33% 56%;
-            background-color: #10b981;
-            animation-duration: 25s;
-            box-shadow: 0 0 30px rgba(16, 185, 129, 0.4);
-        }
-
-        .shape-2 {
-            top: 60%;
-            right: 15%;
-            width: 80px;
-            height: 80px;
-            border-radius: 73% 27% 59% 41% / 57% 43% 57% 43%;
-            background-color: #8b5cf6;
-            animation-duration: 30s;
-            animation-delay: 2s;
-            box-shadow: 0 0 30px rgba(139, 92, 246, 0.4);
-        }
-
-        @keyframes float {
-            0% {
-                transform: translate(0, 0) rotate(0deg);
-            }
-            25% {
-                transform: translate(10px, 15px) rotate(90deg);
-            }
-            50% {
-                transform: translate(5px, -10px) rotate(180deg);
-            }
-            75% {
-                transform: translate(-10px, 5px) rotate(270deg);
-            }
+            0%,
             100% {
-                transform: translate(0, 0) rotate(360deg);
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.5;
             }
         }
 
-        h1 {
+        .hero h1 {
             font-family: var(--heading-font);
             font-size: 3rem;
             font-weight: 700;
-            margin-bottom: 1rem;
-            text-shadow: 0 0 30px rgba(59, 130, 246, 0.5);
-            position: relative;
-            z-index: 10;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(90deg, #fff, #94a3b8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
-        h2 {
-            font-family: var(--heading-font);
-            font-size: 1.8rem;
-            margin: 2rem 0 1rem;
-            color: var(--primary-light);
-            border-bottom: 2px solid var(--border-color);
-            padding-bottom: 0.5rem;
-        }
-
-        p {
-            margin-bottom: 1.5rem;
+        .hero .subtitle {
+            font-size: 1.3rem;
             color: var(--text-muted);
-            font-size: 1.05rem;
+        }
+
+        .hero .arabic-subtitle {
+            font-size: 1.5rem;
+            color: var(--primary-light);
+            margin-top: 0.5rem;
         }
 
         .main-content {
+            max-width: 1000px;
+            margin: -50px auto 0;
+            padding: 0 1rem 4rem;
             position: relative;
             z-index: 10;
         }
 
-        .content-container {
-            background-color: var(--bg-light);
-            border-radius: var(--border-radius);
-            padding: 3rem;
-            margin-bottom: 2rem;
-            box-shadow: var(--shadow-lg);
+        .container {
+            background: var(--bg-light);
+            border-radius: 16px;
+            padding: 2.5rem;
             border: 1px solid var(--border-color);
-        }
-
-        .definition-box {
-            background-color: var(--bg-lighter);
-            border-left: 4px solid var(--primary-color);
-            padding: 1.5rem;
-            margin-bottom: 2rem;
-            border-radius: 0 var(--border-radius) var(--border-radius) 0;
-            box-shadow: var(--shadow-sm);
-        }
-
-        .example-wrapper {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 2rem;
-            margin-bottom: 3rem;
-        }
-
-        .example-card {
-            flex: 1 1 45%;
-            background-color: var(--bg-card);
-            border-radius: var(--border-radius);
-            padding: 1.5rem;
-            box-shadow: var(--shadow);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            border: 1px solid var(--border-color);
-        }
-
-        .example-card:hover {
-            transform: translateY(-5px);
-            box-shadow: var(--glow);
-        }
-
-        .example-header {
-            display: flex;
-            align-items: center;
-            margin-bottom: 1rem;
-        }
-
-        .example-icon {
-            width: 30px;
-            height: 30px;
-            margin-right: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 50%;
-            color: white;
-            font-weight: bold;
-        }
-
-        .bad-example .example-icon {
-            background-color: var(--accent-color);
-        }
-
-        .good-example .example-icon {
-            background-color: var(--secondary-color);
-        }
-
-        .example-title {
-            font-size: 1.3rem;
-            font-weight: 600;
-        }
-
-        .bad-example .example-title {
-            color: var(--accent-color);
-        }
-
-        .good-example .example-title {
-            color: var(--secondary-color);
-        }
-
-        pre {
-            background-color: var(--code-bg);
-            border: 1px solid var(--border-color);
-            border-radius: var(--border-radius);
-            padding: 1.5rem;
-            margin: 1.5rem 0;
-            overflow-x: auto;
-            position: relative;
-        }
-
-        code {
-            font-family: var(--code-font);
-            font-size: 14px;
-            line-height: 1.5;
-            color: var(--code-text);
-            display: block;
-        }
-
-        .explanation {
-            background-color: var(--bg-lighter);
-            border-radius: var(--border-radius);
-            padding: 1.5rem;
-            margin-top: 1.5rem;
-            border: 1px solid var(--border-color);
-        }
-
-        .explanation-title {
-            font-weight: bold;
-            margin-bottom: 0.8rem;
-            color: var(--text-color);
-        }
-
-        .violation-points, .adherence-points {
-            margin-top: 1rem;
-        }
-
-        .violation-points li, .adherence-points li {
-            margin-bottom: 0.8rem;
-        }
-
-        .violation-points {
-            color: var(--accent-color);
-        }
-
-        .adherence-points {
-            color: var(--secondary-color);
-        }
-
-        /* Interactive Demo */
-        .interactive-demo {
-            background-color: var(--bg-lighter);
-            padding: 2rem;
-            margin: 3rem 0;
-            border-radius: var(--border-radius);
-            box-shadow: var(--shadow);
-            border: 1px solid var(--border-color);
-        }
-
-        .interactive-demo h3 {
-            margin-top: 0;
-            color: var(--primary-light);
-            font-family: var(--heading-font);
-            font-size: 1.4rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .demo-controls {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-        }
-
-        button {
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            font-family: var(--body-font);
-            font-weight: 500;
-            font-size: 0.95rem;
-            padding: 0.75rem 1.25rem;
-            border-radius: var(--border-radius);
-            cursor: pointer;
-            transition: background-color 0.2s, transform 0.1s, box-shadow 0.2s;
-        }
-
-        button:hover {
-            background-color: var(--primary-dark);
-            box-shadow: 0 0 15px rgba(59, 130, 246, 0.5);
-        }
-
-        button:active {
-            transform: scale(0.98);
-        }
-
-        .output-container {
-            background-color: var(--bg-color);
-            border: 1px solid var(--border-color);
-            border-radius: var(--border-radius);
-            padding: 1.5rem;
-            margin-top: 1.5rem;
-        }
-
-        .output {
-            font-family: var(--code-font);
-            color: var(--text-color);
-            white-space: pre-wrap;
-            line-height: 1.6;
-        }
-
-        footer {
-            text-align: center;
-            margin-top: 3rem;
-            padding: 2rem 0;
-            border-top: 1px solid var(--border-color);
-            color: var(--text-muted);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
         }
 
         .back-link {
             display: inline-flex;
             align-items: center;
-            margin: 2rem 0;
+            gap: 0.5rem;
             color: var(--primary-light);
             text-decoration: none;
             font-weight: 500;
+            margin-bottom: 2rem;
             transition: color 0.2s;
         }
-        
+
         .back-link:hover {
-            color: var(--primary-color);
-            text-shadow: 0 0 8px rgba(59, 130, 246, 0.5);
+            color: #fff;
         }
 
-        .back-link svg {
+        h2 {
+            font-family: var(--heading-font);
+            font-size: 1.8rem;
+            color: var(--text-color);
+            margin: 2.5rem 0 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        h3 {
+            font-family: var(--heading-font);
+            font-size: 1.4rem;
+            color: var(--primary-light);
+            margin: 1.5rem 0 1rem;
+        }
+
+        p {
+            margin-bottom: 1.5rem;
+            color: var(--text-muted);
+        }
+
+        strong {
+            color: var(--text-color);
+        }
+
+        .arabic-section {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(139, 92, 246, 0.1));
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            border-radius: 12px;
+            padding: 2rem;
+            margin: 2rem 0;
+        }
+
+        .arabic-section h3 {
+            color: var(--primary-light);
+            margin-top: 0;
+        }
+
+        .arabic-text {
+            text-align: right;
+            line-height: 2;
+        }
+
+        .arabic-text p {
+            color: var(--text-color);
+        }
+
+        .visualization {
+            background: var(--bg-lighter);
+            border-radius: 12px;
+            padding: 2rem;
+            margin: 2rem 0;
+            border: 1px solid var(--border-color);
+        }
+
+        .visualization svg {
+            width: 100%;
+            max-width: 700px;
+            height: auto;
+            display: block;
+            margin: 0 auto;
+        }
+
+        .example {
+            border-radius: 12px;
+            padding: 2rem;
+            margin: 2rem 0;
+            border: 1px solid var(--border-color);
+            background: var(--bg-lighter);
+        }
+
+        .bad-example {
+            border-left: 4px solid var(--accent-bad);
+        }
+
+        .bad-example h3 {
+            color: var(--accent-bad);
+        }
+
+        .good-example {
+            border-left: 4px solid var(--accent-good);
+        }
+
+        .good-example h3 {
+            color: var(--accent-good);
+        }
+
+        .code-container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        @media (min-width: 768px) {
+            .code-container {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        pre {
+            background: var(--bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1rem;
+            overflow-x: auto;
+            font-size: 0.85rem;
+            line-height: 1.6;
+        }
+
+        code {
+            font-family: 'Consolas', 'Monaco', monospace;
+            color: #e2e8f0;
+        }
+
+        .code-explanation {
+            background: rgba(16, 185, 129, 0.1);
+            border-radius: 8px;
+            padding: 1rem;
+        }
+
+        .code-explanation h4 {
+            color: var(--primary-light);
+            font-size: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .explanation-item {
+            padding: 0.75rem;
+            margin-bottom: 0.5rem;
+            border-radius: 6px;
+            border-right: 3px solid;
+        }
+
+        .explanation-item.blue {
+            background: rgba(59, 130, 246, 0.15);
+            border-color: #3b82f6;
+        }
+
+        .explanation-item.green {
+            background: rgba(16, 185, 129, 0.15);
+            border-color: #10b981;
+        }
+
+        .explanation-item.purple {
+            background: rgba(139, 92, 246, 0.15);
+            border-color: #8b5cf6;
+        }
+
+        .explanation-item.red {
+            background: rgba(239, 68, 68, 0.15);
+            border-color: #ef4444;
+        }
+
+        .explanation-item.yellow {
+            background: rgba(245, 158, 11, 0.15);
+            border-color: #f59e0b;
+        }
+
+        .explanation-item strong {
+            display: block;
+            margin-bottom: 0.25rem;
+        }
+
+        .explanation-item p {
+            margin: 0;
+            font-size: 0.85rem;
+        }
+
+        .interactive-demo {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(59, 130, 246, 0.1));
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            border-radius: 12px;
+            padding: 2rem;
+            margin: 2rem 0;
+        }
+
+        .interactive-demo h3 {
+            color: var(--primary-light);
+            margin-top: 0;
+        }
+
+        .demo-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        @media (min-width: 768px) {
+            .demo-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        .demo-input {
+            background: var(--bg-color);
+            border-radius: 8px;
+            padding: 1rem;
+        }
+
+        .demo-input label {
+            display: block;
+            color: var(--text-color);
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .demo-input select,
+        .demo-input input {
+            width: 100%;
+            padding: 0.75rem;
+            background: var(--bg-lighter);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            color: var(--text-color);
+            font-size: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .demo-input button {
+            padding: 0.75rem 1.5rem;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
             margin-right: 0.5rem;
         }
 
+        .demo-input button:hover {
+            background: var(--primary-dark);
+        }
+
+        .demo-input button.secondary {
+            background: var(--secondary-color);
+        }
+
+        .demo-output {
+            background: var(--bg-color);
+            border-radius: 8px;
+            padding: 1rem;
+            font-family: 'Consolas', monospace;
+            font-size: 0.9rem;
+            min-height: 200px;
+            white-space: pre-wrap;
+        }
+
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .nav-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            background: var(--bg-lighter);
+            color: var(--text-color);
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: background 0.2s, transform 0.2s;
+        }
+
+        .nav-btn:hover {
+            background: var(--primary-color);
+            transform: translateY(-2px);
+        }
+
+        .nav-btn.next {
+            background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+        }
+
+        footer {
+            background: var(--bg-light);
+            border-top: 1px solid var(--border-color);
+            padding: 2rem;
+            text-align: center;
+            color: var(--text-muted);
+        }
+
         @media (max-width: 768px) {
-            .example-wrapper {
-                flex-direction: column;
+            .hero h1 {
+                font-size: 2rem;
             }
-            
-            .example-card {
-                flex: 1 1 100%;
+
+            .container {
+                padding: 1.5rem;
             }
-            
-            h1 {
-                font-size: 2.5rem;
-            }
-            
-            .content-container {
-                padding: 2rem;
+
+            h2 {
+                font-size: 1.4rem;
             }
         }
     </style>
 </head>
+
 <body>
-    <header>
-        <div class="shapes">
-            <div class="shape shape-1"></div>
-            <div class="shape shape-2"></div>
+    <section class="hero">
+        <div class="hero-badge">
+            <span></span>
+            SOLID Principle #2
         </div>
-        <div class="container">
-            <h1>Open-Closed Principle</h1>
-            <p>Software entities should be open for extension, but closed for modification</p>
-        </div>
-    </header>
+        <h1>Open/Closed Principle</h1>
+        <p class="subtitle">Open for extension, closed for modification</p>
+        <p class="arabic-subtitle" dir="rtl">مفتوح للتوسيع، مقفول للتعديل! 🔌</p>
+    </section>
 
     <div class="main-content">
         <div class="container">
-            <a href="../index.html" class="back-link">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M19 12H5M12 19l-7-7 7-7"/>
+            <a href="../../index.html" class="back-link">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M19 12H5M12 19l-7-7 7-7" />
                 </svg>
-                Back to SOLID Principles
+                Back to Overview
             </a>
-            
-            <div class="content-container">
-                <div class="definition-box">
-                    <h2>Definition</h2>
-                    <p>The Open-Closed Principle (OCP) is the second of the five SOLID principles of object-oriented design. It states that:</p>
-                    <blockquote>
-                        <p><strong>"Software entities (classes, modules, functions, etc.) should be open for extension, but closed for modification."</strong></p>
-                    </blockquote>
-                    <p>This means that you should be able to add new functionality to a system without changing existing code. The goal is to make the system easy to extend with new behaviors without having to modify the classes that already exist.</p>
+
+            <!-- Arabic Explanation -->
+            <div class="arabic-section">
+                <h3 dir="rtl">🔌 إيه هو مبدأ Open/Closed؟</h3>
+                <div class="arabic-text" dir="rtl">
+                    <p>
+                        <strong style="color: var(--primary-light);">تشبيه الـ USB Port:</strong>
+                    </p>
+                    <p>
+                        فكر في الـ <strong style="color: #fbbf24;">USB Port</strong> في الكمبيوتر:
+                    </p>
+                    <p>
+                        • الـ Port نفسه <strong style="color: #ef4444;">مقفول</strong> ← مش بنغير في تصميمه<br>
+                        • بس ممكن نضيف <strong style="color: #10b981;">أجهزة جديدة</strong> ← فلاشة، ماوس، كيبورد،
+                        موبايل...<br>
+                        • كل جهاز جديد بـ<strong style="color: #8b5cf6;">"يوسع"</strong> إمكانيات الكمبيوتر بدون ما نغير
+                        في الـ Port!
+                    </p>
+                    <p style="color: var(--primary-light); font-weight: bold; margin-top: 1rem;">
+                        ✅ Open for Extension: ضيف أجهزة جديدة بسهولة<br>
+                        ❌ Closed for Modification: الـ Port ثابت - مش محتاج تعديل
+                    </p>
                 </div>
+            </div>
 
-                <div class="example-wrapper">
-                    <div class="example-card bad-example">
-                        <div class="example-header">
-                            <div class="example-icon">✗</div>
-                            <div class="example-title">Bad Example: Violating OCP</div>
-                        </div>
-                        <pre><code class="language-javascript">class AreaCalculator {
-    calculateArea(shapes) {
-        let area = 0;
-        
-        for (let shape of shapes) {
-            if (shape.type === 'circle') {
-                area += Math.PI * shape.radius * shape.radius;
-            } 
-            else if (shape.type === 'rectangle') {
-                area += shape.width * shape.height;
-            }
-            // What if we want to add a triangle? We'd have to modify this class!
-        }
-        
-        return area;
+            <!-- SVG Visualization -->
+            <div class="visualization">
+                <h3 style="text-anchor: center; margin-bottom: 1.5rem;">🔌 Plugin Architecture</h3>
+                <svg viewBox="0 0 700 280">
+                    <!-- Core System -->
+                    <rect x="250" y="20" width="200" height="80" rx="12" fill="#1e293b" stroke="#3b82f6"
+                        stroke-width="3" />
+                    <text x="350" y="50" text-anchor="middle" fill="#60a5fa" font-size="14"
+                        font-weight="bold">PaymentProcessor</text>
+                    <text x="350" y="70" text-anchor="middle" fill="#94a3b8" font-size="11">process(payment)</text>
+                    <text x="350" y="88" text-anchor="middle" fill="#64748b" font-size="9">🔒 Closed for
+                        modification</text>
+
+                    <!-- Interface -->
+                    <rect x="250" y="120" width="200" height="50" rx="8" fill="#1e293b" stroke="#8b5cf6"
+                        stroke-width="2" stroke-dasharray="5,3" />
+                    <text x="350" y="142" text-anchor="middle" fill="#a78bfa" font-size="11"
+                        font-weight="bold">«interface»</text>
+                    <text x="350" y="158" text-anchor="middle" fill="#c4b5fd" font-size="10">PaymentMethod</text>
+
+                    <!-- Arrow from Core to Interface -->
+                    <path d="M350 100 L350 120" stroke="#8b5cf6" stroke-width="2" marker-end="url(#arrow)" />
+
+                    <!-- Plugins -->
+                    <rect x="50" y="200" width="120" height="60" rx="8" fill="#1e293b" stroke="#10b981"
+                        stroke-width="2" />
+                    <text x="110" y="225" text-anchor="middle" fill="#34d399" font-size="11" font-weight="bold">💳
+                        CreditCard</text>
+                    <text x="110" y="245" text-anchor="middle" fill="#94a3b8" font-size="9">implements</text>
+
+                    <rect x="190" y="200" width="120" height="60" rx="8" fill="#1e293b" stroke="#f59e0b"
+                        stroke-width="2" />
+                    <text x="250" y="225" text-anchor="middle" fill="#fbbf24" font-size="11" font-weight="bold">📱
+                        PayPal</text>
+                    <text x="250" y="245" text-anchor="middle" fill="#94a3b8" font-size="9">implements</text>
+
+                    <rect x="330" y="200" width="120" height="60" rx="8" fill="#1e293b" stroke="#ec4899"
+                        stroke-width="2" />
+                    <text x="390" y="225" text-anchor="middle" fill="#f472b6" font-size="11" font-weight="bold">₿
+                        Bitcoin</text>
+                    <text x="390" y="245" text-anchor="middle" fill="#94a3b8" font-size="9">implements</text>
+
+                    <rect x="470" y="200" width="120" height="60" rx="8" fill="#1e293b" stroke="#06b6d4"
+                        stroke-width="2" />
+                    <text x="530" y="225" text-anchor="middle" fill="#22d3d1" font-size="11" font-weight="bold">🍎
+                        ApplePay</text>
+                    <text x="530" y="245" text-anchor="middle" fill="#94a3b8" font-size="9">implements</text>
+
+                    <!-- New Plugin (to be added) -->
+                    <rect x="610" y="200" width="80" height="60" rx="8" fill="#1e293b" stroke="#22c55e" stroke-width="2"
+                        stroke-dasharray="5,3" />
+                    <text x="650" y="223" text-anchor="middle" fill="#4ade80" font-size="9">➕ New</text>
+                    <text x="650" y="238" text-anchor="middle" fill="#4ade80" font-size="9">Payment</text>
+                    <text x="650" y="253" text-anchor="middle" fill="#22c55e" font-size="8">Easy to add!</text>
+
+                    <!-- Arrows from plugins to interface -->
+                    <path d="M110 200 L110 180 L280 175" stroke="#10b981" stroke-width="1" fill="none"
+                        stroke-dasharray="3,2" />
+                    <path d="M250 200 L250 180 L310 170" stroke="#f59e0b" stroke-width="1" fill="none"
+                        stroke-dasharray="3,2" />
+                    <path d="M390 200 L390 180 L360 170" stroke="#ec4899" stroke-width="1" fill="none"
+                        stroke-dasharray="3,2" />
+                    <path d="M530 200 L530 180 L420 175" stroke="#06b6d4" stroke-width="1" fill="none"
+                        stroke-dasharray="3,2" />
+
+                    <!-- Arrow Marker -->
+                    <defs>
+                        <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+                            <path d="M0,0 L0,6 L9,3 z" fill="#8b5cf6" />
+                        </marker>
+                    </defs>
+
+                    <text x="350" y="275" text-anchor="middle" fill="#22c55e" font-size="10">🟢 Open for Extension - Add
+                        new payment methods without changing core!</text>
+                </svg>
+            </div>
+
+            <!-- Bad Example -->
+            <div class="example bad-example">
+                <h3>❌ Bad Example - Violating OCP</h3>
+                <p>Adding new payment methods requires modifying existing code:</p>
+
+                <div class="code-container">
+                    <pre dir="ltr"><code>class PaymentProcessor {
+  processPayment(amount, type) {
+    if (type === 'credit') {
+      console.log(`Credit card: $${amount}`);
+    } else if (type === 'paypal') {
+      console.log(`PayPal: $${amount}`);
+    } else if (type === 'bitcoin') {
+      console.log(`Bitcoin: $${amount}`);
     }
+    // ❌ Every new payment type = modify this!
+    // else if (type === 'applepay') { ... }
+    // else if (type === 'googlepay') { ... }
+  }
 }</code></pre>
-                        <div class="explanation">
-                            <div class="explanation-title">Why This Violates OCP:</div>
-                            <p>This implementation violates the Open-Closed Principle for several reasons:</p>
-                            <ul class="violation-points">
-                                <li>To add a new shape type (like a triangle), we must modify the <code>AreaCalculator</code> class.</li>
-                                <li>The <code>calculateArea</code> method contains conditional logic that checks the type of shape.</li>
-                                <li>Each new shape requires a new conditional branch, making the code increasingly complex.</li>
-                                <li>Changes to existing shape calculations risk breaking the entire calculator.</li>
-                                <li>The class is not closed for modification, as it needs to be changed whenever a new shape is added.</li>
-                            </ul>
+
+                    <div class="code-explanation" dir="rtl">
+                        <h4>🔍 ليه ده غلط؟</h4>
+                        <div class="explanation-item red">
+                            <strong>⚠️ كل payment جديد = تعديل الكود</strong>
+                            <p>عشان نضيف ApplePay، لازم نعدل في نفس الـ function!</p>
                         </div>
-                    </div>
-
-                    <div class="example-card good-example">
-                        <div class="example-header">
-                            <div class="example-icon">✓</div>
-                            <div class="example-title">Good Example: Following OCP</div>
+                        <div class="explanation-item red">
+                            <strong>⚠️ خطر على الكود القديم</strong>
+                            <p>ممكن بالغلط نبوظ الـ credit card وإحنا بنضيف bitcoin</p>
                         </div>
-                        <pre><code class="language-javascript">// Base Shape class or interface
-class Shape {
-    calculateArea() {
-        // This should be implemented by subclasses
-        throw new Error("Method 'calculateArea()' must be implemented.");
-    }
-    
-    getDescription() {
-        // This should be implemented by subclasses
-        throw new Error("Method 'getDescription()' must be implemented.");
-    }
-}
-
-// Rectangle implementation
-class Rectangle extends Shape {
-    constructor(width, height) {
-        super();
-        this.width = width;
-        this.height = height;
-    }
-    
-    calculateArea() {
-        return this.width * this.height;
-    }
-    
-    getDescription() {
-        return `Rectangle: ${this.width} × ${this.height}`;
-    }
-}
-
-// Circle implementation
-class Circle extends Shape {
-    constructor(radius) {
-        super();
-        this.radius = radius;
-    }
-    
-    calculateArea() {
-        return Math.PI * this.radius * this.radius;
-    }
-    
-    getDescription() {
-        return `Circle: radius ${this.radius}`;
-    }
-}
-
-// We can add a new shape without modifying existing code
-class Triangle extends Shape {
-    constructor(base, height) {
-        super();
-        this.base = base;
-        this.height = height;
-    }
-    
-    calculateArea() {
-        return 0.5 * this.base * this.height;
-    }
-    
-    getDescription() {
-        return `Triangle: base ${this.base}, height ${this.height}`;
-    }
-}
-
-// Area calculator that works with any Shape
-class AreaCalculator {
-    calculateTotalArea(shapes) {
-        return shapes.reduce((sum, shape) => sum + shape.calculateArea(), 0);
-    }
-}</code></pre>
-                        <div class="explanation">
-                            <div class="explanation-title">Why This Follows OCP:</div>
-                            <p>This implementation follows the Open-Closed Principle:</p>
-                            <ul class="adherence-points">
-                                <li>The <code>AreaCalculator</code> class is closed for modification - it doesn't need to change when new shapes are added.</li>
-                                <li>The system is open for extension - we can add new shapes by creating new subclasses of <code>Shape</code>.</li>
-                                <li>Each shape is responsible for calculating its own area through the <code>calculateArea()</code> method.</li>
-                                <li>Adding a new shape (like <code>Triangle</code>) doesn't require changing any existing code.</li>
-                                <li>The code is more maintainable and less prone to bugs when extending functionality.</li>
-                            </ul>
+                        <div class="explanation-item red">
+                            <strong>⚠️ الـ if/else هتكبر</strong>
+                            <p>كل ما نضيف payment، الكود بيطول ويبقى صعب</p>
                         </div>
-                    </div>
-                </div>
-
-                <div class="interactive-demo">
-                    <h3>Interactive Demo: Area Calculator</h3>
-                    <p>Click the buttons below to add different shapes. The area calculator will compute the total area without needing to be modified for each shape type.</p>
-                    
-                    <div class="demo-controls">
-                        <button id="addRectangleBtn">Add Rectangle</button>
-                        <button id="addCircleBtn">Add Circle</button>
-                        <button id="addTriangleBtn">Add Triangle</button>
-                        <button id="clearShapesBtn">Clear All</button>
-                    </div>
-                    
-                    <div class="output-container">
-                        <h4>Shapes:</h4>
-                        <div id="shapesOutput" class="output">No shapes added yet.</div>
-                    </div>
-                    
-                    <div class="output-container">
-                        <h4>Total Area:</h4>
-                        <div id="calculationOutput" class="output">Total area: 0</div>
                     </div>
                 </div>
             </div>
-            
-            <a href="../../index.html" class="back-link">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M19 12H5M12 19l-7-7 7-7"/>
-                </svg>
-                Back to Main Page
-            </a>
+
+            <!-- Good Example -->
+            <div class="example good-example">
+                <h3>✅ Good Example - Following OCP</h3>
+                <p>Use interface/abstraction - add new types without modifying core:</p>
+
+                <div class="code-container">
+                    <pre dir="ltr"><code>// Interface (contract)
+class PaymentMethod {
+  pay(amount) {
+    throw new Error('Must implement pay()');
+  }
+}
+
+// Existing payment methods
+class CreditCard extends PaymentMethod {
+  pay(amount) {
+    return `💳 Credit card: $${amount}`;
+  }
+}
+
+class PayPal extends PaymentMethod {
+  pay(amount) {
+    return `📱 PayPal: $${amount}`;
+  }
+}
+
+// ✅ Add new payment - NO core changes!
+class Bitcoin extends PaymentMethod {
+  pay(amount) {
+    return `₿ Bitcoin: $${amount}`;
+  }
+}
+
+// Core processor - NEVER changes
+class PaymentProcessor {
+  process(paymentMethod, amount) {
+    return paymentMethod.pay(amount);
+  }
+}</code></pre>
+
+                    <div class="code-explanation" dir="rtl">
+                        <h4>✨ ليه ده صح؟</h4>
+                        <div class="explanation-item purple">
+                            <strong>📋 PaymentMethod Interface</strong>
+                            <p>كل payment لازم يكون عنده pay() - ده "العقد"</p>
+                        </div>
+                        <div class="explanation-item green">
+                            <strong>🔌 إضافة سهلة</strong>
+                            <p>عشان نضيف Bitcoin، بنعمل class جديد ← الكود القديم ثابت!</p>
+                        </div>
+                        <div class="explanation-item blue">
+                            <strong>🔒 PaymentProcessor مقفول</strong>
+                            <p>الـ processor مش محتاج يعرف إيه أنواع الـ payments - بيتعامل مع الـ interface بس</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Interactive Demo -->
+            <div class="interactive-demo">
+                <h3>🎮 جرب بنفسك - Payment System</h3>
+                <p dir="rtl">شوف إزاي نضيف payment methods جديدة بدون ما نغير الـ core:</p>
+
+                <div class="demo-grid">
+                    <div class="demo-input">
+                        <label dir="rtl">اختار طريقة الدفع:</label>
+                        <select id="payment-type">
+                            <option value="credit">💳 Credit Card</option>
+                            <option value="paypal">📱 PayPal</option>
+                            <option value="bitcoin">₿ Bitcoin</option>
+                            <option value="apple">🍎 Apple Pay (New!)</option>
+                        </select>
+
+                        <label dir="rtl">المبلغ ($):</label>
+                        <input type="number" id="amount" value="100" min="1">
+
+                        <button onclick="processPayment()">Process Payment 💰</button>
+                        <button onclick="showArchitecture()" class="secondary">Show Code 👀</button>
+                    </div>
+                    <div class="demo-output" id="output">// Select a payment method and click Process
+                        // Watch how OCP works in action!</div>
+                </div>
+            </div>
+
+            <!-- Summary -->
+            <div class="arabic-section">
+                <h3 dir="rtl">📝 ملخص سريع</h3>
+                <div class="arabic-text" dir="rtl">
+                    <p><strong>✅ القاعدة:</strong> الكود مفتوح للتوسيع، مقفول للتعديل</p>
+                    <p><strong>✅ الفايدة:</strong> تضيف features جديدة بدون ما تغير كود شغال</p>
+                    <p><strong>✅ التشبيه:</strong> زي الـ USB Port - ثابت، بس ممكن تشبك عليه أي جهاز</p>
+                    <p><strong>✅ الطريقة:</strong> استخدم Interfaces أو Abstract Classes</p>
+                </div>
+            </div>
+
+            <!-- Navigation -->
+            <div class="navigation">
+                <a href="../01_single_responsibility/index.html" class="nav-btn">
+                    ← SRP
+                </a>
+                <a href="../03_liskov_substitution/index.html" class="nav-btn next">
+                    Next: Liskov →
+                </a>
+            </div>
         </div>
     </div>
 
     <footer>
-        <div class="container">
-            <p>&copy; 2025 SOLID Principles Interactive Guide</p>
-        </div>
+        <p>SOLID Principles Interactive Guide | Created by Osama Zinhom</p>
     </footer>
 
     <script>
-        // Implementation of the Shape hierarchy
-        class Shape {
-            calculateArea() {
-                throw new Error("Method 'calculateArea()' must be implemented.");
-            }
-            
-            getDescription() {
-                throw new Error("Method 'getDescription()' must be implemented.");
-            }
+        // Payment methods following OCP
+        class PaymentMethod {
+            pay(amount) { throw new Error('Must implement'); }
+            getName() { return 'Unknown'; }
         }
-        
-        class Rectangle extends Shape {
-            constructor(width, height) {
-                super();
-                this.width = width;
-                this.height = height;
-            }
-            
-            calculateArea() {
-                return this.width * this.height;
-            }
-            
-            getDescription() {
-                return `Rectangle: ${this.width} × ${this.height}`;
-            }
+
+        class CreditCard extends PaymentMethod {
+            pay(amount) { return `💳 Processing credit card payment of $${amount}...\n   ✓ Card validated\n   ✓ Payment approved!`; }
+            getName() { return 'Credit Card'; }
         }
-        
-        class Circle extends Shape {
-            constructor(radius) {
-                super();
-                this.radius = radius;
-            }
-            
-            calculateArea() {
-                return Math.PI * this.radius * this.radius;
-            }
-            
-            getDescription() {
-                return `Circle: radius ${this.radius}`;
-            }
+
+        class PayPal extends PaymentMethod {
+            pay(amount) { return `📱 Processing PayPal payment of $${amount}...\n   ✓ Connected to PayPal\n   ✓ Payment approved!`; }
+            getName() { return 'PayPal'; }
         }
-        
-        class Triangle extends Shape {
-            constructor(base, height) {
-                super();
-                this.base = base;
-                this.height = height;
-            }
-            
-            calculateArea() {
-                return 0.5 * this.base * this.height;
-            }
-            
-            getDescription() {
-                return `Triangle: base ${this.base}, height ${this.height}`;
-            }
+
+        class Bitcoin extends PaymentMethod {
+            pay(amount) { return `₿ Processing Bitcoin payment of $${amount}...\n   ✓ Blockchain verified\n   ✓ Transaction confirmed!`; }
+            getName() { return 'Bitcoin'; }
         }
-        
-        class AreaCalculator {
-            calculateTotalArea(shapes) {
-                return shapes.reduce((sum, shape) => sum + shape.calculateArea(), 0);
+
+        // NEW payment - added WITHOUT changing existing code!
+        class ApplePay extends PaymentMethod {
+            pay(amount) { return `🍎 Processing Apple Pay of $${amount}...\n   ✓ Touch ID verified\n   ✓ Payment approved!`; }
+            getName() { return 'Apple Pay'; }
+        }
+
+        // Core processor - NEVER changes
+        class PaymentProcessor {
+            process(method, amount) {
+                return method.pay(amount);
             }
         }
 
-        // Demo interaction code
-        document.addEventListener('DOMContentLoaded', function() {
-            const shapesOutput = document.getElementById('shapesOutput');
-            const calculationOutput = document.getElementById('calculationOutput');
-            const addRectangleBtn = document.getElementById('addRectangleBtn');
-            const addCircleBtn = document.getElementById('addCircleBtn');
-            const addTriangleBtn = document.getElementById('addTriangleBtn');
-            const clearShapesBtn = document.getElementById('clearShapesBtn');
-            
-            const calculator = new AreaCalculator();
-            const shapes = [];
-            
-            function updateShapesOutput() {
-                if (shapes.length === 0) {
-                    shapesOutput.textContent = "No shapes added yet.";
-                } else {
-                    shapesOutput.textContent = shapes.map((shape, index) => 
-                        `${index + 1}. ${shape.getDescription()}`
-                    ).join('\n');
-                }
-                
-                const totalArea = calculator.calculateTotalArea(shapes);
-                calculationOutput.textContent = `Total area: ${totalArea.toFixed(2)}`;
-            }
-            
-            addRectangleBtn.addEventListener('click', function() {
-                const width = Math.floor(Math.random() * 10) + 1;
-                const height = Math.floor(Math.random() * 10) + 1;
-                shapes.push(new Rectangle(width, height));
-                updateShapesOutput();
-            });
-            
-            addCircleBtn.addEventListener('click', function() {
-                const radius = Math.floor(Math.random() * 5) + 1;
-                shapes.push(new Circle(radius));
-                updateShapesOutput();
-            });
-            
-            addTriangleBtn.addEventListener('click', function() {
-                const base = Math.floor(Math.random() * 10) + 1;
-                const height = Math.floor(Math.random() * 10) + 1;
-                shapes.push(new Triangle(base, height));
-                updateShapesOutput();
-            });
-            
-            clearShapesBtn.addEventListener('click', function() {
-                shapes.length = 0; // Clear the array
-                updateShapesOutput();
-            });
-        });
+        const methods = {
+            credit: new CreditCard(),
+            paypal: new PayPal(),
+            bitcoin: new Bitcoin(),
+            apple: new ApplePay()
+        };
+
+        const processor = new PaymentProcessor();
+
+        function processPayment() {
+            const type = document.getElementById('payment-type').value;
+            const amount = document.getElementById('amount').value;
+            const output = document.getElementById('output');
+
+            const method = methods[type];
+            const result = processor.process(method, amount);
+
+            output.textContent = `🔄 PaymentProcessor.process(${method.getName()}, $${amount})\n\n${result}\n\n----------------------------------------\n✅ OCP in action:\n   • PaymentProcessor never changed\n   • New payment methods = new classes\n   • No if/else modification needed!`;
+        }
+
+        function showArchitecture() {
+            const output = document.getElementById('output');
+            output.textContent = `📐 OCP Architecture:\n\n┌─────────────────────────────┐\n│     PaymentProcessor        │ ← 🔒 Closed\n│     process(method, amt)    │    (never changes)\n└─────────────┬───────────────┘\n              │\n              ▼\n┌─────────────────────────────┐\n│   «interface»               │\n│   PaymentMethod.pay()       │ ← The contract\n└─────────────┬───────────────┘\n              │\n    ┌─────────┼─────────┐\n    ▼         ▼         ▼\n┌───────┐ ┌───────┐ ┌───────┐\n│Credit │ │PayPal │ │Bitcoin│ ← 🟢 Open\n│ Card  │ │       │ │       │   (add new)\n└───────┘ └───────┘ └───────┘\n\n➕ To add Apple Pay:\n   1. Create class ApplePay extends PaymentMethod\n   2. Implement pay() method\n   3. Done! No other changes needed.`;
+        }
     </script>
 </body>
+
 </html>
