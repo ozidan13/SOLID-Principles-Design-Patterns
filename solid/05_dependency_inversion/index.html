@@ -1,879 +1,361 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dependency Inversion Principle (DIP) - عكس الاعتماديات</title>
+    <title>Dependency Inversion Principle | عكس الاعتماديات</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800&family=Inter:wght@300;400;600;800&family=Fira+Code:wght@400;500&display=swap"
         rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter'], arabic: ['Cairo'], mono: ['Fira Code'] }
+                }
+            }
+        }
+    </script>
     <style>
-        :root {
-            --primary-color: #ec4899;
-            --primary-dark: #db2777;
-            --primary-light: #f472b6;
-            --secondary-color: #3b82f6;
-            --accent-color: #10b981;
-            --accent-good: #10b981;
-            --accent-bad: #ef4444;
-            --text-color: #e2e8f0;
-            --text-muted: #94a3b8;
-            --bg-color: #0f172a;
-            --bg-light: #1e293b;
-            --bg-lighter: #334155;
-            --border-color: #334155;
-            --heading-font: 'Poppins', sans-serif;
-            --body-font: 'Inter', sans-serif;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
         body {
-            font-family: var(--body-font);
-            line-height: 1.7;
-            color: var(--text-color);
-            background-color: var(--bg-color);
+            background: #020617;
+            color: #E2E8F0;
         }
 
-        .hero {
-            min-height: 50vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            background: linear-gradient(135deg, #0f172a 0%, #831843 100%);
-            padding: 3rem 1rem;
-            position: relative;
-            overflow: hidden;
+        .glass-card {
+            background: rgba(15, 23, 42, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
         }
 
-        .hero::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: radial-gradient(circle at 30% 30%, rgba(236, 72, 153, 0.1) 0%, transparent 50%);
+        .glass-card:hover {
+            border-color: rgba(236, 72, 153, 0.4);
         }
 
-        .hero-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.5rem 1rem;
-            background: rgba(236, 72, 153, 0.2);
-            border: 1px solid rgba(236, 72, 153, 0.3);
-            border-radius: 50px;
-            color: var(--primary-light);
-            font-size: 0.9rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .hero-badge span {
-            width: 8px;
-            height: 8px;
-            background: var(--primary-light);
-            border-radius: 50%;
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-
-            0%,
-            100% {
-                opacity: 1;
-            }
-
-            50% {
-                opacity: 0.5;
-            }
-        }
-
-        .hero h1 {
-            font-family: var(--heading-font);
-            font-size: 3rem;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-            background: linear-gradient(90deg, #fff, #94a3b8);
+        .text-gradient {
+            background: linear-gradient(135deg, #EC4899, #8B5CF6);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .hero .subtitle {
-            font-size: 1.3rem;
-            color: var(--text-muted);
-        }
-
-        .hero .arabic-subtitle {
-            font-size: 1.5rem;
-            color: var(--primary-light);
-            margin-top: 0.5rem;
-        }
-
-        .main-content {
-            max-width: 1000px;
-            margin: -50px auto 0;
-            padding: 0 1rem 4rem;
-            position: relative;
-            z-index: 10;
-        }
-
-        .container {
-            background: var(--bg-light);
-            border-radius: 16px;
-            padding: 2.5rem;
-            border: 1px solid var(--border-color);
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
-        }
-
-        .back-link {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            color: var(--primary-light);
-            text-decoration: none;
-            font-weight: 500;
-            margin-bottom: 2rem;
-            transition: color 0.2s;
-        }
-
-        .back-link:hover {
-            color: #fff;
-        }
-
-        h2 {
-            font-family: var(--heading-font);
-            font-size: 1.8rem;
-            color: var(--text-color);
-            margin: 2.5rem 0 1.5rem;
-            padding-bottom: 0.5rem;
-            border-bottom: 2px solid var(--border-color);
-        }
-
-        h3 {
-            font-family: var(--heading-font);
-            font-size: 1.4rem;
-            color: var(--primary-light);
-            margin: 1.5rem 0 1rem;
-        }
-
-        p {
-            margin-bottom: 1.5rem;
-            color: var(--text-muted);
-        }
-
-        strong {
-            color: var(--text-color);
-        }
-
-        .arabic-section {
-            background: linear-gradient(135deg, rgba(236, 72, 153, 0.1), rgba(59, 130, 246, 0.1));
-            border: 1px solid rgba(236, 72, 153, 0.2);
-            border-radius: 12px;
-            padding: 2rem;
-            margin: 2rem 0;
-        }
-
-        .arabic-section h3 {
-            color: var(--primary-light);
-            margin-top: 0;
-        }
-
-        .arabic-text {
-            text-align: right;
-            line-height: 2;
-        }
-
-        .arabic-text p {
-            color: var(--text-color);
-        }
-
-        .visualization {
-            background: var(--bg-lighter);
-            border-radius: 12px;
-            padding: 2rem;
-            margin: 2rem 0;
-            border: 1px solid var(--border-color);
-        }
-
-        .visualization svg {
-            width: 100%;
-            max-width: 700px;
-            height: auto;
-            display: block;
-            margin: 0 auto;
-        }
-
-        .example {
-            border-radius: 12px;
-            padding: 2rem;
-            margin: 2rem 0;
-            border: 1px solid var(--border-color);
-            background: var(--bg-lighter);
-        }
-
-        .bad-example {
-            border-left: 4px solid var(--accent-bad);
-        }
-
-        .bad-example h3 {
-            color: var(--accent-bad);
-        }
-
-        .good-example {
-            border-left: 4px solid var(--accent-good);
-        }
-
-        .good-example h3 {
-            color: var(--accent-good);
-        }
-
-        .code-container {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 1rem;
-            margin-top: 1rem;
-        }
-
-        @media (min-width: 768px) {
-            .code-container {
-                grid-template-columns: 1fr 1fr;
-            }
         }
 
         pre {
-            background: var(--bg-color);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 1rem;
-            overflow-x: auto;
-            font-size: 0.85rem;
-            line-height: 1.6;
-        }
-
-        code {
-            font-family: 'Consolas', 'Monaco', monospace;
-            color: #e2e8f0;
-        }
-
-        .code-explanation {
-            background: rgba(236, 72, 153, 0.1);
-            border-radius: 8px;
-            padding: 1rem;
-        }
-
-        .code-explanation h4 {
-            color: var(--primary-light);
-            font-size: 1rem;
-            margin-bottom: 1rem;
-        }
-
-        .explanation-item {
-            padding: 0.75rem;
-            margin-bottom: 0.5rem;
-            border-radius: 6px;
-            border-right: 3px solid;
-        }
-
-        .explanation-item.blue {
-            background: rgba(59, 130, 246, 0.15);
-            border-color: #3b82f6;
-        }
-
-        .explanation-item.green {
-            background: rgba(16, 185, 129, 0.15);
-            border-color: #10b981;
-        }
-
-        .explanation-item.purple {
-            background: rgba(139, 92, 246, 0.15);
-            border-color: #8b5cf6;
-        }
-
-        .explanation-item.red {
-            background: rgba(239, 68, 68, 0.15);
-            border-color: #ef4444;
-        }
-
-        .explanation-item.pink {
-            background: rgba(236, 72, 153, 0.15);
-            border-color: #ec4899;
-        }
-
-        .explanation-item strong {
-            display: block;
-            margin-bottom: 0.25rem;
-        }
-
-        .explanation-item p {
-            margin: 0;
-            font-size: 0.85rem;
-        }
-
-        .interactive-demo {
-            background: linear-gradient(135deg, rgba(236, 72, 153, 0.1), rgba(59, 130, 246, 0.1));
-            border: 1px solid rgba(236, 72, 153, 0.3);
-            border-radius: 12px;
-            padding: 2rem;
-            margin: 2rem 0;
-        }
-
-        .interactive-demo h3 {
-            color: var(--primary-light);
-            margin-top: 0;
-        }
-
-        .demo-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 1rem;
-            margin-top: 1rem;
-        }
-
-        @media (min-width: 768px) {
-            .demo-grid {
-                grid-template-columns: 1fr 1fr;
-            }
-        }
-
-        .demo-input {
-            background: var(--bg-color);
-            border-radius: 8px;
-            padding: 1rem;
-        }
-
-        .demo-input label {
-            display: block;
-            color: var(--text-color);
-            margin-bottom: 0.5rem;
-            font-weight: 500;
-        }
-
-        .demo-input select {
-            width: 100%;
-            padding: 0.75rem;
-            background: var(--bg-lighter);
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            color: var(--text-color);
-            font-size: 1rem;
-            margin-bottom: 1rem;
-        }
-
-        .demo-input button {
-            padding: 0.75rem 1.5rem;
-            background: var(--primary-color);
-            color: white;
-            border: none;
-            border-radius: 6px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background 0.2s;
-            width: 100%;
-        }
-
-        .demo-input button:hover {
-            background: var(--primary-dark);
-        }
-
-        .demo-output {
-            background: var(--bg-color);
-            border-radius: 8px;
-            padding: 1rem;
-            font-family: 'Consolas', monospace;
-            font-size: 0.9rem;
-            min-height: 200px;
-            white-space: pre-wrap;
-        }
-
-        .solid-summary {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 0.5rem;
-            margin-top: 2rem;
-        }
-
-        .solid-letter {
-            background: var(--bg-lighter);
-            border: 2px solid var(--border-color);
-            border-radius: 8px;
-            padding: 1rem;
-            text-align: center;
-            transition: all 0.2s;
-        }
-
-        .solid-letter:hover {
-            transform: translateY(-4px);
-            border-color: var(--primary-color);
-        }
-
-        .solid-letter .letter {
-            font-size: 2rem;
-            font-weight: 700;
-            background: linear-gradient(90deg, #3b82f6, #10b981, #f59e0b, #8b5cf6, #ec4899);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .solid-letter .name {
-            font-size: 0.7rem;
-            color: var(--text-muted);
-            margin-top: 0.25rem;
-        }
-
-        .navigation {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 3rem;
-            padding-top: 2rem;
-            border-top: 1px solid var(--border-color);
-        }
-
-        .nav-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.75rem 1.5rem;
-            background: var(--bg-lighter);
-            color: var(--text-color);
-            text-decoration: none;
-            border-radius: 8px;
-            font-weight: 500;
-            transition: background 0.2s, transform 0.2s;
-        }
-
-        .nav-btn:hover {
-            background: var(--primary-color);
-            transform: translateY(-2px);
-        }
-
-        .nav-btn.home {
-            background: linear-gradient(90deg, var(--secondary-color), var(--accent-color));
-        }
-
-        footer {
-            background: var(--bg-light);
-            border-top: 1px solid var(--border-color);
-            padding: 2rem;
-            text-align: center;
-            color: var(--text-muted);
-        }
-
-        @media (max-width: 768px) {
-            .hero h1 {
-                font-size: 2rem;
-            }
-
-            .container {
-                padding: 1.5rem;
-            }
-
-            h2 {
-                font-size: 1.4rem;
-            }
-
-            .solid-summary {
-                grid-template-columns: repeat(5, 1fr);
-                gap: 0.25rem;
-            }
-
-            .solid-letter .letter {
-                font-size: 1.5rem;
-            }
-
-            .solid-letter .name {
-                display: none;
-            }
+            background: #0B1221 !important;
+            border: 1px solid #1E293B;
+            border-radius: 0.75rem;
         }
     </style>
 </head>
 
 <body>
-    <section class="hero">
-        <div class="hero-badge"><span></span>SOLID Principle #5</div>
-        <h1>Dependency Inversion Principle</h1>
-        <p class="subtitle">Depend on abstractions, not concretions</p>
-        <p class="arabic-subtitle" dir="rtl">اعتمد على الـ Abstractions مش الـ Concrete Classes! 🔄</p>
-    </section>
-
-    <div class="main-content">
-        <div class="container">
-            <a href="../../index.html" class="back-link">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M19 12H5M12 19l-7-7 7-7" />
-                </svg>
-                Back to Overview
+    <nav class="fixed top-0 w-full z-50 glass-card">
+        <div class="container mx-auto px-6 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div
+                    class="w-10 h-10 rounded-lg bg-gradient-to-br from-pink-500 to-purple-500 flex items-center justify-center text-white font-bold text-lg">
+                    D</div>
+                <span class="font-bold text-lg">Dependency<span class="text-pink-500">Inversion</span></span>
+            </div>
+            <a href="../../index.html"
+                class="px-4 py-2 rounded-full bg-pink-500/10 text-pink-400 border border-pink-500/20 hover:bg-pink-500 hover:text-white transition">
+                <i class="fa-solid fa-home mr-1"></i> الرئيسية
             </a>
+        </div>
+    </nav>
 
-            <!-- Arabic Explanation -->
-            <div class="arabic-section">
-                <h3 dir="rtl">🔄 إيه هو مبدأ عكس الاعتماديات؟</h3>
-                <div class="arabic-text" dir="rtl">
-                    <p><strong style="color: var(--primary-light);">تشبيه الفيشة والمقبس:</strong></p>
-                    <p>الـ <strong style="color: #3b82f6;">Laptop</strong> مش بيعتمد على <strong
-                            style="color: #ef4444;">شاحن محدد</strong>:</p>
-                    <p>• الـ Laptop بيعتمد على <strong style="color: #10b981;">Standard Power Interface</strong>
-                        (الفيشة)<br>
-                        • أي شاحن بيـ implement الـ interface ده يشتغل!<br>
-                        • ممكن تستخدم شاحن <strong style="color: #f59e0b;">Samsung</strong> أو <strong
-                            style="color: #8b5cf6;">Apple</strong> أو <strong style="color: #ec4899;">أي حاجة</strong>
-                    </p>
-                    <p style="color: var(--primary-light); font-weight: bold; margin-top: 1rem;">
-                        ✅ High-level (Laptop) يعتمد على abstraction (الفيشة)<br>
-                        ✅ Low-level (الشاحن) يـ implement الـ abstraction
-                    </p>
+    <header class="relative pt-32 pb-20 px-6 overflow-hidden">
+        <div class="absolute top-0 right-0 w-[500px] h-[500px] bg-pink-500/10 rounded-full blur-[128px]"></div>
+        <div class="container mx-auto text-center relative z-10" data-aos="fade-up">
+            <div
+                class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-800/50 border border-slate-700 text-xs font-mono text-pink-400 mb-6">
+                <span class="w-2 h-2 rounded-full bg-pink-500 animate-pulse"></span>
+                SOLID PRINCIPLE #5
+            </div>
+            <h1 class="text-5xl md:text-7xl font-black mb-4"><span class="text-gradient">Dependency Inversion</span>
+            </h1>
+            <h2 class="text-3xl font-bold text-slate-300 font-arabic mb-6">عكس الاعتماديات</h2>
+            <div class="p-6 bg-pink-950/30 border border-pink-900/50 rounded-2xl max-w-3xl mx-auto">
+                <p class="font-arabic text-xl text-pink-100/90 leading-loose">
+                    <span class="text-pink-400 font-bold">يعني إيه؟</span>
+                    زي الفيشة الكهربائية! اللابتوب مش بيعتمد على <span class="text-red-400">شاحن معين</span>...
+                    <br>بيعتمد على <span class="text-emerald-400">الـ Interface</span> (الفيشة) - أي شاحن يشتغل! 🔌
+                </p>
+            </div>
+        </div>
+    </header>
+
+    <section class="py-20 px-6 bg-slate-900/30">
+        <div class="container mx-auto max-w-6xl">
+            <div class="text-center mb-16" data-aos="fade-up">
+                <span class="text-pink-500 font-mono text-sm">THE CONCEPT</span>
+                <h2 class="text-4xl font-bold text-white mt-2">مثال الفيشة 🔌</h2>
+            </div>
+            <div class="grid lg:grid-cols-2 gap-12 items-center">
+                <div class="glass-card p-2 rounded-2xl" data-aos="fade-right">
+                    <svg viewBox="0 0 500 380" class="w-full bg-[#0B1121] rounded-xl">
+                        <text x="250" y="25" text-anchor="middle" fill="#94a3b8" font-family="Cairo"
+                            font-size="14">اعتمد على Abstraction مش Concrete</text>
+
+                        <!-- Bad: Direct dependency -->
+                        <g transform="translate(30,50)">
+                            <text x="90" y="0" text-anchor="middle" fill="#ef4444" font-size="12" font-weight="bold">❌
+                                Direct Dependency</text>
+                            <rect x="40" y="15" width="100" height="50" rx="8" fill="#1e293b" stroke="#3b82f6"
+                                stroke-width="2" />
+                            <text x="90" y="40" text-anchor="middle" fill="#60a5fa"
+                                font-size="10">NotificationService</text>
+                            <text x="90" y="55" text-anchor="middle" fill="#94a3b8" font-size="8">High-Level</text>
+                            <path d="M90 65 L90 90" stroke="#ef4444" stroke-width="2" marker-end="url(#arrow)" />
+                            <rect x="40" y="95" width="100" height="50" rx="8" fill="#1e293b" stroke="#ef4444"
+                                stroke-width="2" />
+                            <text x="90" y="120" text-anchor="middle" fill="#f87171" font-size="10">EmailSender</text>
+                            <text x="90" y="135" text-anchor="middle" fill="#94a3b8" font-size="8">Concrete!</text>
+                            <text x="90" y="170" text-anchor="middle" fill="#ef4444" font-family="Cairo"
+                                font-size="9">مربوط بـ Email بس!</text>
+                        </g>
+
+                        <!-- Good: Abstraction -->
+                        <g transform="translate(250,50)">
+                            <text x="110" y="0" text-anchor="middle" fill="#10b981" font-size="12" font-weight="bold">✅
+                                Dependency Inversion</text>
+                            <rect x="60" y="15" width="100" height="45" rx="8" fill="#1e293b" stroke="#3b82f6"
+                                stroke-width="2" />
+                            <text x="110" y="38" text-anchor="middle" fill="#60a5fa"
+                                font-size="10">NotificationService</text>
+                            <text x="110" y="52" text-anchor="middle" fill="#94a3b8" font-size="8">High-Level</text>
+                            <path d="M110 60 L110 80" stroke="#8b5cf6" stroke-width="2" />
+                            <rect x="60" y="85" width="100" height="35" rx="6" fill="#1e293b" stroke="#8b5cf6"
+                                stroke-width="2" stroke-dasharray="4,2" />
+                            <text x="110" y="105" text-anchor="middle" fill="#a78bfa" font-size="9">«interface»
+                                INotifier</text>
+                            <path d="M70 120 L50 145" stroke="#10b981" stroke-width="1" />
+                            <path d="M110 120 L110 145" stroke="#10b981" stroke-width="1" />
+                            <path d="M150 120 L170 145" stroke="#10b981" stroke-width="1" />
+                            <rect x="10" y="150" width="70" height="40" rx="6" fill="#1e293b" stroke="#10b981"
+                                stroke-width="1" />
+                            <text x="45" y="173" text-anchor="middle" fill="#34d399" font-size="9">📧 Email</text>
+                            <rect x="90" y="150" width="70" height="40" rx="6" fill="#1e293b" stroke="#10b981"
+                                stroke-width="1" />
+                            <text x="125" y="173" text-anchor="middle" fill="#34d399" font-size="9">📱 SMS</text>
+                            <rect x="170" y="150" width="70" height="40" rx="6" fill="#1e293b" stroke="#10b981"
+                                stroke-width="1" />
+                            <text x="205" y="173" text-anchor="middle" fill="#34d399" font-size="9">🔔 Push</text>
+                        </g>
+
+                        <defs>
+                            <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+                                <path d="M0,0 L0,6 L9,3 z" fill="#ef4444" />
+                            </marker>
+                        </defs>
+
+                        <!-- Summary -->
+                        <rect x="30" y="250" width="440" height="110" rx="10" fill="#1e293b" />
+                        <text x="250" y="280" text-anchor="middle" fill="#ec4899" font-family="Cairo" font-size="13"
+                            font-weight="bold">💡 المفتاح: Abstraction في النص!</text>
+                        <text x="250" y="305" text-anchor="middle" fill="#94a3b8" font-family="Cairo"
+                            font-size="11">High-Level (Service) يعتمد على Interface</text>
+                        <text x="250" y="325" text-anchor="middle" fill="#94a3b8" font-family="Cairo"
+                            font-size="11">Low-Level (Email, SMS) يـ implement الـ Interface</text>
+                        <text x="250" y="350" text-anchor="middle" fill="#10b981" font-family="Cairo" font-size="11">✅
+                            الاتنين بيعتمدوا على الـ Abstraction!</text>
+                    </svg>
+                </div>
+                <div class="space-y-6" data-aos="fade-left">
+                    <div class="glass-card p-6 rounded-xl border-r-4 border-r-blue-500">
+                        <h3 class="text-xl font-bold text-white mb-3">🔵 High-Level Module</h3>
+                        <p class="text-slate-300 font-arabic text-right leading-relaxed">
+                            الـ NotificationService - <span class="text-blue-400 font-bold">مش عايز يعرف</span> هيبعت
+                            email ولا SMS.
+                            عايز بس INotifier يـ send()!
+                        </p>
+                    </div>
+                    <div class="glass-card p-6 rounded-xl border-r-4 border-r-purple-500">
+                        <h3 class="text-xl font-bold text-white mb-3">🟣 Abstraction (Interface)</h3>
+                        <p class="text-slate-300 font-arabic text-right leading-relaxed">
+                            INotifier - <span class="text-purple-400 font-bold">العقد</span> بين الـ Service والـ
+                            Implementation.
+                            الاتنين بيعتمدوا عليه!
+                        </p>
+                    </div>
+                    <div class="glass-card p-6 rounded-xl border-r-4 border-r-emerald-500">
+                        <h3 class="text-xl font-bold text-white mb-3">🟢 Low-Level Modules</h3>
+                        <p class="text-slate-300 font-arabic text-right leading-relaxed">
+                            Email, SMS, Push - كل واحد <span class="text-emerald-400 font-bold">يـ implement</span> الـ
+                            INotifier.
+                            سهل تضيف جديد!
+                        </p>
+                    </div>
                 </div>
             </div>
+        </div>
+    </section>
 
-            <!-- SVG Visualization -->
-            <div class="visualization">
-                <h3 style="text-align: center; margin-bottom: 1.5rem;">🔌 Dependency Direction</h3>
-                <svg viewBox="0 0 700 280">
-                    <!-- Bad: Direct dependency -->
-                    <g>
-                        <text x="175" y="25" text-anchor="middle" fill="#ef4444" font-size="13" font-weight="bold">❌
-                            Direct Dependency</text>
-
-                        <rect x="100" y="40" width="150" height="60" rx="10" fill="#1e293b" stroke="#3b82f6"
-                            stroke-width="2" />
-                        <text x="175" y="65" text-anchor="middle" fill="#60a5fa" font-size="12"
-                            font-weight="bold">NotificationService</text>
-                        <text x="175" y="85" text-anchor="middle" fill="#94a3b8" font-size="10">High-Level Module</text>
-
-                        <path d="M175 100 L175 130" stroke="#ef4444" stroke-width="2" marker-end="url(#arrowRed)" />
-                        <text x="195" y="120" fill="#ef4444" font-size="9">depends on</text>
-
-                        <rect x="100" y="140" width="150" height="60" rx="10" fill="#1e293b" stroke="#ef4444"
-                            stroke-width="2" />
-                        <text x="175" y="165" text-anchor="middle" fill="#f87171" font-size="12"
-                            font-weight="bold">EmailSender</text>
-                        <text x="175" y="185" text-anchor="middle" fill="#94a3b8" font-size="10">Concrete Class</text>
-
-                        <text x="175" y="225" text-anchor="middle" fill="#ef4444" font-size="10">High-level tied to
-                            low-level!</text>
-                        <text x="175" y="240" text-anchor="middle" fill="#ef4444" font-size="10">Can't switch to SMS
-                            easily</text>
-                    </g>
-
-                    <!-- Good: Abstraction in between -->
-                    <g>
-                        <text x="525" y="25" text-anchor="middle" fill="#10b981" font-size="13" font-weight="bold">✅
-                            Dependency Inversion</text>
-
-                        <rect x="450" y="40" width="150" height="50" rx="10" fill="#1e293b" stroke="#3b82f6"
-                            stroke-width="2" />
-                        <text x="525" y="60" text-anchor="middle" fill="#60a5fa" font-size="11"
-                            font-weight="bold">NotificationService</text>
-                        <text x="525" y="78" text-anchor="middle" fill="#94a3b8" font-size="9">High-Level Module</text>
-
-                        <path d="M525 90 L525 110" stroke="#8b5cf6" stroke-width="2" marker-end="url(#arrowPurple)" />
-
-                        <rect x="450" y="115" width="150" height="40" rx="8" fill="#1e293b" stroke="#8b5cf6"
-                            stroke-width="2" stroke-dasharray="5,3" />
-                        <text x="525" y="135" text-anchor="middle" fill="#a78bfa" font-size="10"
-                            font-weight="bold">«interface» INotifier</text>
-                        <text x="525" y="148" text-anchor="middle" fill="#c4b5fd" font-size="8">send(message)</text>
-
-                        <path d="M480 155 L430 180" stroke="#10b981" stroke-width="1" fill="none" />
-                        <path d="M525 155 L525 180" stroke="#10b981" stroke-width="1" fill="none" />
-                        <path d="M570 155 L620 180" stroke="#10b981" stroke-width="1" fill="none" />
-
-                        <rect x="380" y="185" width="90" height="45" rx="6" fill="#1e293b" stroke="#10b981"
-                            stroke-width="1" />
-                        <text x="425" y="205" text-anchor="middle" fill="#34d399" font-size="9" font-weight="bold">📧
-                            Email</text>
-                        <text x="425" y="220" text-anchor="middle" fill="#94a3b8" font-size="8">implements</text>
-
-                        <rect x="480" y="185" width="90" height="45" rx="6" fill="#1e293b" stroke="#10b981"
-                            stroke-width="1" />
-                        <text x="525" y="205" text-anchor="middle" fill="#34d399" font-size="9" font-weight="bold">📱
-                            SMS</text>
-                        <text x="525" y="220" text-anchor="middle" fill="#94a3b8" font-size="8">implements</text>
-
-                        <rect x="580" y="185" width="90" height="45" rx="6" fill="#1e293b" stroke="#10b981"
-                            stroke-width="1" />
-                        <text x="625" y="205" text-anchor="middle" fill="#34d399" font-size="9" font-weight="bold">🔔
-                            Push</text>
-                        <text x="625" y="220" text-anchor="middle" fill="#94a3b8" font-size="8">implements</text>
-
-                        <text x="525" y="255" text-anchor="middle" fill="#10b981" font-size="10">Both depend on
-                            abstraction!</text>
-                        <text x="525" y="270" text-anchor="middle" fill="#10b981" font-size="10">Easy to swap
-                            implementations</text>
-                    </g>
-
-                    <!-- Arrow Markers -->
-                    <defs>
-                        <marker id="arrowRed" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
-                            <path d="M0,0 L0,6 L9,3 z" fill="#ef4444" />
-                        </marker>
-                        <marker id="arrowPurple" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
-                            <path d="M0,0 L0,6 L9,3 z" fill="#8b5cf6" />
-                        </marker>
-                    </defs>
-                </svg>
-            </div>
-
-            <!-- Bad Example -->
-            <div class="example bad-example">
-                <h3>❌ Bad Example - Direct Dependency</h3>
-                <p>High-level module directly depends on low-level implementation:</p>
-
-                <div class="code-container">
-                    <pre dir="ltr"><code>// ❌ NotificationService is TIED to EmailSender
-class EmailSender {
-  send(message) {
-    console.log(`📧 Email: ${message}`);
+    <section class="py-24 px-6 bg-black/20">
+        <div class="container mx-auto max-w-6xl">
+            <h2 class="text-4xl font-bold text-white mb-12 text-center" data-aos="fade-up">الكود 💻</h2>
+            <div class="grid lg:grid-cols-2 gap-8" data-aos="fade-up">
+                <div class="bg-[#0B1221] rounded-xl overflow-hidden border border-red-500/30">
+                    <div
+                        class="flex items-center gap-2 px-4 py-2 bg-slate-900 border-b border-slate-800 text-xs text-slate-400">
+                        <span class="w-3 h-3 rounded-full bg-red-500"></span>
+                        <span class="w-3 h-3 rounded-full bg-yellow-500"></span>
+                        <span class="w-3 h-3 rounded-full bg-green-500"></span>
+                        <span class="ml-2">❌ Direct Dependency</span>
+                    </div>
+                    <pre class="p-4 text-sm overflow-x-auto"><code>class EmailSender {
+  send(msg) { 
+    console.log(`📧 Email: ${msg}`); 
   }
 }
 
 class NotificationService {
   constructor() {
-    // ❌ Creates EmailSender internally!
+    // ❌ مربوط بـ EmailSender!
     this.sender = new EmailSender();
   }
   
-  notify(message) {
-    this.sender.send(message);
+  notify(msg) {
+    this.sender.send(msg);
   }
 }
 
-// Using it
-const service = new NotificationService();
-service.notify("Hello!");
-
-// ❌ Can't easily switch to SMS!</code></pre>
-
-                    <div class="code-explanation" dir="rtl">
-                        <h4>🔍 ليه ده غلط؟</h4>
-                        <div class="explanation-item red">
-                            <strong>⚠️ Tight Coupling</strong>
-                            <p>NotificationService مربوط بـ EmailSender - مينفعش يشتغل من غيره!</p>
-                        </div>
-                        <div class="explanation-item red">
-                            <strong>⚠️ صعب الاختبار</strong>
-                            <p>عشان تختبر NotificationService، لازم تبعت emails فعلاً!</p>
-                        </div>
-                        <div class="explanation-item red">
-                            <strong>⚠️ مفيش مرونة</strong>
-                            <p>عايز تضيف SMS؟ لازم تغير NotificationService!</p>
-                        </div>
-                    </div>
+// ❌ عايز SMS؟ لازم تغير الكود!</code></pre>
                 </div>
-            </div>
-
-            <!-- Good Example -->
-            <div class="example good-example">
-                <h3>✅ Good Example - Dependency Inversion</h3>
-                <p>Both depend on abstraction - swap implementations easily:</p>
-
-                <div class="code-container">
-                    <pre dir="ltr"><code>// ✅ Abstraction (Interface)
+                <div class="bg-[#0B1221] rounded-xl overflow-hidden border border-emerald-500/30">
+                    <div
+                        class="flex items-center gap-2 px-4 py-2 bg-slate-900 border-b border-slate-800 text-xs text-slate-400">
+                        <span class="w-3 h-3 rounded-full bg-red-500"></span>
+                        <span class="w-3 h-3 rounded-full bg-yellow-500"></span>
+                        <span class="w-3 h-3 rounded-full bg-green-500"></span>
+                        <span class="ml-2">✅ Dependency Injection</span>
+                    </div>
+                    <pre class="p-4 text-sm overflow-x-auto"><code>// Interface
 class INotifier {
-  send(message) {
-    throw new Error("Must implement");
-  }
+  send(msg) { throw "implement!"; }
 }
 
-// Implementations
-class EmailNotifier extends INotifier {
-  send(message) {
-    return `📧 Email: ${message}`;
-  }
+class Email extends INotifier {
+  send(msg) { return `📧 ${msg}`; }
 }
 
-class SMSNotifier extends INotifier {
-  send(message) {
-    return `📱 SMS: ${message}`;
-  }
+class SMS extends INotifier {
+  send(msg) { return `📱 ${msg}`; }
 }
 
-class PushNotifier extends INotifier {
-  send(message) {
-    return `🔔 Push: ${message}`;
-  }
-}
-
-// ✅ Depends on abstraction, not concrete!
+// ✅ بياخد الـ notifier من بره!
 class NotificationService {
   constructor(notifier) {
     this.notifier = notifier;
   }
-  
-  notify(message) {
-    return this.notifier.send(message);
+  notify(msg) {
+    return this.notifier.send(msg);
   }
 }
 
-// Easy to swap!
-const emailService = new NotificationService(new EmailNotifier());
-const smsService = new NotificationService(new SMSNotifier());</code></pre>
-
-                    <div class="code-explanation" dir="rtl">
-                        <h4>✨ ليه ده صح؟</h4>
-                        <div class="explanation-item purple">
-                            <strong>📋 INotifier Abstraction</strong>
-                            <p>Interface بيحدد العقد - كل notifier لازم يكون عنده send()</p>
-                        </div>
-                        <div class="explanation-item green">
-                            <strong>💉 Dependency Injection</strong>
-                            <p>NotificationService بياخد الـ notifier من بره - مش بيعمله!</p>
-                        </div>
-                        <div class="explanation-item blue">
-                            <strong>🔄 سهل التبديل</strong>
-                            <p>عايز SMS بدل Email؟ غير في السطر اللي بيعمل new بس!</p>
-                        </div>
-                        <div class="explanation-item pink">
-                            <strong>🧪 سهل الاختبار</strong>
-                            <p>ممكن تعمل MockNotifier للتستينج - مش لازم تبعت emails</p>
-                        </div>
-                    </div>
+// سهل التبديل!
+new NotificationService(new Email());
+new NotificationService(new SMS());</code></pre>
                 </div>
-            </div>
-
-            <!-- Interactive Demo -->
-            <div class="interactive-demo">
-                <h3>🎮 جرب بنفسك - Notification System</h3>
-                <p dir="rtl">شوف إزاي نقدر نبدل الـ implementation بسهولة:</p>
-
-                <div class="demo-grid">
-                    <div class="demo-input">
-                        <label dir="rtl">اختار طريقة الإشعارات:</label>
-                        <select id="notifier-type">
-                            <option value="email">📧 Email Notifier</option>
-                            <option value="sms">📱 SMS Notifier</option>
-                            <option value="push">🔔 Push Notifier</option>
-                            <option value="slack">💼 Slack Notifier (New!)</option>
-                        </select>
-                        <button onclick="sendNotification()">Send Notification 📤</button>
-                    </div>
-                    <div class="demo-output" id="output">// Select a notifier and click Send
-                        // Watch DIP in action - swapping is easy!</div>
-                </div>
-            </div>
-
-            <!-- SOLID Summary -->
-            <div class="arabic-section">
-                <h3 dir="rtl">🏆 ملخص SOLID كامل</h3>
-                <div class="solid-summary">
-                    <a href="../01_single_responsibility/index.html" class="solid-letter">
-                        <div class="letter">S</div>
-                        <div class="name">Single Responsibility</div>
-                    </a>
-                    <a href="../02_open_closed/index.html" class="solid-letter">
-                        <div class="letter">O</div>
-                        <div class="name">Open/Closed</div>
-                    </a>
-                    <a href="../03_liskov_substitution/index.html" class="solid-letter">
-                        <div class="letter">L</div>
-                        <div class="name">Liskov Substitution</div>
-                    </a>
-                    <a href="../04_interface_segregation/index.html" class="solid-letter">
-                        <div class="letter">I</div>
-                        <div class="name">Interface Segregation</div>
-                    </a>
-                    <a href="#" class="solid-letter"
-                        style="border-color: var(--primary-color); background: rgba(236, 72, 153, 0.1);">
-                        <div class="letter" style="background: var(--primary-color); -webkit-background-clip: text;">D
-                        </div>
-                        <div class="name">Dependency Inversion ✓</div>
-                    </a>
-                </div>
-
-                <div class="arabic-text" dir="rtl" style="margin-top: 2rem;">
-                    <p><strong>🎉 مبروك! خلصت SOLID!</strong></p>
-                    <p>
-                        <strong style="color: #3b82f6;">S</strong> - كل class ليه مسؤولية واحدة |
-                        <strong style="color: #10b981;">O</strong> - مفتوح للتوسيع، مقفول للتعديل |
-                        <strong style="color: #f59e0b;">L</strong> - الأولاد يقدروا ياخدوا مكان الآباء |
-                        <strong style="color: #8b5cf6;">I</strong> - interfaces صغيرة ومتخصصة |
-                        <strong style="color: #ec4899;">D</strong> - اعتمد على abstractions
-                    </p>
-                </div>
-            </div>
-
-            <!-- Navigation -->
-            <div class="navigation">
-                <a href="../04_interface_segregation/index.html" class="nav-btn">← ISP</a>
-                <a href="../../index.html" class="nav-btn home">🏠 Back to Home</a>
             </div>
         </div>
-    </div>
+    </section>
 
-    <footer>
-        <p>SOLID Principles Interactive Guide | Created by Osama Zinhom</p>
+    <section class="py-24 px-6">
+        <div class="container mx-auto max-w-4xl">
+            <h2 class="text-4xl font-bold text-white mb-8 text-center" data-aos="fade-up">جرب! 🎮</h2>
+            <div class="glass-card p-8 rounded-2xl" data-aos="fade-up">
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                    <button onclick="test('email')"
+                        class="p-4 bg-slate-900 border-2 border-slate-700 rounded-xl hover:border-pink-500 transition">
+                        <div class="text-3xl mb-2">📧</div>
+                        <div class="text-white text-sm">Email</div>
+                    </button>
+                    <button onclick="test('sms')"
+                        class="p-4 bg-slate-900 border-2 border-slate-700 rounded-xl hover:border-pink-500 transition">
+                        <div class="text-3xl mb-2">📱</div>
+                        <div class="text-white text-sm">SMS</div>
+                    </button>
+                    <button onclick="test('push')"
+                        class="p-4 bg-slate-900 border-2 border-slate-700 rounded-xl hover:border-pink-500 transition">
+                        <div class="text-3xl mb-2">🔔</div>
+                        <div class="text-white text-sm">Push</div>
+                    </button>
+                    <button onclick="test('slack')"
+                        class="p-4 bg-slate-900 border-2 border-slate-700 rounded-xl hover:border-pink-500 transition">
+                        <div class="text-3xl mb-2">💼</div>
+                        <div class="text-white text-sm">Slack</div>
+                    </button>
+                </div>
+                <div id="output"
+                    class="h-32 p-4 bg-slate-900 rounded-xl font-mono text-sm text-slate-300 overflow-y-auto">
+                    // اختار notifier وشوف DIP في العمل!</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SOLID Summary -->
+    <section class="py-16 px-6 bg-gradient-to-b from-transparent to-pink-950/20">
+        <div class="container mx-auto max-w-4xl text-center" data-aos="fade-up">
+            <h2 class="text-3xl font-bold text-white mb-8 font-arabic">🏆 مبروك! خلصت SOLID</h2>
+            <div class="grid grid-cols-5 gap-2 mb-8">
+                <a href="../01_single_responsibility/index.html"
+                    class="glass-card p-4 rounded-xl hover:border-blue-500 transition">
+                    <div class="text-2xl font-black text-blue-400">S</div>
+                    <div class="text-xs text-slate-500">Single</div>
+                </a>
+                <a href="../02_open_closed/index.html"
+                    class="glass-card p-4 rounded-xl hover:border-emerald-500 transition">
+                    <div class="text-2xl font-black text-emerald-400">O</div>
+                    <div class="text-xs text-slate-500">Open</div>
+                </a>
+                <a href="../03_liskov_substitution/index.html"
+                    class="glass-card p-4 rounded-xl hover:border-amber-500 transition">
+                    <div class="text-2xl font-black text-amber-400">L</div>
+                    <div class="text-xs text-slate-500">Liskov</div>
+                </a>
+                <a href="../04_interface_segregation/index.html"
+                    class="glass-card p-4 rounded-xl hover:border-purple-500 transition">
+                    <div class="text-2xl font-black text-purple-400">I</div>
+                    <div class="text-xs text-slate-500">Interface</div>
+                </a>
+                <div class="glass-card p-4 rounded-xl border-pink-500 bg-pink-500/10">
+                    <div class="text-2xl font-black text-pink-400">D</div>
+                    <div class="text-xs text-pink-400">Dependency ✓</div>
+                </div>
+            </div>
+            <a href="../../index.html"
+                class="px-8 py-4 bg-gradient-to-r from-pink-500 to-purple-500 text-white font-bold rounded-xl inline-block">
+                <i class="fa-solid fa-home mr-2"></i> العودة للرئيسية
+            </a>
+        </div>
+    </section>
+
+    <footer class="py-8 text-center text-slate-600 bg-black/40 border-t border-slate-800">
+        <p>SOLID Principles | Eng. Osama Zinhom</p>
     </footer>
 
     <script>
-        // DIP Demo
-        class INotifier {
-            send(message) { throw new Error("Must implement"); }
-            getName() { return "Unknown"; }
-        }
-
-        class EmailNotifier extends INotifier {
-            send(message) { return `📧 Email sent!\n   To: user@example.com\n   Message: "${message}"`; }
-            getName() { return "Email Notifier"; }
-        }
-
-        class SMSNotifier extends INotifier {
-            send(message) { return `📱 SMS sent!\n   To: +20 10x xxx xxxx\n   Message: "${message}"`; }
-            getName() { return "SMS Notifier"; }
-        }
-
-        class PushNotifier extends INotifier {
-            send(message) { return `🔔 Push notification sent!\n   Device: iPhone 15\n   Message: "${message}"`; }
-            getName() { return "Push Notifier"; }
-        }
-
-        class SlackNotifier extends INotifier {
-            send(message) { return `💼 Slack message sent!\n   Channel: #general\n   Message: "${message}"`; }
-            getName() { return "Slack Notifier"; }
-        }
-
-        class NotificationService {
-            constructor(notifier) {
-                this.notifier = notifier;
-            }
-            notify(message) {
-                return this.notifier.send(message);
-            }
-        }
-
+        AOS.init({ duration: 800, once: true });
         const notifiers = {
-            email: new EmailNotifier(),
-            sms: new SMSNotifier(),
-            push: new PushNotifier(),
-            slack: new SlackNotifier()
+            email: { emoji: '📧', name: 'EmailNotifier', msg: 'Email sent to user@example.com' },
+            sms: { emoji: '📱', name: 'SMSNotifier', msg: 'SMS sent to +20 10x xxx xxxx' },
+            push: { emoji: '🔔', name: 'PushNotifier', msg: 'Push notification sent to iPhone' },
+            slack: { emoji: '💼', name: 'SlackNotifier', msg: 'Slack message sent to #general' }
         };
-
-        function sendNotification() {
-            const type = document.getElementById('notifier-type').value;
-            const notifier = notifiers[type];
-            const service = new NotificationService(notifier);
-
-            const result = service.notify("Hello from SOLID!");
-
-            let output = `🔄 Creating NotificationService...\n`;
-            output += `   new NotificationService(${notifier.getName()})\n\n`;
-            output += `📤 Calling service.notify()...\n\n`;
-            output += result;
-            output += `\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
-            output += `✅ DIP in action:\n`;
-            output += `   • NotificationService doesn't know which notifier\n`;
-            output += `   • Just calls notifier.send() on the interface\n`;
-            output += `   • Swapping notifiers = change 1 line!`;
-
-            document.getElementById('output').textContent = output;
+        function test(type) {
+            const n = notifiers[type];
+            let out = `🔄 new NotificationService(${n.name})\n━━━━━━━━━━━━━━━━━━━\n`;
+            out += `${n.emoji} ${n.msg}\n\n`;
+            out += `✅ DIP: Service مش عارف implementation!\n`;
+            out += `   بيتعامل مع INotifier بس.\n`;
+            out += `   سهل تبدل أو تضيف notifier جديد!`;
+            document.getElementById('output').textContent = out;
         }
     </script>
 </body>
