@@ -1,956 +1,279 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>State Pattern</title>
+    <title>State Pattern | نمط الحالة</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800&family=Inter:wght@300;400;600;800&family=Fira+Code:wght@400;500&display=swap"
+        rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = { theme: { extend: { fontFamily: { sans: ['Inter'], arabic: ['Cairo'], mono: ['Fira Code'] } } } }
+    </script>
     <style>
-        :root {
-            --primary-color: #3b82f6; /* Vibrant blue */
-            --primary-dark: #2563eb;
-            --primary-light: #60a5fa;
-            --secondary-color: #10b981; /* Green */
-            --secondary-dark: #059669;
-            --accent-color: #8b5cf6; /* Purple */
-            --accent-color-good: #059669; /* Green for good examples */
-            --accent-color-bad: #ef4444; /* Red for bad examples */
-            --text-color: #e2e8f0;
-            --text-muted: #94a3b8;
-            --bg-color: #0f172a; /* Dark blue background */
-            --bg-light: #1e293b;
-            --bg-lighter: #334155;
-            --bg-card: #1e293b;
-            --border-color: #334155;
-            --code-bg: #0f172a;
-            --code-text: #e2e8f0;
-            --heading-font: 'Poppins', sans-serif;
-            --body-font: 'Inter', sans-serif;
-            --border-radius: 8px;
-            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
-            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2), 0 2px 4px -1px rgba(0, 0, 0, 0.1);
-            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
-            --glow: 0 0 15px rgba(59, 130, 246, 0.5);
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
         body {
-            font-family: var(--body-font);
-            line-height: 1.7;
-            color: var(--text-color);
-            background-color: var(--bg-color);
+            background: #020617;
+            color: #E2E8F0;
         }
 
-        /* Hero Section */
-        .hero {
-            position: relative;
-            min-height: 40vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            color: white;
-            text-align: center;
-            overflow: hidden;
-            background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
-            padding: 3rem 1rem;
+        .glass-card {
+            background: rgba(15, 23, 42, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
         }
 
-        .hero::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2000 1500"><rect fill="%23000000" width="2000" height="1500"/><defs><circle stroke="%23222" vector-effect="non-scaling-stroke" id="a" fill="none" stroke-width="5" r="315"/></defs><g transform="translate(1000 750)"><use stroke="%233b82f6" href="%23a" transform="rotate(60 0 0) scale(0.4 0.4)"/><use stroke="%233b82f6" href="%23a" transform="rotate(120 0 0) scale(0.5 0.5)"/><use stroke="%233b82f6" href="%23a" transform="rotate(180 0 0) scale(0.6 0.6)"/><use stroke="%233b82f6" href="%23a" transform="rotate(240 0 0) scale(0.7 0.7)"/><use stroke="%233b82f6" href="%23a" transform="rotate(300 0 0) scale(0.8 0.8)"/></g></svg>');
-            background-size: cover;
-            opacity: 0.1;
-            animation: pulse 15s ease-in-out infinite alternate;
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(1); opacity: 0.1; }
-            50% { transform: scale(1.05); opacity: 0.15; }
-            100% { transform: scale(1); opacity: 0.1; }
-        }
-
-        .hero-content {
-            position: relative;
-            z-index: 10;
-            max-width: 800px;
-        }
-
-        .hero h1 {
-            font-family: var(--heading-font);
-            font-size: 3rem;
-            font-weight: 700;
-            margin-bottom: 1rem;
-            text-shadow: 0 0 30px rgba(59, 130, 246, 0.5);
-        }
-
-        .hero p {
-            font-size: 1.2rem;
-            opacity: 0.9;
-            max-width: 600px;
-            margin: 0 auto;
-        }
-
-        /* Shapes animation */
-        .shapes {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            overflow: hidden;
-        }
-
-        .shape {
-            position: absolute;
-            opacity: 0.2;
-            animation: float 15s infinite linear;
-        }
-
-        .shape-1 {
-            top: 20%;
-            left: 10%;
-            width: 60px;
-            height: 60px;
-            border-radius: 41% 59% 37% 63% / 44% 67% 33% 56%;
-            background-color: #10b981;
-            animation-duration: 25s;
-            box-shadow: 0 0 30px rgba(16, 185, 129, 0.4);
-        }
-
-        .shape-2 {
-            top: 60%;
-            right: 15%;
-            width: 80px;
-            height: 80px;
-            border-radius: 73% 27% 59% 41% / 57% 43% 57% 43%;
-            background-color: #8b5cf6;
-            animation-duration: 30s;
-            animation-delay: 2s;
-            box-shadow: 0 0 30px rgba(139, 92, 246, 0.4);
-        }
-
-        @keyframes float {
-            0% {
-                transform: translate(0, 0) rotate(0deg);
-            }
-            25% {
-                transform: translate(10px, 15px) rotate(90deg);
-            }
-            50% {
-                transform: translate(5px, -10px) rotate(180deg);
-            }
-            75% {
-                transform: translate(-10px, 5px) rotate(270deg);
-            }
-            100% {
-                transform: translate(0, 0) rotate(360deg);
-            }
-        }
-
-        /* Main Content */
-        .main-content {
-            position: relative;
-            margin-top: -50px;
-            padding-bottom: 4rem;
-        }
-
-        .container {
-            width: 90%;
-            max-width: 1000px;
-            margin: 0 auto;
-            padding: 3rem;
-            background-color: var(--bg-light);
-            border-radius: var(--border-radius);
-            box-shadow: var(--shadow-lg);
-            border: 1px solid var(--border-color);
-        }
-
-        /* Typography */
-        h1, h2, h3 {
-            font-family: var(--heading-font);
-            color: var(--text-color);
-        }
-
-        h2 {
-            font-size: 1.8rem;
-            font-weight: 600;
-            margin-top: 3rem;
-            margin-bottom: 1.5rem;
-            color: var(--primary-light);
-        }
-
-        h3 {
-            font-size: 1.4rem;
-            font-weight: 500;
-            margin-top: 2rem;
-            margin-bottom: 1rem;
-        }
-
-        p, li {
-            margin-bottom: 1.5rem;
-            color: var(--text-muted);
-            font-size: 1.05rem;
-            line-height: 1.8;
-        }
-
-        ul, ol {
-            padding-left: 1.5rem;
-            margin-bottom: 2rem;
-        }
-
-        li {
-            margin-bottom: 0.5rem;
-        }
-
-        strong {
-            color: var(--text-color);
-            font-weight: 600;
-        }
-
-        /* Code styling */
-        code {
-            background-color: var(--code-bg);
-            padding: 0.2em 0.4em;
-            border-radius: 4px;
-            font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
-            font-size: 0.9em;
-            color: #f87171;
-            border: 1px solid var(--border-color);
+        .text-gradient {
+            background: linear-gradient(135deg, #10B981, #3B82F6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
         pre {
-            background-color: var(--code-bg);
-            color: var(--code-text);
-            padding: 1.5rem;
-            border-radius: var(--border-radius);
-            overflow-x: auto;
-            margin: 2rem 0;
-            font-size: 0.9rem;
-            line-height: 1.6;
-            border: 1px solid var(--border-color);
-        }
-
-        pre code {
-            background: none;
-            padding: 0;
-            color: inherit;
-            font-size: inherit;
-            border: none;
-        }
-
-        /* Examples */
-        .example {
-            border: 1px solid var(--border-color);
-            padding: 2rem;
-            margin: 2.5rem 0;
-            border-radius: var(--border-radius);
-            background-color: var(--bg-light);
-            box-shadow: var(--shadow-sm);
-        }
-
-        .visualization {
-            display: flex;
-            justify-content: center;
-            margin: 2rem 0;
-            overflow-x: auto;
-            padding: 1rem;
-        }
-
-        .visualization svg {
-            max-width: 100%;
-        }
-        
-        /* Footer */
-        footer {
-            background-color: var(--bg-color);
-            color: white;
-            padding: 3rem 0;
-            text-align: center;
-            margin-top: 4rem;
-            border-top: 1px solid var(--border-color);
-        }
-
-        .footer-content {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 2rem;
-        }
-
-        .footer-content p {
-            color: rgba(255, 255, 255, 0.7);
-            margin-bottom: 0;
-        }
-
-        /* Interactive Demo */
-        .interactive-demo {
-            background-color: var(--bg-lighter);
-            padding: 2rem;
-            margin: 3rem 0;
-            border-radius: var(--border-radius);
-            box-shadow: var(--shadow);
-            border: 1px solid var(--border-color);
-        }
-
-        .interactive-demo h3 {
-            margin-top: 0;
-            color: var(--primary-light);
-        }
-
-        /* State Machine Visualization */
-        .state-machine {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 2rem;
-            margin: 2rem 0;
-        }
-
-        .state {
-            position: relative;
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
-            background-color: var(--bg-card);
-            border: 2px solid var(--border-color);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 600;
-            transition: all 0.3s ease;
-        }
-
-        .state.active {
-            background-color: var(--primary-color);
-            border-color: var(--primary-light);
-            box-shadow: var(--glow);
-            transform: scale(1.1);
-        }
-
-        .states-container {
-            display: flex;
-            justify-content: space-around;
-            width: 100%;
-            position: relative;
-        }
-
-        .transition-arrow {
-            position: absolute;
-            width: 150px;
-            height: 2px;
-            background-color: var(--border-color);
-            transform-origin: left center;
-        }
-
-        .transition-arrow::after {
-            content: '';
-            position: absolute;
-            right: 0;
-            top: -4px;
-            width: 0;
-            height: 0;
-            border-left: 8px solid var(--border-color);
-            border-top: 5px solid transparent;
-            border-bottom: 5px solid transparent;
-        }
-
-        .transition-label {
-            position: absolute;
-            font-size: 0.8rem;
-            color: var(--text-muted);
-            text-align: center;
-            padding: 0.25rem 0.5rem;
-            background-color: var(--bg-color);
-            border-radius: 4px;
-            transform: translateY(-50%);
-        }
-
-        /* Controls for Interactive Demo */
-        .demo-controls {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 1rem;
-            margin: 2rem 0;
-            justify-content: center;
-        }
-
-        /* Buttons */
-        button {
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            padding: 0.75rem 1.5rem;
-            border-radius: var(--border-radius);
-            font-family: var(--body-font);
-            font-size: 1rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: background-color 0.2s, transform 0.1s, box-shadow 0.2s;
-        }
-
-        button:hover {
-            background-color: var(--primary-dark);
-            box-shadow: 0 0 15px rgba(59, 130, 246, 0.5);
-        }
-
-        button:active {
-            transform: scale(0.98);
-        }
-
-        button:disabled {
-            background-color: var(--bg-lighter);
-            color: var(--text-muted);
-            cursor: not-allowed;
-        }
-
-        /* Status display */
-        .status-display {
-            background-color: var(--bg-color);
-            border: 1px solid var(--border-color);
-            padding: 1.5rem;
-            border-radius: var(--border-radius);
-            margin-top: 2rem;
-        }
-
-        .status-title {
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-            color: var(--primary-light);
-        }
-
-        .status-value {
-            font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
-        }
-
-        /* Log output */
-        .log-output {
-            background-color: var(--bg-color);
-            border: 1px solid var(--border-color);
-            padding: 1.5rem;
-            border-radius: var(--border-radius);
-            margin-top: 1.5rem;
-            height: 200px;
-            overflow-y: auto;
-            font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
-            font-size: 0.9rem;
-            line-height: 1.6;
-        }
-
-        .log-entry {
-            margin-bottom: 0.5rem;
-            border-bottom: 1px dashed var(--border-color);
-            padding-bottom: 0.5rem;
-        }
-
-        .log-entry:last-child {
-            margin-bottom: 0;
-            border-bottom: none;
+            background: #0B1221 !important;
+            border: 1px solid #1E293B;
+            border-radius: 0.75rem;
         }
     </style>
 </head>
+
 <body>
-    <!-- Hero Section -->
-    <section class="hero">
-        <div class="shapes">
-            <div class="shape shape-1"></div>
-            <div class="shape shape-2"></div>
-        </div>
-        <div class="hero-content">
-            <h1>State Pattern</h1>
-            <p>Allow an object to alter its behavior when its internal state changes</p>
-        </div>
-    </section>
-
-    <!-- Main Content -->
-    <main class="container">
-        <section class="content-section">
-            <h2>Understanding the State Pattern</h2>
-            <p>The State pattern is a behavioral design pattern that allows an object to alter its behavior when its internal state changes. The object will appear to change its class as its behavior changes based on the state it's in.</p>
-            
-            <h3>Problem</h3>
-            <p>Imagine you're developing a document editing application with a document that can be in different states: Draft, Moderation, Published. Each state determines what operations can be performed on the document. For example:</p>
-            <ul>
-                <li>When a document is in a <strong>Draft</strong> state, it can be edited and submitted for review.</li>
-                <li>In <strong>Moderation</strong>, it can be either approved or rejected.</li>
-                <li>Once <strong>Published</strong>, it can be viewed by anyone but can't be edited without making a new draft.</li>
-            </ul>
-            
-            <p>Implementing this with conditional statements (like if/else or switch) can lead to several problems:</p>
-            <ul>
-                <li>Code becomes difficult to maintain as you add more states and state-dependent behaviors</li>
-                <li>State transition logic gets scattered throughout the code</li>
-                <li>Adding new states requires modifying multiple conditional blocks</li>
-                <li>The code becomes prone to errors when logic isn't updated consistently</li>
-            </ul>
-            
-            <h3>Solution</h3>
-            <p>The State pattern suggests creating new classes for all possible states of an object and extracting state-specific behaviors into these classes. The original object (called Context) stores a reference to one of the state objects that represents its current state and delegates all state-specific work to that object.</p>
-            
-            <p>When the context's state changes, it simply switches to another state object. This way:</p>
-            <ul>
-                <li>State-specific code is isolated in separate classes</li>
-                <li>State transitions become explicit</li>
-                <li>Each state is self-contained and only concerned with its own behavior</li>
-                <li>New states can be added without modifying existing state code</li>
-            </ul>
-            
-            <h3>Structure</h3>
-            <div class="visualization">
-                <img src="../../images/state-pattern.svg" alt="State Pattern Structure" width="800" height="500">
+    <nav class="fixed top-0 w-full z-50 glass-card">
+        <div class="container mx-auto px-6 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div
+                    class="w-10 h-10 rounded-lg bg-gradient-to-br from-emerald-500 to-blue-500 flex items-center justify-center text-white font-bold text-lg">
+                    🏧</div>
+                <span class="font-bold text-lg">State<span class="text-emerald-500">Pattern</span></span>
             </div>
-            
-            <h3>Participants</h3>
-            <ul>
-                <li><strong>Context:</strong> Defines the interface of interest to clients and maintains a reference to an instance of a State subclass, which represents the current state.</li>
-                <li><strong>State:</strong> The interface for all concrete states, encapsulating the state-specific behaviors.</li>
-                <li><strong>Concrete States:</strong> Each subclass implements behavior associated with a particular state of the Context.</li>
-            </ul>
-            
-            <h3>When to Use</h3>
-            <p>Use the State Pattern when:</p>
-            <ul>
-                <li>An object's behavior depends on its state, and it must change its behavior at runtime based on that state</li>
-                <li>Operations have large, multipart conditional statements that depend on the object's state</li>
-                <li>The transitions between states follow a predictable pattern and should be explicitly represented</li>
-                <li>You want to avoid the proliferation of state-specific code across multiple methods</li>
-            </ul>
-            
-            <h3>Benefits</h3>
-            <ul>
-                <li><strong>Single Responsibility Principle:</strong> Organizes the code related to particular states into separate classes.</li>
-                <li><strong>Open/Closed Principle:</strong> Allows introducing new states without changing existing state classes or the context.</li>
-                <li><strong>Simplified Code:</strong> Eliminates bulky state machine conditionals from the context code.</li>
-                <li><strong>Explicit Transitions:</strong> Makes state transitions explicit and easier to understand.</li>
-            </ul>
-            
-            <h3>Real-World Uses</h3>
-            <ul>
-                <li><strong>Document Processing:</strong> Managing document states in workflow systems (Draft, Review, Published, etc.)</li>
-                <li><strong>Order Processing:</strong> Managing orders in e-commerce systems (New, Paid, Shipped, Delivered, etc.)</li>
-                <li><strong>Game Development:</strong> Managing character states (Standing, Walking, Jumping, etc.)</li>
-                <li><strong>Network Connections:</strong> Managing connection states (Connecting, Connected, Disconnected)</li>
-                <li><strong>UI Elements:</strong> Managing the state of buttons, windows, and other UI elements</li>
-            </ul>
-        </section>
-        
-        <section class="content-section">
-            <h2>Implementation Example</h2>
-            <p>Here's a JavaScript implementation of the State pattern for a document workflow system:</p>
-            
-            <pre><code class="language-javascript">// Context class
-class Document {
-    constructor() {
-        // Initialize with Draft state
-        this.state = new DraftState(this);
-        this.content = "";
-    }
-    
-    // Methods that delegate to the current state
-    edit(content) {
-        this.state.edit(content);
-    }
-    
-    review() {
-        this.state.review();
-    }
-    
-    approve() {
-        this.state.approve();
-    }
-    
-    reject() {
-        this.state.reject();
-    }
-    
-    publish() {
-        this.state.publish();
-    }
-    
-    // Method to change the document's state
-    changeState(state) {
-        this.state = state;
-    }
-    
-    // Business logic methods that can be called by states
-    setContent(content) {
-        this.content = content;
-    }
-    
-    getContent() {
-        return this.content;
-    }
-}
+            <a href="../../../index.html"
+                class="px-4 py-2 rounded-full bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500 hover:text-white transition">
+                <i class="fa-solid fa-home mr-1"></i> الرئيسية
+            </a>
+        </div>
+    </nav>
 
-// State interface (abstract class in JS)
-class DocumentState {
-    constructor(document) {
-        this.document = document;
-    }
-    
-    edit(content) {
-        console.log("Operation not allowed in current state");
-    }
-    
-    review() {
-        console.log("Operation not allowed in current state");
-    }
-    
-    approve() {
-        console.log("Operation not allowed in current state");
-    }
-    
-    reject() {
-        console.log("Operation not allowed in current state");
-    }
-    
-    publish() {
-        console.log("Operation not allowed in current state");
-    }
-}
+    <header class="relative pt-32 pb-20 px-6 overflow-hidden">
+        <div class="absolute top-0 right-0 w-[500px] h-[500px] bg-emerald-500/10 rounded-full blur-[128px]"></div>
+        <div class="container mx-auto text-center relative z-10" data-aos="fade-up">
+            <div
+                class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-800/50 border border-slate-700 text-xs font-mono text-emerald-400 mb-6">
+                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                BEHAVIORAL PATTERN
+            </div>
+            <h1 class="text-5xl md:text-7xl font-black mb-4"><span class="text-gradient">State Pattern</span></h1>
+            <h2 class="text-3xl font-bold text-slate-300 font-arabic mb-6">نمط الحالة</h2>
+            <div class="p-6 bg-emerald-950/30 border border-emerald-900/50 rounded-2xl max-w-3xl mx-auto">
+                <p class="font-arabic text-xl text-emerald-100/90 leading-loose">
+                    <span class="text-emerald-400 font-bold">يعني إيه؟</span>
+                    زي <span class="text-blue-400">ماكينة البيع</span>! سلوكها بيتغير حسب حالتها.
+                    <br>"مستني فلوس" ≠ "مستني اختيار" ≠ "بيطلع المنتج" 🏧
+                </p>
+            </div>
+        </div>
+    </header>
 
-// Concrete State: Draft
-class DraftState extends DocumentState {
-    constructor(document) {
-        super(document);
-    }
-    
-    edit(content) {
-        this.document.setContent(content);
-        console.log("Document updated with new content");
-    }
-    
-    review() {
-        console.log("Document submitted for review");
-        this.document.changeState(new ModerationState(this.document));
-    }
-}
+    <section class="py-20 px-6 bg-slate-900/30">
+        <div class="container mx-auto max-w-6xl">
+            <div class="text-center mb-16" data-aos="fade-up">
+                <span class="text-emerald-500 font-mono text-sm">THE CONCEPT</span>
+                <h2 class="text-4xl font-bold text-white mt-2">ماكينة البيع 🏧</h2>
+            </div>
+            <div class="grid lg:grid-cols-2 gap-12 items-center">
+                <div class="glass-card p-2 rounded-2xl" data-aos="fade-right">
+                    <svg viewBox="0 0 500 400" class="w-full bg-[#0B1121] rounded-xl">
+                        <text x="250" y="30" text-anchor="middle" fill="#94a3b8" font-family="Cairo"
+                            font-size="14">الحالة بتحدد السلوك</text>
 
-// Concrete State: Moderation
-class ModerationState extends DocumentState {
-    constructor(document) {
-        super(document);
-    }
-    
-    approve() {
-        console.log("Document has been approved");
-        this.document.changeState(new PublishedState(this.document));
-    }
-    
-    reject() {
-        console.log("Document has been rejected, returning to draft");
-        this.document.changeState(new DraftState(this.document));
-    }
-}
+                        <!-- Vending Machine -->
+                        <g transform="translate(50,50)">
+                            <rect width="150" height="200" rx="10" fill="#374151" stroke="#6b7280" stroke-width="2" />
+                            <rect x="15" y="15" width="120" height="80" rx="5" fill="#1f2937" />
+                            <text x="75" y="55" text-anchor="middle" font-size="24">🥤🍫🍪</text>
+                            <rect x="15" y="110" width="50" height="30" rx="3" fill="#10b981" />
+                            <text x="40" y="130" text-anchor="middle" fill="white" font-size="8">💵</text>
+                            <rect x="85" y="110" width="50" height="30" rx="3" fill="#3b82f6" />
+                            <text x="110" y="130" text-anchor="middle" fill="white" font-size="8">🔘</text>
+                            <rect x="40" y="160" width="70" height="25" rx="3" fill="#1f2937" />
+                            <text x="75" y="248" text-anchor="middle" fill="#94a3b8" font-size="9">VendingMachine
+                                (Context)</text>
+                        </g>
 
-// Concrete State: Published
-class PublishedState extends DocumentState {
-    constructor(document) {
-        super(document);
-    }
-    
-    edit(content) {
-        console.log("Creating a new draft from published document");
-        // First, transition back to draft
-        this.document.changeState(new DraftState(this.document));
-        // Then edit the content
-        this.document.edit(content);
-    }
-}
+                        <!-- States -->
+                        <g transform="translate(250,60)">
+                            <rect width="110" height="50" rx="8" fill="#1e293b" stroke="#f59e0b" stroke-width="2" />
+                            <text x="55" y="30" text-anchor="middle" fill="#fbbf24" font-size="10">💰
+                                WaitingMoney</text>
+                        </g>
+                        <g transform="translate(370,60)">
+                            <rect width="110" height="50" rx="8" fill="#1e293b" stroke="#3b82f6" stroke-width="2" />
+                            <text x="55" y="30" text-anchor="middle" fill="#60a5fa" font-size="10">🔘
+                                ReadyToSelect</text>
+                        </g>
+                        <g transform="translate(250,130)">
+                            <rect width="110" height="50" rx="8" fill="#1e293b" stroke="#10b981" stroke-width="2" />
+                            <text x="55" y="30" text-anchor="middle" fill="#34d399" font-size="10">📦 Dispensing</text>
+                        </g>
+                        <g transform="translate(370,130)">
+                            <rect width="110" height="50" rx="8" fill="#1e293b" stroke="#ef4444" stroke-width="2" />
+                            <text x="55" y="30" text-anchor="middle" fill="#f87171" font-size="10">❌ SoldOut</text>
+                        </g>
 
-// Client code
-function clientCode() {
-    const document = new Document();
-    
-    // Initial draft
-    document.edit("Initial draft content");
-    
-    // Submit for review
-    document.review();
-    
-    // Try to edit while in moderation (not allowed)
-    document.edit("Trying to edit in moderation");
-    
-    // Approve the document
-    document.approve();
-    
-    // Try to approve again (not allowed in published state)
-    document.approve();
-    
-    // Edit the published document (creates a new draft)
-    document.edit("Updated content for new draft");
-    
-    // Submit for review again
-    document.review();
-    
-    // Reject this time
-    document.reject();
-    
-    // Now we're back in draft, can edit again
-    document.edit("Improved content after rejection");
-}
+                        <!-- Arrows between states -->
+                        <path d="M360 85 L370 85" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arr)" />
+                        <path d="M425 110 L425 130" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arr)" />
+                        <path d="M305 180 L305 200 L200 200" stroke="#94a3b8" stroke-width="1.5"
+                            stroke-dasharray="3,2" />
 
-clientCode();</code></pre>
-            
-            <p>In this example:</p>
-            <ul>
-                <li>The <code>Document</code> class is the context that maintains a reference to the current state.</li>
-                <li>The <code>DocumentState</code> defines the interface for all states and provides default implementations for all operations.</li>
-                <li>Concrete state classes (<code>DraftState</code>, <code>ModerationState</code>, <code>PublishedState</code>) implement the specific behaviors for each state.</li>
-                <li>State transitions are handled within the state classes themselves, making them explicit and centralized.</li>
-                <li>The client code interacts only with the <code>Document</code> class, which delegates the operations to the current state.</li>
-            </ul>
-        </section>
-        
-        <section class="content-section interactive-demo-section">
-            <h2>Interactive Demo</h2>
-            <p>Experience the State pattern in action with this interactive demo of a document workflow system. See how the document's behavior changes as it transitions between different states.</p>
-            
-            <div class="interactive-demo">
-                <h3>Interactive Demo: Document Workflow</h3>
-                <p>Use the controls below to transition the document through various states and see how its behavior changes.</p>
-                
-                <div id="state-demo">
-                    <div class="state-machine">
-                        <div class="states-container">
-                            <div id="draft-state" class="state active">Draft</div>
-                            <div id="moderation-state" class="state">Moderation</div>
-                            <div id="published-state" class="state">Published</div>
-                        </div>
+                        <defs>
+                            <marker id="arr" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+                                <path d="M0,0 L6,3 L0,6" fill="#94a3b8" />
+                            </marker>
+                        </defs>
+
+                        <!-- Explanation -->
+                        <rect x="230" y="220" width="250" height="80" rx="8" fill="#1e293b" />
+                        <text x="355" y="245" text-anchor="middle" fill="#94a3b8" font-family="Cairo" font-size="10">❌
+                            بدون State Pattern:</text>
+                        <text x="355" y="265" text-anchor="middle" fill="#f87171" font-size="9">if (state == "waiting")
+                            ... else if ...</text>
+                        <text x="355" y="285" text-anchor="middle" fill="#10b981" font-family="Cairo" font-size="10">✅
+                            مع State: كل حالة Class منفصل!</text>
+
+                        <!-- Summary -->
+                        <rect x="30" y="330" width="440" height="50" rx="8" fill="#1e293b" />
+                        <text x="250" y="360" text-anchor="middle" fill="#94a3b8" font-family="Cairo"
+                            font-size="11">الماكينة بتغير سلوكها تلقائياً لما الحالة تتغير!</text>
+                    </svg>
+                </div>
+                <div class="space-y-6" data-aos="fade-left">
+                    <div class="glass-card p-6 rounded-xl border-r-4 border-r-amber-500">
+                        <h3 class="text-xl font-bold text-white mb-3">💰 WaitingMoney</h3>
+                        <p class="text-slate-300 font-arabic text-right">insertMoney() → يتقبل الفلوس ويغير للحالة
+                            التانية</p>
                     </div>
-                    
-                    <div class="demo-controls">
-                        <button id="edit-btn">Edit Content</button>
-                        <button id="review-btn">Submit for Review</button>
-                        <button id="approve-btn">Approve</button>
-                        <button id="reject-btn">Reject</button>
-                        <button id="view-btn">View Content</button>
+                    <div class="glass-card p-6 rounded-xl border-r-4 border-r-blue-500">
+                        <h3 class="text-xl font-bold text-white mb-3">🔘 ReadyToSelect</h3>
+                        <p class="text-slate-300 font-arabic text-right">selectProduct() → يختار المنتج ويبدأ التسليم
+                        </p>
                     </div>
-                    
-                    <div class="status-display">
-                        <div class="status-title">Current State:</div>
-                        <div id="current-state" class="status-value">Draft</div>
-                        
-                        <div class="status-title" style="margin-top: 1rem;">Current Content:</div>
-                        <div id="document-content" class="status-value">No content yet</div>
-                    </div>
-                    
-                    <div class="log-output" id="log-output">
-                        <div class="log-entry">Document initialized in Draft state</div>
+                    <div class="glass-card p-6 rounded-xl border-r-4 border-r-emerald-500">
+                        <h3 class="text-xl font-bold text-white mb-3">📦 Dispensing</h3>
+                        <p class="text-slate-300 font-arabic text-right">dispense() → يطلع المنتج ويرجع للبداية</p>
                     </div>
                 </div>
             </div>
-        </section>
-    </main>
-
-    <footer>
-        <div class="footer-content">
-            <p>&copy; 2025 Design Patterns Interactive Guide</p>
         </div>
+    </section>
+
+    <section class="py-24 px-6">
+        <div class="container mx-auto max-w-4xl">
+            <h2 class="text-4xl font-bold text-white mb-8 text-center" data-aos="fade-up">جرب الماكينة! 🏧</h2>
+            <div class="glass-card p-8 rounded-2xl" data-aos="fade-up">
+                <div class="flex flex-col items-center mb-6">
+                    <div id="stateDisplay"
+                        class="px-6 py-3 bg-amber-500/20 border border-amber-500 rounded-full text-amber-400 font-bold mb-4">
+                        💰 مستني فلوس
+                    </div>
+                    <div id="balance" class="text-3xl font-bold text-white mb-4">0 EGP</div>
+                </div>
+                <div class="grid grid-cols-3 gap-3 mb-6">
+                    <button onclick="action('insert')"
+                        class="p-4 bg-amber-600 text-white rounded-xl hover:bg-amber-700 transition">
+                        <span class="text-2xl">💵</span><br><span class="text-xs">Insert 10 EGP</span>
+                    </button>
+                    <button onclick="action('select')"
+                        class="p-4 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition">
+                        <span class="text-2xl">🥤</span><br><span class="text-xs">Select Drink</span>
+                    </button>
+                    <button onclick="action('dispense')"
+                        class="p-4 bg-emerald-600 text-white rounded-xl hover:bg-emerald-700 transition">
+                        <span class="text-2xl">📦</span><br><span class="text-xs">Get Product</span>
+                    </button>
+                </div>
+                <div id="output"
+                    class="h-32 p-4 bg-slate-900 rounded-xl font-mono text-sm text-slate-300 overflow-y-auto">
+                    // ابدأ بإدخال الفلوس!</div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-12 px-6">
+        <div class="container mx-auto max-w-4xl flex justify-between">
+            <a href="../command/index.html"
+                class="px-6 py-3 glass-card rounded-xl text-slate-300 hover:text-white transition">
+                <i class="fa-solid fa-arrow-right"></i> Command
+            </a>
+            <a href="../chain_of_responsibility/index.html"
+                class="px-6 py-3 bg-gradient-to-r from-emerald-500 to-blue-500 text-white font-bold rounded-xl">
+                Chain of Responsibility <i class="fa-solid fa-arrow-left"></i>
+            </a>
+        </div>
+    </section>
+
+    <footer class="py-8 text-center text-slate-600 bg-black/40 border-t border-slate-800">
+        <p>Design Patterns | Eng. Osama Zinhom</p>
     </footer>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // State Pattern Implementation
-            class Document {
-                constructor() {
-                    this.state = new DraftState(this);
-                    this.content = "No content yet";
-                    this.log("Document initialized in Draft state");
+        AOS.init({ duration: 800, once: true });
+
+        const states = {
+            waiting: { name: '💰 مستني فلوس', color: 'amber' },
+            ready: { name: '🔘 جاهز للاختيار', color: 'blue' },
+            dispensing: { name: '📦 بيطلع المنتج', color: 'emerald' }
+        };
+        let currentState = 'waiting';
+        let balance = 0;
+
+        function updateDisplay() {
+            const s = states[currentState];
+            document.getElementById('stateDisplay').textContent = s.name;
+            document.getElementById('stateDisplay').className = `px-6 py-3 bg-${s.color}-500/20 border border-${s.color}-500 rounded-full text-${s.color}-400 font-bold mb-4`;
+            document.getElementById('balance').textContent = balance + ' EGP';
+        }
+
+        function log(msg) {
+            document.getElementById('output').textContent += msg + '\n';
+        }
+
+        function action(type) {
+            if (type === 'insert') {
+                if (currentState === 'waiting' || currentState === 'ready') {
+                    balance += 10;
+                    if (balance >= 10) currentState = 'ready';
+                    log(`💵 +10 EGP | Balance: ${balance} | State → ${states[currentState].name}`);
                 }
-                
-                edit(content) {
-                    this.state.edit(content);
-                }
-                
-                review() {
-                    this.state.review();
-                }
-                
-                approve() {
-                    this.state.approve();
-                }
-                
-                reject() {
-                    this.state.reject();
-                }
-                
-                view() {
-                    this.state.view();
-                }
-                
-                changeState(state) {
-                    this.state = state;
-                    this.updateUI();
-                }
-                
-                setContent(content) {
-                    this.content = content;
-                    document.getElementById('document-content').textContent = content;
-                }
-                
-                getContent() {
-                    return this.content;
-                }
-                
-                getStateName() {
-                    return this.state.constructor.name.replace('State', '');
-                }
-                
-                log(message) {
-                    const logOutput = document.getElementById('log-output');
-                    const logEntry = document.createElement('div');
-                    logEntry.classList.add('log-entry');
-                    logEntry.textContent = message;
-                    logOutput.appendChild(logEntry);
-                    logOutput.scrollTop = logOutput.scrollHeight;
-                }
-                
-                updateUI() {
-                    // Update current state display
-                    document.getElementById('current-state').textContent = this.getStateName();
-                    
-                    // Reset all state elements
-                    document.getElementById('draft-state').classList.remove('active');
-                    document.getElementById('moderation-state').classList.remove('active');
-                    document.getElementById('published-state').classList.remove('active');
-                    
-                    // Activate current state element
-                    if (this.state instanceof DraftState) {
-                        document.getElementById('draft-state').classList.add('active');
-                    } else if (this.state instanceof ModerationState) {
-                        document.getElementById('moderation-state').classList.add('active');
-                    } else if (this.state instanceof PublishedState) {
-                        document.getElementById('published-state').classList.add('active');
+            } else if (type === 'select') {
+                if (currentState === 'ready') {
+                    if (balance >= 10) {
+                        currentState = 'dispensing';
+                        log(`🔘 Product selected! State → ${states[currentState].name}`);
+                    } else {
+                        log('⚠️ Not enough balance!');
                     }
-                    
-                    // Update button states
-                    const editBtn = document.getElementById('edit-btn');
-                    const reviewBtn = document.getElementById('review-btn');
-                    const approveBtn = document.getElementById('approve-btn');
-                    const rejectBtn = document.getElementById('reject-btn');
-                    const viewBtn = document.getElementById('view-btn');
-                    
-                    // Reset all buttons
-                    editBtn.disabled = false;
-                    reviewBtn.disabled = false;
-                    approveBtn.disabled = false;
-                    rejectBtn.disabled = false;
-                    viewBtn.disabled = false;
-                    
-                    // Set button states based on current state
-                    if (this.state instanceof DraftState) {
-                        approveBtn.disabled = true;
-                        rejectBtn.disabled = true;
-                    } else if (this.state instanceof ModerationState) {
-                        editBtn.disabled = true;
-                        reviewBtn.disabled = true;
-                    } else if (this.state instanceof PublishedState) {
-                        approveBtn.disabled = true;
-                        rejectBtn.disabled = true;
-                        reviewBtn.disabled = true;
-                    }
+                } else {
+                    log('⚠️ Insert money first!');
+                }
+            } else if (type === 'dispense') {
+                if (currentState === 'dispensing') {
+                    balance -= 10;
+                    log('📦 Here is your drink! 🥤');
+                    currentState = balance >= 10 ? 'ready' : 'waiting';
+                    log(`State → ${states[currentState].name}`);
+                } else {
+                    log('⚠️ Select product first!');
                 }
             }
-            
-            class DocumentState {
-                constructor(document) {
-                    this.document = document;
-                }
-                
-                edit(content) {
-                    this.document.log("Operation not allowed in current state");
-                }
-                
-                review() {
-                    this.document.log("Operation not allowed in current state");
-                }
-                
-                approve() {
-                    this.document.log("Operation not allowed in current state");
-                }
-                
-                reject() {
-                    this.document.log("Operation not allowed in current state");
-                }
-                
-                view() {
-                    this.document.log(`Viewing document: "${this.document.getContent()}"`);
-                }
-            }
-            
-            class DraftState extends DocumentState {
-                constructor(document) {
-                    super(document);
-                }
-                
-                edit(content) {
-                    // Simulating a content prompt
-                    const newContent = prompt("Enter new content:", this.document.getContent());
-                    if (newContent !== null) {
-                        this.document.setContent(newContent);
-                        this.document.log("Document updated with new content");
-                    }
-                }
-                
-                review() {
-                    this.document.log("Document submitted for review");
-                    this.document.changeState(new ModerationState(this.document));
-                }
-            }
-            
-            class ModerationState extends DocumentState {
-                constructor(document) {
-                    super(document);
-                }
-                
-                approve() {
-                    this.document.log("Document has been approved");
-                    this.document.changeState(new PublishedState(this.document));
-                }
-                
-                reject() {
-                    this.document.log("Document has been rejected, returning to draft");
-                    this.document.changeState(new DraftState(this.document));
-                }
-            }
-            
-            class PublishedState extends DocumentState {
-                constructor(document) {
-                    super(document);
-                }
-                
-                edit(content) {
-                    this.document.log("Creating a new draft from published document");
-                    this.document.changeState(new DraftState(this.document));
-                    this.document.edit(content);
-                }
-            }
-            
-            // Create document instance
-            const doc = new Document();
-            
-            // Add event listeners to buttons
-            document.getElementById('edit-btn').addEventListener('click', () => doc.edit());
-            document.getElementById('review-btn').addEventListener('click', () => doc.review());
-            document.getElementById('approve-btn').addEventListener('click', () => doc.approve());
-            document.getElementById('reject-btn').addEventListener('click', () => doc.reject());
-            document.getElementById('view-btn').addEventListener('click', () => doc.view());
-            
-            // Initial UI update
-            doc.updateUI();
-        });
+            updateDisplay();
+        }
     </script>
 </body>
-</html> 
+
+</html>

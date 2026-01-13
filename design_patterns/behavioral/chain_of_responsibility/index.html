@@ -1,827 +1,218 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chain of Responsibility Pattern</title>
+    <title>Chain of Responsibility | سلسلة المسؤولية</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800&family=Inter:wght@300;400;600;800&family=Fira+Code:wght@400;500&display=swap"
+        rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = { theme: { extend: { fontFamily: { sans: ['Inter'], arabic: ['Cairo'], mono: ['Fira Code'] } } } }
+    </script>
     <style>
-        :root {
-            --primary-color: #3b82f6; /* Vibrant blue */
-            --primary-dark: #2563eb;
-            --primary-light: #60a5fa;
-            --secondary-color: #10b981; /* Green */
-            --secondary-dark: #059669;
-            --accent-color: #8b5cf6; /* Purple */
-            --accent-color-good: #059669; /* Green for good examples */
-            --accent-color-bad: #ef4444; /* Red for bad examples */
-            --text-color: #e2e8f0;
-            --text-muted: #94a3b8;
-            --bg-color: #0f172a; /* Dark blue background */
-            --bg-light: #1e293b;
-            --bg-lighter: #334155;
-            --bg-card: #1e293b;
-            --border-color: #334155;
-            --code-bg: #0f172a;
-            --code-text: #e2e8f0;
-            --heading-font: 'Poppins', sans-serif;
-            --body-font: 'Inter', sans-serif;
-            --border-radius: 8px;
-            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
-            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2), 0 2px 4px -1px rgba(0, 0, 0, 0.1);
-            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
-            --glow: 0 0 15px rgba(59, 130, 246, 0.5);
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
         body {
-            font-family: var(--body-font);
-            line-height: 1.7;
-            color: var(--text-color);
-            background-color: var(--bg-color);
-        }
-        
-        .hero {
-            position: relative;
-            min-height: 40vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            color: white;
-            text-align: center;
-            overflow: hidden;
-            background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
-            padding: 3rem 1rem;
+            background: #020617;
+            color: #E2E8F0;
         }
 
-        .hero-content {
-            position: relative;
-            z-index: 10;
-            max-width: 800px;
+        .glass-card {
+            background: rgba(15, 23, 42, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
         }
 
-        .hero h1 {
-            font-family: var(--heading-font);
-            font-size: 3rem;
-            font-weight: 700;
-            margin-bottom: 1rem;
-            text-shadow: 0 0 30px rgba(59, 130, 246, 0.5);
+        .text-gradient {
+            background: linear-gradient(135deg, #EF4444, #F59E0B);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
-        .hero p {
-            font-size: 1.2rem;
-            opacity: 0.9;
-            max-width: 600px;
-            margin: 0 auto;
-        }
-
-        .main-content {
-            position: relative;
-            margin-top: -50px;
-            padding-bottom: 4rem;
-        }
-
-        .container {
-            width: 90%;
-            max-width: 1000px;
-            margin: 0 auto;
-            padding: 3rem;
-            background-color: var(--bg-light);
-            border-radius: var(--border-radius);
-            box-shadow: var(--shadow-lg);
-            border: 1px solid var(--border-color);
-        }
-
-        h1, h2, h3 {
-            font-family: var(--heading-font);
-            color: var(--text-color);
-        }
-
-        h2 {
-            font-size: 1.8rem;
-            font-weight: 600;
-            margin-top: 3rem;
-            margin-bottom: 1.5rem;
-            color: var(--primary-light);
-        }
-
-        h3 {
-            font-size: 1.4rem;
-            font-weight: 500;
-            margin-top: 2rem;
-            margin-bottom: 1rem;
-        }
-
-        p, li {
-            margin-bottom: 1.5rem;
-            color: var(--text-muted);
-            font-size: 1.05rem;
-            line-height: 1.8;
-        }
-
-        ul, ol {
-            padding-left: 1.5rem;
-            margin-bottom: 2rem;
-        }
-
-        li {
-            margin-bottom: 0.5rem;
-        }
-
-        strong {
-            color: var(--text-color);
-            font-weight: 600;
-        }
-
-        .visualization {
-            display: flex;
-            justify-content: center;
-            margin: 2rem 0;
-            overflow-x: auto;
-            padding: 1rem;
-        }
-
-        footer {
-            background-color: var(--bg-color);
-            color: white;
-            padding: 3rem 0;
-            text-align: center;
-            margin-top: 4rem;
-            border-top: 1px solid var(--border-color);
-        }
-
-        .footer-content {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 2rem;
-        }
-
-        .footer-content p {
-            color: rgba(255, 255, 255, 0.7);
-            margin-bottom: 0;
+        pre {
+            background: #0B1221 !important;
+            border: 1px solid #1E293B;
+            border-radius: 0.75rem;
         }
     </style>
 </head>
+
 <body>
-    <!-- Hero Section -->
-    <section class="hero">
-        <div class="hero-content">
-            <h1>Chain of Responsibility Pattern</h1>
-            <p>Pass a request along a chain of handlers, each processing the request or passing it to the next handler</p>
+    <nav class="fixed top-0 w-full z-50 glass-card">
+        <div class="container mx-auto px-6 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div
+                    class="w-10 h-10 rounded-lg bg-gradient-to-br from-red-500 to-amber-500 flex items-center justify-center text-white font-bold text-lg">
+                    🔗</div>
+                <span class="font-bold text-lg">Chain<span class="text-red-500">OfResponsibility</span></span>
+            </div>
+            <a href="../../../index.html"
+                class="px-4 py-2 rounded-full bg-red-500/10 text-red-400 hover:bg-red-500 hover:text-white transition">
+                <i class="fa-solid fa-home mr-1"></i> الرئيسية
+            </a>
+        </div>
+    </nav>
+
+    <header class="relative pt-32 pb-20 px-6 overflow-hidden">
+        <div class="absolute top-0 right-0 w-[500px] h-[500px] bg-red-500/10 rounded-full blur-[128px]"></div>
+        <div class="container mx-auto text-center relative z-10" data-aos="fade-up">
+            <div
+                class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-800/50 border border-slate-700 text-xs font-mono text-red-400 mb-6">
+                <span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
+                BEHAVIORAL PATTERN
+            </div>
+            <h1 class="text-5xl md:text-7xl font-black mb-4"><span class="text-gradient">Chain of Responsibility</span>
+            </h1>
+            <h2 class="text-3xl font-bold text-slate-300 font-arabic mb-6">سلسلة المسؤولية</h2>
+            <div class="p-6 bg-red-950/30 border border-red-900/50 rounded-2xl max-w-3xl mx-auto">
+                <p class="font-arabic text-xl text-red-100/90 leading-loose">
+                    <span class="text-red-400 font-bold">يعني إيه؟</span>
+                    زي <span class="text-amber-400">الدعم الفني</span>! المشكلة بتعدي على مستويات لحد ما حد يحلها.
+                    <br>Level 1 → Level 2 → Level 3 → Manager 🎫
+                </p>
+            </div>
+        </div>
+    </header>
+
+    <section class="py-20 px-6 bg-slate-900/30">
+        <div class="container mx-auto max-w-6xl">
+            <div class="text-center mb-16" data-aos="fade-up">
+                <span class="text-red-500 font-mono text-sm">THE CONCEPT</span>
+                <h2 class="text-4xl font-bold text-white mt-2">الدعم الفني 🎫</h2>
+            </div>
+            <div class="glass-card p-4 rounded-2xl mb-8" data-aos="fade-up">
+                <svg viewBox="0 0 700 180" class="w-full bg-[#0B1121] rounded-xl">
+                    <text x="350" y="25" text-anchor="middle" fill="#94a3b8" font-family="Cairo" font-size="14">الطلب
+                        بيعدي على السلسلة لحد ما حد يعالجه</text>
+
+                    <!-- Chain -->
+                    <g transform="translate(50,60)">
+                        <rect width="100" height="70" rx="8" fill="#1e293b" stroke="#10b981" stroke-width="2" />
+                        <text x="50" y="30" text-anchor="middle" font-size="18">👨‍💻</text>
+                        <text x="50" y="50" text-anchor="middle" fill="#34d399" font-size="10">Level 1</text>
+                        <text x="50" y="65" text-anchor="middle" fill="#94a3b8" font-size="8">مشاكل بسيطة</text>
+                    </g>
+                    <path d="M150 95 L180 95" stroke="#f59e0b" stroke-width="2" marker-end="url(#ar)" />
+
+                    <g transform="translate(180,60)">
+                        <rect width="100" height="70" rx="8" fill="#1e293b" stroke="#3b82f6" stroke-width="2" />
+                        <text x="50" y="30" text-anchor="middle" font-size="18">👨‍🔧</text>
+                        <text x="50" y="50" text-anchor="middle" fill="#60a5fa" font-size="10">Level 2</text>
+                        <text x="50" y="65" text-anchor="middle" fill="#94a3b8" font-size="8">مشاكل متوسطة</text>
+                    </g>
+                    <path d="M280 95 L310 95" stroke="#f59e0b" stroke-width="2" marker-end="url(#ar)" />
+
+                    <g transform="translate(310,60)">
+                        <rect width="100" height="70" rx="8" fill="#1e293b" stroke="#8b5cf6" stroke-width="2" />
+                        <text x="50" y="30" text-anchor="middle" font-size="18">👨‍💼</text>
+                        <text x="50" y="50" text-anchor="middle" fill="#a78bfa" font-size="10">Level 3</text>
+                        <text x="50" y="65" text-anchor="middle" fill="#94a3b8" font-size="8">مشاكل معقدة</text>
+                    </g>
+                    <path d="M410 95 L440 95" stroke="#f59e0b" stroke-width="2" marker-end="url(#ar)" />
+
+                    <g transform="translate(440,60)">
+                        <rect width="100" height="70" rx="8" fill="#1e293b" stroke="#ef4444" stroke-width="2" />
+                        <text x="50" y="30" text-anchor="middle" font-size="18">🧑‍💼</text>
+                        <text x="50" y="50" text-anchor="middle" fill="#f87171" font-size="10">Manager</text>
+                        <text x="50" y="65" text-anchor="middle" fill="#94a3b8" font-size="8">قرارات كبيرة</text>
+                    </g>
+
+                    <g transform="translate(560,60)">
+                        <rect width="100" height="70" rx="8" fill="#1e293b" stroke="#6b7280" stroke-width="2"
+                            stroke-dasharray="4,2" />
+                        <text x="50" y="40" text-anchor="middle" fill="#9ca3af" font-size="10">null</text>
+                        <text x="50" y="55" text-anchor="middle" fill="#6b7280" font-size="8">نهاية السلسلة</text>
+                    </g>
+
+                    <defs>
+                        <marker id="ar" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+                            <path d="M0,0 L8,4 L0,8" fill="#f59e0b" />
+                        </marker>
+                    </defs>
+                </svg>
+            </div>
         </div>
     </section>
 
-    <!-- Main Content -->
-    <main class="container">
-        <section class="content-section">
-            <h2>Understanding the Chain of Responsibility Pattern</h2>
-            <p>The Chain of Responsibility pattern is a behavioral design pattern that passes a request along a chain of handlers. Upon receiving a request, each handler decides either to process the request or to pass it to the next handler in the chain.</p>
-            
-            <h3>Problem</h3>
-            <p>Imagine you're developing an authentication and authorization system for a web application. The system needs to perform several checks before granting access:</p>
-            <ul>
-                <li>Authentication: Verifying the user's identity</li>
-                <li>Authorization: Checking if the authenticated user has permission to access a resource</li>
-                <li>Validation: Ensuring the request contains valid data</li>
-                <li>Rate limiting: Preventing too many requests from the same source</li>
-            </ul>
-            
-            <p>Each of these checks is independent but must be executed in a specific order. Adding or removing checks should not disrupt the system.</p>
-            
-            <h3>Solution</h3>
-            <p>The Chain of Responsibility pattern suggests organizing these checks into a chain of objects, each with a reference to the next check in the chain. The request enters at the beginning of the chain and is passed along until a handler processes it or until it reaches the end without being handled.</p>
-            
-            <h3>Structure</h3>
-            <div class="visualization">
-                <img src="../../images/chain-of-responsibility-pattern.svg" alt="Chain of Responsibility Pattern Structure" width="800" height="500">
-            </div>
-            
-            <h3>Participants</h3>
-            <ul>
-                <li><strong>Handler:</strong> The interface or abstract class that defines how client requests will be handled. It typically includes a method to set the next handler in the chain and a method to handle the request.</li>
-                <li><strong>BaseHandler:</strong> An optional abstract class that implements the default chain behavior (setting the next handler and passing requests to it).</li>
-                <li><strong>ConcreteHandlers:</strong> Classes that handle requests they're responsible for and pass others along the chain.</li>
-                <li><strong>Client:</strong> Initiates the request to a handler in the chain.</li>
-            </ul>
-            
-            <h3>When to Use</h3>
-            <p>Use the Chain of Responsibility Pattern when:</p>
-            <ul>
-                <li>More than one object can handle a request, but the handler isn't known in advance</li>
-                <li>You want to issue a request to one of several objects without specifying the receiver explicitly</li>
-                <li>The set of objects that can handle a request should be specified dynamically</li>
-                <li>You want to decouple the sender and receiver of a request</li>
-            </ul>
-            
-            <h3>Benefits</h3>
-            <ul>
-                <li><strong>Decoupling:</strong> The pattern decouples the sender of a request from its receiver.</li>
-                <li><strong>Flexibility:</strong> You can change the chain at runtime by adding or removing responsibilities.</li>
-                <li><strong>Single Responsibility Principle:</strong> Classes focus only on their specific handling logic.</li>
-                <li><strong>Open/Closed Principle:</strong> You can introduce new handlers without changing existing code.</li>
-            </ul>
-            
-            <h3>Real-World Uses</h3>
-            <ul>
-                <li><strong>Request Processing:</strong> HTTP request middleware in web frameworks like Express.js</li>
-                <li><strong>Event Handling:</strong> DOM event propagation in browsers (capturing and bubbling)</li>
-                <li><strong>Logging Systems:</strong> Different log levels handled by different components</li>
-                <li><strong>Authentication & Authorization:</strong> Sequential checks for user credentials and permissions</li>
-                <li><strong>Data Validation:</strong> Multiple validation rules applied sequentially to input data</li>
-            </ul>
-        </section>
-        
-        <section class="content-section">
-            <h2>Implementation Example</h2>
-            <p>Here's a JavaScript implementation of the Chain of Responsibility pattern for a request validation system:</p>
-            
-            <pre><code class="language-javascript">// Handler interface (abstract class in JavaScript)
-class Handler {
-    setNext(handler) {
-        this.nextHandler = handler;
-        return handler;
-    }
-    
-    handle(request) {
-        if (this.nextHandler) {
-            return this.nextHandler.handle(request);
-        }
-        
-        return null; // If there's no next handler
-    }
-}
-
-// Concrete Handlers
-class AuthenticationHandler extends Handler {
-    handle(request) {
-        // Check if the request has valid authentication
-        if (!request.token) {
-            return "AuthenticationHandler: Request lacks authentication token";
-        }
-        
-        console.log("AuthenticationHandler: Request has a token, passing to next handler");
-        return super.handle(request);
-    }
-}
-
-class AuthorizationHandler extends Handler {
-    handle(request) {
-        // Check if the user has the permission
-        if (!request.permissions || !request.permissions.includes('access')) {
-            return "AuthorizationHandler: User doesn't have access permission";
-        }
-        
-        console.log("AuthorizationHandler: User has permission, passing to next handler");
-        return super.handle(request);
-    }
-}
-
-class ValidationHandler extends Handler {
-    handle(request) {
-        // Check if the request data is valid
-        if (!request.data || Object.keys(request.data).length === 0) {
-            return "ValidationHandler: Request has no data";
-        }
-        
-        // Additional validation logic could go here
-        
-        console.log("ValidationHandler: Request data is valid, passing to next handler");
-        return super.handle(request);
-    }
-}
-
-class RateLimitHandler extends Handler {
-    constructor() {
-        super();
-        this.requestCount = 0;
-        this.maxRequests = 5;
-    }
-    
-    handle(request) {
-        this.requestCount++;
-        
-        if (this.requestCount > this.maxRequests) {
-            return "RateLimitHandler: Too many requests, try again later";
-        }
-        
-        console.log(`RateLimitHandler: Request count ${this.requestCount}/${this.maxRequests}, passing to next handler`);
-        return super.handle(request);
-    }
-}
-
-class ResourceHandler extends Handler {
-    handle(request) {
-        // This is the final handler that processes the actual request
-        return `ResourceHandler: Request processed successfully, fetched data for ID: ${request.data.id}`;
-    }
-}
-
-// Client code
-function clientCode() {
-    // Create handler instances
-    const authentication = new AuthenticationHandler();
-    const authorization = new AuthorizationHandler();
-    const validation = new ValidationHandler();
-    const rateLimit = new RateLimitHandler();
-    const resource = new ResourceHandler();
-    
-    // Build the chain
-    authentication
-        .setNext(authorization)
-        .setNext(validation)
-        .setNext(rateLimit)
-        .setNext(resource);
-    
-    // Create some sample requests
-    const validRequest = {
-        token: "valid-token",
-        permissions: ["access", "read"],
-        data: { id: 123 }
-    };
-    
-    const noTokenRequest = {
-        permissions: ["access"],
-        data: { id: 456 }
-    };
-    
-    const noPermissionRequest = {
-        token: "valid-token",
-        permissions: ["read"],
-        data: { id: 789 }
-    };
-    
-    const noDataRequest = {
-        token: "valid-token",
-        permissions: ["access", "read"]
-    };
-    
-    // Process the requests
-    console.log("Processing valid request:");
-    console.log(authentication.handle(validRequest));
-    console.log("\nProcessing request without token:");
-    console.log(authentication.handle(noTokenRequest));
-    console.log("\nProcessing request without permission:");
-    console.log(authentication.handle(noPermissionRequest));
-    console.log("\nProcessing request without data:");
-    console.log(authentication.handle(noDataRequest));
-    
-    // Test rate limiting by sending multiple valid requests
-    console.log("\nTesting rate limiting:");
-    for (let i = 0; i < 6; i++) {
-        console.log(`Request ${i + 1}: ${authentication.handle(validRequest)}`);
-    }
-}
-
-clientCode();</code></pre>
-            
-            <p>In this example:</p>
-            <ul>
-                <li>The <code>Handler</code> class defines the interface with methods to set the next handler and handle requests.</li>
-                <li>Concrete handlers (<code>AuthenticationHandler</code>, <code>AuthorizationHandler</code>, etc.) implement specific validation logic.</li>
-                <li>Each handler decides whether to process the request or pass it to the next handler in the chain.</li>
-                <li>The <code>clientCode</code> function demonstrates how different requests are processed by the chain, with some being rejected at different points and others passing through all handlers.</li>
-                <li>The <code>RateLimitHandler</code> demonstrates how handlers can maintain state between requests.</li>
-            </ul>
-        </section>
-
-        <section class="content-section interactive-demo-section">
-            <h2>Interactive Demo</h2>
-            <p>Experience the Chain of Responsibility pattern in action with this interactive demo of a request processing system. See how requests flow through different handlers and how each handler makes independent decisions.</p>
-            
-            <div class="interactive-demo">
-                <h3>Interactive Demo: Request Processing Chain</h3>
-                <p>Create requests with different characteristics and see how they're processed by various handlers in the chain.</p>
-                
-                <div id="chain-demo">
-                    <div class="request-builder">
-                        <h4>Build Your Request</h4>
-                        <div class="form-group">
-                            <label>
-                                <input type="checkbox" id="has-token" checked> Include authentication token
-                            </label>
-                        </div>
-                        <div class="form-group">
-                            <label>Permissions:</label>
-                            <div class="checkbox-group">
-                                <label>
-                                    <input type="checkbox" id="permission-access" checked> Access
-                                </label>
-                                <label>
-                                    <input type="checkbox" id="permission-read" checked> Read
-                                </label>
-                                <label>
-                                    <input type="checkbox" id="permission-write"> Write
-                                </label>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label>
-                                <input type="checkbox" id="has-data" checked> Include request data
-                            </label>
-                        </div>
-                        <button id="send-request-btn">Send Request</button>
-                        <button id="reset-chain-btn">Reset Chain</button>
-                    </div>
-                    
-                    <div class="chain-visualization">
-                        <div class="handler-node" id="auth-handler">
-                            <div class="handler-title">Authentication</div>
-                            <div class="handler-status">Waiting...</div>
-                        </div>
-                        <div class="handler-arrow">→</div>
-                        <div class="handler-node" id="authz-handler">
-                            <div class="handler-title">Authorization</div>
-                            <div class="handler-status">Waiting...</div>
-                        </div>
-                        <div class="handler-arrow">→</div>
-                        <div class="handler-node" id="valid-handler">
-                            <div class="handler-title">Validation</div>
-                            <div class="handler-status">Waiting...</div>
-                        </div>
-                        <div class="handler-arrow">→</div>
-                        <div class="handler-node" id="rate-handler">
-                            <div class="handler-title">Rate Limiting</div>
-                            <div class="handler-status">Waiting...</div>
-                        </div>
-                        <div class="handler-arrow">→</div>
-                        <div class="handler-node" id="resource-handler">
-                            <div class="handler-title">Resource</div>
-                            <div class="handler-status">Waiting...</div>
-                        </div>
-                    </div>
-                    
-                    <div class="request-info">
-                        <h4>Current Request</h4>
-                        <pre id="request-json">{ "token": "valid-token", "permissions": ["access", "read"], "data": { "id": 123 } }</pre>
-                    </div>
-                    
-                    <div class="log-output" id="chain-log-output">
-                        <div class="log-entry">Chain of Responsibility demo initialized</div>
-                    </div>
+    <section class="py-24 px-6">
+        <div class="container mx-auto max-w-4xl">
+            <h2 class="text-4xl font-bold text-white mb-8 text-center" data-aos="fade-up">جرب! 🎫</h2>
+            <div class="glass-card p-8 rounded-2xl" data-aos="fade-up">
+                <div class="grid grid-cols-4 gap-2 mb-6">
+                    <button onclick="ticket('simple')"
+                        class="p-3 bg-emerald-600/50 border border-emerald-500 text-white rounded-xl hover:bg-emerald-600 transition text-sm">
+                        🔧 مشكلة بسيطة
+                    </button>
+                    <button onclick="ticket('medium')"
+                        class="p-3 bg-blue-600/50 border border-blue-500 text-white rounded-xl hover:bg-blue-600 transition text-sm">
+                        ⚙️ مشكلة متوسطة
+                    </button>
+                    <button onclick="ticket('complex')"
+                        class="p-3 bg-purple-600/50 border border-purple-500 text-white rounded-xl hover:bg-purple-600 transition text-sm">
+                        🔬 مشكلة معقدة
+                    </button>
+                    <button onclick="ticket('critical')"
+                        class="p-3 bg-red-600/50 border border-red-500 text-white rounded-xl hover:bg-red-600 transition text-sm">
+                        🚨 أزمة!
+                    </button>
                 </div>
+                <div id="output"
+                    class="h-48 p-4 bg-slate-900 rounded-xl font-mono text-sm text-slate-300 overflow-y-auto">
+                    // ارفع تذكرة وشوف السلسلة!</div>
             </div>
-            
-            <style>
-                .request-builder {
-                    background-color: var(--bg-lighter);
-                    padding: 1.5rem;
-                    border-radius: var(--border-radius);
-                    margin-bottom: 2rem;
-                }
-                
-                .form-group {
-                    margin-bottom: 1rem;
-                }
-                
-                .checkbox-group {
-                    display: flex;
-                    gap: 1.5rem;
-                    margin-top: 0.5rem;
-                }
-                
-                .chain-visualization {
-                    display: flex;
-                    align-items: center;
-                    justify-content: space-between;
-                    margin: 2rem 0;
-                    flex-wrap: wrap;
-                    gap: 0.5rem;
-                }
-                
-                .handler-node {
-                    background-color: var(--bg-color);
-                    border: 2px solid var(--border-color);
-                    border-radius: var(--border-radius);
-                    padding: 1rem;
-                    width: 120px;
-                    text-align: center;
-                    transition: all 0.3s ease;
-                }
-                
-                .handler-node.processing {
-                    border-color: var(--primary-color);
-                    box-shadow: var(--glow);
-                }
-                
-                .handler-node.success {
-                    border-color: var(--secondary-color);
-                    background-color: rgba(16, 185, 129, 0.2);
-                }
-                
-                .handler-node.rejected {
-                    border-color: #ef4444;
-                    background-color: rgba(239, 68, 68, 0.2);
-                }
-                
-                .handler-title {
-                    font-weight: 600;
-                    margin-bottom: 0.5rem;
-                }
-                
-                .handler-status {
-                    font-size: 0.85rem;
-                    color: var(--text-muted);
-                }
-                
-                .handler-arrow {
-                    font-size: 1.5rem;
-                    color: var(--text-muted);
-                }
-                
-                .request-info {
-                    background-color: var(--bg-color);
-                    border: 1px solid var(--border-color);
-                    padding: 1.5rem;
-                    border-radius: var(--border-radius);
-                    margin-top: 2rem;
-                }
-                
-                .request-info pre {
-                    background-color: var(--bg-lighter);
-                    padding: 1rem;
-                    border-radius: var(--border-radius);
-                    overflow-x: auto;
-                    margin: 1rem 0 0;
-                }
-                
-                @media (max-width: 768px) {
-                    .chain-visualization {
-                        flex-direction: column;
-                        align-items: center;
-                        gap: 1rem;
-                    }
-                    
-                    .handler-arrow {
-                        transform: rotate(90deg);
-                    }
-                }
-            </style>
-        </section>
-    </main>
-
-    <footer>
-        <div class="footer-content">
-            <p>&copy; 2025 Design Patterns Interactive Guide</p>
         </div>
+    </section>
+
+    <section class="py-12 px-6">
+        <div class="container mx-auto max-w-4xl flex justify-between">
+            <a href="../state/index.html"
+                class="px-6 py-3 glass-card rounded-xl text-slate-300 hover:text-white transition">
+                <i class="fa-solid fa-arrow-right"></i> State
+            </a>
+            <a href="../iterator/index.html"
+                class="px-6 py-3 bg-gradient-to-r from-red-500 to-amber-500 text-white font-bold rounded-xl">
+                Iterator <i class="fa-solid fa-arrow-left"></i>
+            </a>
+        </div>
+    </section>
+
+    <footer class="py-8 text-center text-slate-600 bg-black/40 border-t border-slate-800">
+        <p>Design Patterns | Eng. Osama Zinhom</p>
     </footer>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Chain of Responsibility Implementation
-            class Handler {
-                setNext(handler) {
-                    this.nextHandler = handler;
-                    return handler;
-                }
-                
-                handle(request) {
-                    if (this.nextHandler) {
-                        return this.nextHandler.handle(request);
-                    }
-                    
-                    return null;
-                }
-            }
-            
-            class AuthenticationHandler extends Handler {
-                handle(request) {
-                    updateHandlerUI('auth-handler', 'processing');
-                    logMessage('AuthenticationHandler: Checking token...');
-                    
-                    // Simulate processing time
-                    return new Promise(resolve => {
-                        setTimeout(() => {
-                            if (!request.token) {
-                                updateHandlerUI('auth-handler', 'rejected');
-                                logMessage('AuthenticationHandler: Request rejected - No token provided');
-                                resolve("Authentication failed: No token provided");
-                            } else {
-                                updateHandlerUI('auth-handler', 'success');
-                                logMessage('AuthenticationHandler: Token is valid, passing to next handler');
-                                resolve(super.handle(request));
-                            }
-                        }, 1000);
-                    });
-                }
-            }
-            
-            class AuthorizationHandler extends Handler {
-                handle(request) {
-                    updateHandlerUI('authz-handler', 'processing');
-                    logMessage('AuthorizationHandler: Checking permissions...');
-                    
-                    return new Promise(resolve => {
-                        setTimeout(() => {
-                            if (!request.permissions || !request.permissions.includes('access')) {
-                                updateHandlerUI('authz-handler', 'rejected');
-                                logMessage('AuthorizationHandler: Request rejected - Missing access permission');
-                                resolve("Authorization failed: Missing access permission");
-                            } else {
-                                updateHandlerUI('authz-handler', 'success');
-                                logMessage('AuthorizationHandler: Permissions validated, passing to next handler');
-                                resolve(super.handle(request));
-                            }
-                        }, 1000);
-                    });
-                }
-            }
-            
-            class ValidationHandler extends Handler {
-                handle(request) {
-                    updateHandlerUI('valid-handler', 'processing');
-                    logMessage('ValidationHandler: Checking request data...');
-                    
-                    return new Promise(resolve => {
-                        setTimeout(() => {
-                            if (!request.data || Object.keys(request.data).length === 0) {
-                                updateHandlerUI('valid-handler', 'rejected');
-                                logMessage('ValidationHandler: Request rejected - No data provided');
-                                resolve("Validation failed: No data provided");
-                            } else {
-                                updateHandlerUI('valid-handler', 'success');
-                                logMessage('ValidationHandler: Data is valid, passing to next handler');
-                                resolve(super.handle(request));
-                            }
-                        }, 1000);
-                    });
-                }
-            }
-            
-            class RateLimitHandler extends Handler {
-                constructor() {
-                    super();
-                    this.requestCount = 0;
-                    this.maxRequests = 3;
-                }
-                
-                handle(request) {
-                    updateHandlerUI('rate-handler', 'processing');
-                    this.requestCount++;
-                    logMessage(`RateLimitHandler: Request count ${this.requestCount}/${this.maxRequests}`);
-                    
-                    return new Promise(resolve => {
-                        setTimeout(() => {
-                            if (this.requestCount > this.maxRequests) {
-                                updateHandlerUI('rate-handler', 'rejected');
-                                logMessage('RateLimitHandler: Request rejected - Rate limit exceeded');
-                                resolve("Rate limit exceeded: Too many requests");
-                            } else {
-                                updateHandlerUI('rate-handler', 'success');
-                                logMessage('RateLimitHandler: Within rate limits, passing to next handler');
-                                resolve(super.handle(request));
-                            }
-                        }, 1000);
-                    });
-                }
-                
-                reset() {
-                    this.requestCount = 0;
-                    logMessage("RateLimitHandler: Rate limit counter has been reset");
-                }
-            }
-            
-            class ResourceHandler extends Handler {
-                handle(request) {
-                    updateHandlerUI('resource-handler', 'processing');
-                    logMessage('ResourceHandler: Processing request...');
-                    
-                    return new Promise(resolve => {
-                        setTimeout(() => {
-                            updateHandlerUI('resource-handler', 'success');
-                            const result = `Request processed successfully! Resource ID: ${request.data.id}`;
-                            logMessage(`ResourceHandler: ${result}`);
-                            resolve(result);
-                        }, 1000);
-                    });
-                }
-            }
-            
-            // UI functions
-            function updateHandlerUI(handlerId, state) {
-                const handler = document.getElementById(handlerId);
-                
-                // Reset states
-                handler.classList.remove('processing', 'success', 'rejected');
-                
-                // Set new state
-                if (state === 'processing') {
-                    handler.classList.add('processing');
-                    handler.querySelector('.handler-status').textContent = 'Processing...';
-                } else if (state === 'success') {
-                    handler.classList.add('success');
-                    handler.querySelector('.handler-status').textContent = 'Passed';
-                } else if (state === 'rejected') {
-                    handler.classList.add('rejected');
-                    handler.querySelector('.handler-status').textContent = 'Rejected';
+        AOS.init({ duration: 800, once: true });
+
+        const handlers = [
+            { name: '👨‍💻 Level 1', handles: ['simple'], color: '#10b981' },
+            { name: '👨‍🔧 Level 2', handles: ['medium'], color: '#3b82f6' },
+            { name: '👨‍💼 Level 3', handles: ['complex'], color: '#8b5cf6' },
+            { name: '🧑‍💼 Manager', handles: ['critical'], color: '#ef4444' }
+        ];
+
+        function ticket(type) {
+            let out = `🎫 Ticket: ${type.toUpperCase()}\n━━━━━━━━━━━━━━━━━━━\n`;
+            for (let i = 0; i < handlers.length; i++) {
+                const h = handlers[i];
+                out += `→ ${h.name}: `;
+                if (h.handles.includes(type)) {
+                    out += `✅ حليت المشكلة!\n`;
+                    out += `━━━━━━━━━━━━━━━━━━━\n`;
+                    out += `✅ Chain Pattern: مر على ${i + 1} handlers`;
+                    break;
                 } else {
-                    handler.querySelector('.handler-status').textContent = 'Waiting...';
+                    out += `❌ مش مسؤوليتي - بمررها...\n`;
                 }
             }
-            
-            function logMessage(message) {
-                const logOutput = document.getElementById('chain-log-output');
-                const logEntry = document.createElement('div');
-                logEntry.classList.add('log-entry');
-                logEntry.textContent = message;
-                logOutput.appendChild(logEntry);
-                logOutput.scrollTop = logOutput.scrollHeight;
-            }
-            
-            function resetHandlersUI() {
-                const handlerIds = ['auth-handler', 'authz-handler', 'valid-handler', 'rate-handler', 'resource-handler'];
-                handlerIds.forEach(id => {
-                    const handler = document.getElementById(id);
-                    handler.classList.remove('processing', 'success', 'rejected');
-                    handler.querySelector('.handler-status').textContent = 'Waiting...';
-                });
-            }
-            
-            function updateRequestJSON() {
-                const hasToken = document.getElementById('has-token').checked;
-                const hasAccessPermission = document.getElementById('permission-access').checked;
-                const hasReadPermission = document.getElementById('permission-read').checked;
-                const hasWritePermission = document.getElementById('permission-write').checked;
-                const hasData = document.getElementById('has-data').checked;
-                
-                const request = {};
-                
-                if (hasToken) {
-                    request.token = "valid-token";
-                }
-                
-                const permissions = [];
-                if (hasAccessPermission) permissions.push("access");
-                if (hasReadPermission) permissions.push("read");
-                if (hasWritePermission) permissions.push("write");
-                
-                if (permissions.length > 0) {
-                    request.permissions = permissions;
-                }
-                
-                if (hasData) {
-                    request.data = { id: Math.floor(Math.random() * 1000) + 1 };
-                }
-                
-                document.getElementById('request-json').textContent = JSON.stringify(request, null, 2);
-                
-                return request;
-            }
-            
-            // Initialize chain
-            const authentication = new AuthenticationHandler();
-            const authorization = new AuthorizationHandler();
-            const validation = new ValidationHandler();
-            const rateLimit = new RateLimitHandler();
-            const resource = new ResourceHandler();
-            
-            // Build the chain
-            authentication
-                .setNext(authorization)
-                .setNext(validation)
-                .setNext(rateLimit)
-                .setNext(resource);
-            
-            // Update initial request JSON
-            updateRequestJSON();
-            
-            // Add event listeners
-            document.getElementById('has-token').addEventListener('change', updateRequestJSON);
-            document.getElementById('permission-access').addEventListener('change', updateRequestJSON);
-            document.getElementById('permission-read').addEventListener('change', updateRequestJSON);
-            document.getElementById('permission-write').addEventListener('change', updateRequestJSON);
-            document.getElementById('has-data').addEventListener('change', updateRequestJSON);
-            
-            document.getElementById('send-request-btn').addEventListener('click', async function() {
-                resetHandlersUI();
-                const request = updateRequestJSON();
-                logMessage("==== New Request Started ====");
-                logMessage(`Sending request: ${JSON.stringify(request)}`);
-                
-                try {
-                    const result = await authentication.handle(request);
-                    if (result) {
-                        logMessage(`Final result: ${result}`);
-                    }
-                } catch (error) {
-                    logMessage(`Error: ${error.message}`);
-                }
-            });
-            
-            document.getElementById('reset-chain-btn').addEventListener('click', function() {
-                resetHandlersUI();
-                rateLimit.reset();
-                logMessage("==== Chain Reset ====");
-                logMessage("All handlers have been reset to their initial state");
-            });
-        });
+            document.getElementById('output').textContent = out;
+        }
     </script>
 </body>
-</html> 
+
+</html>
