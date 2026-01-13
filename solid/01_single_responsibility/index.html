@@ -1,744 +1,569 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Single Responsibility Principle (SRP) - مبدأ المسؤولية الواحدة</title>
+    <title>Single Responsibility Principle | مبدأ المسؤولية الواحدة</title>
+    <meta name="description"
+        content="SOLID Principles: SRP explained with Egyptian Arabic, SVGs, and Interactive Code.">
+
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800&family=Inter:wght@300;400;600;800&family=Fira+Code:wght@400;500&display=swap"
+        rel="stylesheet">
+
+    <!-- Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+    <!-- Animation -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+
+    <!-- Tailwind -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        neon: { green: '#10B981', blue: '#3B82F6', purple: '#8B5CF6' },
+                        dark: { bg: '#020617', card: '#0F172A', border: '#1E293B' }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        arabic: ['Cairo', 'sans-serif'],
+                        mono: ['Fira Code', 'monospace'],
+                    },
+                }
+            }
+        }
+    </script>
+
     <style>
-        :root {
-            --primary-color: #3b82f6;
-            --primary-dark: #2563eb;
-            --primary-light: #60a5fa;
-            --secondary-color: #10b981;
-            --secondary-dark: #059669;
-            --accent-color: #8b5cf6;
-            --accent-good: #059669;
-            --accent-bad: #ef4444;
-            --text-color: #e2e8f0;
-            --text-muted: #94a3b8;
-            --bg-color: #0f172a;
-            --bg-light: #1e293b;
-            --bg-lighter: #334155;
-            --border-color: #334155;
-            --heading-font: 'Poppins', sans-serif;
-            --body-font: 'Inter', sans-serif;
-        }
-
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-
         body {
-            font-family: var(--body-font);
-            line-height: 1.7;
-            color: var(--text-color);
-            background-color: var(--bg-color);
+            background-color: #020617;
+            color: #E2E8F0;
+            overflow-x: hidden;
         }
 
-        /* Hero */
-        .hero {
-            min-height: 50vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
-            padding: 3rem 1rem;
-            position: relative;
-            overflow: hidden;
+        .glass-card {
+            background: rgba(15, 23, 42, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
         }
 
-        .hero::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: radial-gradient(circle at 30% 30%, rgba(59, 130, 246, 0.1) 0%, transparent 50%);
+        .glass-card:hover {
+            border-color: rgba(59, 130, 246, 0.4);
         }
 
-        .hero-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.5rem 1rem;
-            background: rgba(59, 130, 246, 0.2);
-            border: 1px solid rgba(59, 130, 246, 0.3);
-            border-radius: 50px;
-            color: var(--primary-light);
-            font-size: 0.9rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .hero-badge span {
-            width: 8px;
-            height: 8px;
-            background: var(--primary-light);
-            border-radius: 50%;
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
-
-        .hero h1 {
-            font-family: var(--heading-font);
-            font-size: 3rem;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-            background: linear-gradient(90deg, #fff, #94a3b8);
+        .text-gradient {
+            background: linear-gradient(135deg, #3B82F6 0%, #8B5CF6 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            background-clip: text;
         }
 
-        .hero .subtitle {
-            font-size: 1.3rem;
-            color: var(--text-muted);
+        ::-webkit-scrollbar {
+            width: 8px;
         }
 
-        .hero .arabic-subtitle {
-            font-size: 1.5rem;
-            color: var(--primary-light);
-            margin-top: 0.5rem;
+        ::-webkit-scrollbar-track {
+            background: #020617;
         }
 
-        /* Main Content */
-        .main-content {
-            max-width: 1000px;
-            margin: -50px auto 0;
-            padding: 0 1rem 4rem;
-            position: relative;
-            z-index: 10;
+        ::-webkit-scrollbar-thumb {
+            background: #1E293B;
+            border-radius: 4px;
         }
 
-        .container {
-            background: var(--bg-light);
-            border-radius: 16px;
-            padding: 2.5rem;
-            border: 1px solid var(--border-color);
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
-        }
-
-        /* Back Link */
-        .back-link {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            color: var(--primary-light);
-            text-decoration: none;
-            font-weight: 500;
-            margin-bottom: 2rem;
-            transition: color 0.2s;
-        }
-
-        .back-link:hover { color: #fff; }
-
-        /* Typography */
-        h2 {
-            font-family: var(--heading-font);
-            font-size: 1.8rem;
-            color: var(--text-color);
-            margin: 2.5rem 0 1.5rem;
-            padding-bottom: 0.5rem;
-            border-bottom: 2px solid var(--border-color);
-        }
-
-        h3 {
-            font-family: var(--heading-font);
-            font-size: 1.4rem;
-            color: var(--primary-light);
-            margin: 1.5rem 0 1rem;
-        }
-
-        p { margin-bottom: 1.5rem; color: var(--text-muted); }
-        strong { color: var(--text-color); }
-
-        /* Arabic Section */
-        .arabic-section {
-            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(139, 92, 246, 0.1));
-            border: 1px solid rgba(59, 130, 246, 0.2);
-            border-radius: 12px;
-            padding: 2rem;
-            margin: 2rem 0;
-        }
-
-        .arabic-section h3 {
-            color: var(--primary-light);
-            margin-top: 0;
+        ::-webkit-scrollbar-thumb:hover {
+            background: #3B82F6;
         }
 
         .arabic-text {
-            text-align: right;
-            line-height: 2;
-        }
-
-        .arabic-text p {
-            color: var(--text-color);
-        }
-
-        /* SVG Visualization */
-        .visualization {
-            background: var(--bg-lighter);
-            border-radius: 12px;
-            padding: 2rem;
-            margin: 2rem 0;
-            border: 1px solid var(--border-color);
-        }
-
-        .visualization svg {
-            width: 100%;
-            max-width: 700px;
-            height: auto;
-            display: block;
-            margin: 0 auto;
-        }
-
-        /* Code Examples */
-        .example {
-            border-radius: 12px;
-            padding: 2rem;
-            margin: 2rem 0;
-            border: 1px solid var(--border-color);
-            background: var(--bg-lighter);
-        }
-
-        .bad-example {
-            border-left: 4px solid var(--accent-bad);
-        }
-
-        .bad-example h3 { color: var(--accent-bad); }
-
-        .good-example {
-            border-left: 4px solid var(--accent-good);
-        }
-
-        .good-example h3 { color: var(--accent-good); }
-
-        .code-container {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 1rem;
-            margin-top: 1rem;
-        }
-
-        @media (min-width: 768px) {
-            .code-container {
-                grid-template-columns: 1fr 1fr;
-            }
+            font-family: 'Cairo', sans-serif;
+            direction: rtl;
         }
 
         pre {
-            background: var(--bg-color);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 1rem;
-            overflow-x: auto;
-            font-size: 0.85rem;
-            line-height: 1.6;
-        }
-
-        code {
-            font-family: 'Consolas', 'Monaco', monospace;
-            color: #e2e8f0;
-        }
-
-        .code-explanation {
-            background: rgba(59, 130, 246, 0.1);
-            border-radius: 8px;
-            padding: 1rem;
-        }
-
-        .code-explanation h4 {
-            color: var(--primary-light);
-            font-size: 1rem;
-            margin-bottom: 1rem;
-        }
-
-        .explanation-item {
-            padding: 0.75rem;
-            margin-bottom: 0.5rem;
-            border-radius: 6px;
-            border-right: 3px solid;
-        }
-
-        .explanation-item.blue { background: rgba(59, 130, 246, 0.15); border-color: var(--primary-color); }
-        .explanation-item.green { background: rgba(16, 185, 129, 0.15); border-color: var(--secondary-color); }
-        .explanation-item.purple { background: rgba(139, 92, 246, 0.15); border-color: var(--accent-color); }
-        .explanation-item.red { background: rgba(239, 68, 68, 0.15); border-color: var(--accent-bad); }
-
-        .explanation-item strong {
-            display: block;
-            margin-bottom: 0.25rem;
-        }
-
-        .explanation-item p {
-            margin: 0;
-            font-size: 0.85rem;
-        }
-
-        /* Interactive Demo */
-        .interactive-demo {
-            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(59, 130, 246, 0.1));
-            border: 1px solid rgba(16, 185, 129, 0.3);
-            border-radius: 12px;
-            padding: 2rem;
-            margin: 2rem 0;
-        }
-
-        .interactive-demo h3 {
-            color: var(--secondary-color);
-            margin-top: 0;
-        }
-
-        .demo-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 1rem;
-            margin-top: 1rem;
-        }
-
-        @media (min-width: 768px) {
-            .demo-grid {
-                grid-template-columns: 1fr 1fr;
-            }
-        }
-
-        .demo-input {
-            background: var(--bg-color);
-            border-radius: 8px;
-            padding: 1rem;
-        }
-
-        .demo-input label {
-            display: block;
-            color: var(--text-color);
-            margin-bottom: 0.5rem;
-            font-weight: 500;
-        }
-
-        .demo-input input {
-            width: 100%;
-            padding: 0.75rem;
-            background: var(--bg-lighter);
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            color: var(--text-color);
-            font-size: 1rem;
-            margin-bottom: 1rem;
-        }
-
-        .demo-input input:focus {
-            outline: none;
-            border-color: var(--primary-color);
-        }
-
-        .demo-input button {
-            padding: 0.75rem 1.5rem;
-            background: var(--secondary-color);
-            color: white;
-            border: none;
-            border-radius: 6px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-
-        .demo-input button:hover {
-            background: var(--secondary-dark);
-        }
-
-        .demo-output {
-            background: var(--bg-color);
-            border-radius: 8px;
-            padding: 1rem;
-            font-family: 'Consolas', monospace;
-            font-size: 0.9rem;
-            min-height: 150px;
-            white-space: pre-wrap;
-        }
-
-        /* Navigation */
-        .navigation {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 3rem;
-            padding-top: 2rem;
-            border-top: 1px solid var(--border-color);
-        }
-
-        .nav-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.75rem 1.5rem;
-            background: var(--bg-lighter);
-            color: var(--text-color);
-            text-decoration: none;
-            border-radius: 8px;
-            font-weight: 500;
-            transition: background 0.2s, transform 0.2s;
-        }
-
-        .nav-btn:hover {
-            background: var(--primary-color);
-            transform: translateY(-2px);
-        }
-
-        .nav-btn.next {
-            background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
-        }
-
-        /* Footer */
-        footer {
-            background: var(--bg-light);
-            border-top: 1px solid var(--border-color);
-            padding: 2rem;
-            text-align: center;
-            color: var(--text-muted);
-        }
-
-        @media (max-width: 768px) {
-            .hero h1 { font-size: 2rem; }
-            .container { padding: 1.5rem; }
-            h2 { font-size: 1.4rem; }
+            background: #0B1221 !important;
+            border: 1px solid #1E293B;
+            border-radius: 0.75rem;
         }
     </style>
 </head>
+
 <body>
-    <!-- Hero -->
-    <section class="hero">
-        <div class="hero-badge">
-            <span></span>
-            SOLID Principle #1
-        </div>
-        <h1>Single Responsibility Principle</h1>
-        <p class="subtitle">A class should have only one reason to change</p>
-        <p class="arabic-subtitle" dir="rtl">كل كلاس ليه مسؤولية واحدة بس! 🎯</p>
-    </section>
 
-    <div class="main-content">
-        <div class="container">
-            <!-- Back Link -->
-            <a href="../../index.html" class="back-link">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M19 12H5M12 19l-7-7 7-7"/>
-                </svg>
-                Back to Overview
-            </a>
-
-            <!-- Arabic Explanation -->
-            <div class="arabic-section">
-                <h3 dir="rtl">🎯 إيه هو مبدأ المسؤولية الواحدة؟</h3>
-                <div class="arabic-text" dir="rtl">
-                    <p>
-                        <strong style="color: var(--primary-light);">تشبيه الشيف في المطعم:</strong>
-                    </p>
-                    <p>
-                        في مطعم محترم، كل واحد ليه شغلته:
-                    </p>
-                    <p>
-                        • الـ <strong style="color: #fbbf24;">شيف 👨‍🍳</strong> → بيطبخ بس - مش بيقدم الأكل<br>
-                        • الـ <strong style="color: #34d399;">ويتر 🧑‍🍳</strong> → بيقدم الأكل بس - مش بيطبخ<br>
-                        • الـ <strong style="color: #f472b6;">كاشير 💰</strong> → بيحسب الفلوس بس - مش بيطبخ ولا بيقدم
-                    </p>
-                    <p style="color: var(--secondary-color); font-weight: bold; margin-top: 1rem;">
-                        لو الشيف عمل كل حاجة، المطعم هيبوظ! نفس الكلام في الكود - كل Class ليه وظيفة واحدة بس ✅
-                    </p>
+    <!-- Nav -->
+    <nav class="fixed top-0 w-full z-50 glass-card border-b-0">
+        <div class="container mx-auto px-6 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div
+                    class="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-white font-bold text-lg shadow-lg shadow-blue-500/20">
+                    S
                 </div>
+                <span class="font-bold text-lg tracking-wide">Single<span
+                        class="text-blue-500">Responsibility</span></span>
+            </div>
+            <div class="hidden md:flex gap-6 text-sm font-medium text-slate-400">
+                <a href="#concept" class="hover:text-blue-400 transition">المفهوم</a>
+                <a href="#code" class="hover:text-blue-400 transition">الكود</a>
+                <a href="#demo" class="hover:text-blue-400 transition">تجربة</a>
+                <a href="../../index.html"
+                    class="px-4 py-2 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20 hover:bg-blue-500 hover:text-white transition">
+                    <i class="fa-solid fa-home mr-1"></i> الرئيسية
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="relative pt-32 pb-20 px-6 overflow-hidden">
+        <!-- Background Glows -->
+        <div
+            class="absolute top-0 right-0 w-[500px] h-[500px] bg-blue-500/10 rounded-full blur-[128px] pointer-events-none">
+        </div>
+        <div
+            class="absolute bottom-0 left-0 w-[500px] h-[500px] bg-purple-500/10 rounded-full blur-[128px] pointer-events-none">
+        </div>
+
+        <div class="container mx-auto text-center relative z-10" data-aos="fade-up">
+            <div
+                class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-800/50 border border-slate-700 text-xs font-mono text-blue-400 mb-6">
+                <span class="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></span>
+                SOLID PRINCIPLE #1
             </div>
 
-            <!-- SVG Visualization -->
-            <div class="visualization">
-                <h3 style="text-align: center; margin-bottom: 1.5rem;">🏗️ Visual: Single vs Multiple Responsibilities</h3>
-                <svg viewBox="0 0 700 320">
-                    <!-- Bad: One class doing everything -->
-                    <g>
-                        <text x="175" y="30" text-anchor="middle" fill="#ef4444" font-size="14" font-weight="bold">❌ Violating SRP</text>
-                        <rect x="50" y="45" width="250" height="250" rx="12" fill="#1e293b" stroke="#ef4444" stroke-width="2"/>
-                        <text x="175" y="75" text-anchor="middle" fill="#f87171" font-size="13" font-weight="bold">ReportManager</text>
-                        <line x1="70" y1="90" x2="280" y2="90" stroke="#334155" stroke-width="1"/>
-                        
-                        <rect x="70" y="105" width="210" height="35" rx="6" fill="#7f1d1d"/>
-                        <text x="175" y="128" text-anchor="middle" fill="#fca5a5" font-size="11">📄 generateReport()</text>
-                        
-                        <rect x="70" y="150" width="210" height="35" rx="6" fill="#7f1d1d"/>
-                        <text x="175" y="173" text-anchor="middle" fill="#fca5a5" font-size="11">💾 saveToFile()</text>
-                        
-                        <rect x="70" y="195" width="210" height="35" rx="6" fill="#7f1d1d"/>
-                        <text x="175" y="218" text-anchor="middle" fill="#fca5a5" font-size="11">📧 sendEmail()</text>
-                        
-                        <rect x="70" y="240" width="210" height="35" rx="6" fill="#7f1d1d"/>
-                        <text x="175" y="263" text-anchor="middle" fill="#fca5a5" font-size="11">🖨️ printReport()</text>
-                    </g>
+            <h1 class="text-5xl md:text-7xl font-black mb-4 tracking-tight">
+                <span class="text-gradient">Single Responsibility</span>
+            </h1>
 
-                    <!-- Good: Separated responsibilities -->
-                    <g>
-                        <text x="525" y="30" text-anchor="middle" fill="#10b981" font-size="14" font-weight="bold">✅ Following SRP</text>
-                        
-                        <rect x="400" y="45" width="130" height="60" rx="8" fill="#1e293b" stroke="#3b82f6" stroke-width="2"/>
-                        <text x="465" y="70" text-anchor="middle" fill="#60a5fa" font-size="11" font-weight="bold">ReportGenerator</text>
-                        <text x="465" y="90" text-anchor="middle" fill="#94a3b8" font-size="10">📄 generate()</text>
-                        
-                        <rect x="550" y="45" width="130" height="60" rx="8" fill="#1e293b" stroke="#10b981" stroke-width="2"/>
-                        <text x="615" y="70" text-anchor="middle" fill="#34d399" font-size="11" font-weight="bold">FileSaver</text>
-                        <text x="615" y="90" text-anchor="middle" fill="#94a3b8" font-size="10">💾 save()</text>
-                        
-                        <rect x="400" y="120" width="130" height="60" rx="8" fill="#1e293b" stroke="#f59e0b" stroke-width="2"/>
-                        <text x="465" y="145" text-anchor="middle" fill="#fbbf24" font-size="11" font-weight="bold">EmailSender</text>
-                        <text x="465" y="165" text-anchor="middle" fill="#94a3b8" font-size="10">📧 send()</text>
-                        
-                        <rect x="550" y="120" width="130" height="60" rx="8" fill="#1e293b" stroke="#8b5cf6" stroke-width="2"/>
-                        <text x="615" y="145" text-anchor="middle" fill="#a78bfa" font-size="11" font-weight="bold">ReportPrinter</text>
-                        <text x="615" y="165" text-anchor="middle" fill="#94a3b8" font-size="10">🖨️ print()</text>
+            <h2 class="text-3xl md:text-4xl font-bold text-slate-300 font-arabic mb-6">
+                مبدأ المسؤولية الواحدة
+            </h2>
 
-                        <!-- Coordinator -->
-                        <rect x="475" y="200" width="150" height="50" rx="8" fill="#1e293b" stroke="#6366f1" stroke-width="2" stroke-dasharray="5,3"/>
-                        <text x="550" y="222" text-anchor="middle" fill="#818cf8" font-size="11" font-weight="bold">ReportWorkflow</text>
-                        <text x="550" y="240" text-anchor="middle" fill="#94a3b8" font-size="9">Coordinates all 👆</text>
+            <p class="text-lg text-slate-400 max-w-2xl mx-auto leading-relaxed mb-4">
+                A class should have only <strong class="text-white">one reason to change</strong>.
+            </p>
 
-                        <!-- Arrows -->
-                        <path d="M465 105 L465 115 L530 190" stroke="#6366f1" stroke-width="1" fill="none" stroke-dasharray="3,2"/>
-                        <path d="M615 105 L615 115 L570 190" stroke="#6366f1" stroke-width="1" fill="none" stroke-dasharray="3,2"/>
-                        <path d="M465 180 L465 190 L520 200" stroke="#6366f1" stroke-width="1" fill="none" stroke-dasharray="3,2"/>
-                        <path d="M615 180 L615 190 L580 200" stroke="#6366f1" stroke-width="1" fill="none" stroke-dasharray="3,2"/>
-                    </g>
+            <!-- Arabic Box -->
+            <div class="p-6 bg-blue-950/30 border border-blue-900/50 rounded-2xl mb-12 max-w-3xl mx-auto"
+                data-aos="fade-up" data-aos-delay="200">
+                <p class="font-arabic text-xl md:text-2xl text-blue-100/90 leading-loose">
+                    <span class="text-blue-400 font-bold">يعني إيه؟</span>
+                    كل Class ليه شغلانة واحدة بس! زي المطعم كده... الشيف بيطبخ، الجرسون بيقدم، والكاشير بيحاسب.
+                    <br>
+                    <span class="text-yellow-400">مينفعش</span> الشيف يطبخ ويقدم ويحاسب! 🍳
+                </p>
+            </div>
+        </div>
+    </header>
 
-                    <!-- Caption -->
-                    <text x="175" y="310" text-anchor="middle" fill="#94a3b8" font-size="10">One class = Too many reasons to change</text>
-                    <text x="550" y="275" text-anchor="middle" fill="#94a3b8" font-size="10">Each class = One responsibility</text>
-                </svg>
+    <!-- The Analogy Section -->
+    <section id="concept" class="py-20 px-6 bg-slate-900/30">
+        <div class="container mx-auto max-w-6xl">
+            <div class="text-center mb-16" data-aos="fade-up">
+                <span class="text-blue-500 font-mono text-sm tracking-wider">THE CONCEPT</span>
+                <h2 class="text-4xl font-bold text-white mt-2">المطعم المحترم 🍽️</h2>
+            </div>
+
+            <div class="grid lg:grid-cols-2 gap-12 items-center">
+                <!-- SVG Restaurant -->
+                <div class="relative" data-aos="fade-right">
+                    <div class="glass-card p-2 rounded-2xl">
+                        <svg viewBox="0 0 600 400" class="w-full h-auto bg-[#0B1121] rounded-xl">
+                            <defs>
+                                <linearGradient id="chefGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" style="stop-color:#fbbf24" />
+                                    <stop offset="100%" style="stop-color:#f59e0b" />
+                                </linearGradient>
+                                <linearGradient id="waiterGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" style="stop-color:#34d399" />
+                                    <stop offset="100%" style="stop-color:#10b981" />
+                                </linearGradient>
+                                <linearGradient id="cashierGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" style="stop-color:#f472b6" />
+                                    <stop offset="100%" style="stop-color:#ec4899" />
+                                </linearGradient>
+                            </defs>
+
+                            <!-- Title -->
+                            <text x="300" y="40" text-anchor="middle" fill="#94a3b8" font-family="Cairo" font-size="16"
+                                font-weight="bold">✅ المطعم المنظم - كل واحد ليه شغلته</text>
+
+                            <!-- Chef -->
+                            <g transform="translate(100, 100)">
+                                <circle cx="50" cy="50" r="45" fill="url(#chefGrad)" fill-opacity="0.2"
+                                    stroke="url(#chefGrad)" stroke-width="3" />
+                                <text x="50" y="40" text-anchor="middle" font-size="30">👨‍🍳</text>
+                                <text x="50" y="70" text-anchor="middle" fill="#fbbf24" font-family="Cairo"
+                                    font-size="12" font-weight="bold">الشيف</text>
+                                <text x="50" y="120" text-anchor="middle" fill="#94a3b8" font-size="11">cook()</text>
+                                <text x="50" y="140" text-anchor="middle" fill="#64748b" font-family="Cairo"
+                                    font-size="10">بيطبخ بس ✓</text>
+                            </g>
+
+                            <!-- Waiter -->
+                            <g transform="translate(250, 100)">
+                                <circle cx="50" cy="50" r="45" fill="url(#waiterGrad)" fill-opacity="0.2"
+                                    stroke="url(#waiterGrad)" stroke-width="3" />
+                                <text x="50" y="40" text-anchor="middle" font-size="30">🧑‍🍳</text>
+                                <text x="50" y="70" text-anchor="middle" fill="#34d399" font-family="Cairo"
+                                    font-size="12" font-weight="bold">الجرسون</text>
+                                <text x="50" y="120" text-anchor="middle" fill="#94a3b8" font-size="11">serve()</text>
+                                <text x="50" y="140" text-anchor="middle" fill="#64748b" font-family="Cairo"
+                                    font-size="10">بيقدم بس ✓</text>
+                            </g>
+
+                            <!-- Cashier -->
+                            <g transform="translate(400, 100)">
+                                <circle cx="50" cy="50" r="45" fill="url(#cashierGrad)" fill-opacity="0.2"
+                                    stroke="url(#cashierGrad)" stroke-width="3" />
+                                <text x="50" y="40" text-anchor="middle" font-size="30">💰</text>
+                                <text x="50" y="70" text-anchor="middle" fill="#f472b6" font-family="Cairo"
+                                    font-size="12" font-weight="bold">الكاشير</text>
+                                <text x="50" y="120" text-anchor="middle" fill="#94a3b8"
+                                    font-size="11">checkout()</text>
+                                <text x="50" y="140" text-anchor="middle" fill="#64748b" font-family="Cairo"
+                                    font-size="10">بيحاسب بس ✓</text>
+                            </g>
+
+                            <!-- Bottom comparison -->
+                            <rect x="50" y="280" width="500" height="90" rx="10" fill="#1e293b" stroke="#ef4444"
+                                stroke-width="2" stroke-dasharray="5,5" />
+                            <text x="300" y="310" text-anchor="middle" fill="#ef4444" font-family="Cairo" font-size="14"
+                                font-weight="bold">❌ الشيف اللي بيعمل كل حاجة</text>
+                            <text x="300" y="335" text-anchor="middle" fill="#94a3b8" font-size="11">cook() + serve() +
+                                checkout() + clean()</text>
+                            <text x="300" y="355" text-anchor="middle" fill="#f87171" font-family="Cairo"
+                                font-size="11">⚠️ لو غيرت طريقة الحساب ← ممكن تبوظ الطبخ!</text>
+                        </svg>
+                    </div>
+                </div>
+
+                <!-- Explanation Cards -->
+                <div class="space-y-6" data-aos="fade-left">
+                    <div
+                        class="glass-card p-6 rounded-xl hover:bg-slate-800/50 transition border-r-4 border-r-yellow-500">
+                        <h3 class="text-xl font-bold text-white mb-3 flex items-center gap-2">
+                            <span class="text-2xl">👨‍🍳</span> الشيف
+                        </h3>
+                        <p class="text-slate-300 leading-relaxed font-arabic text-right">
+                            شغلته الوحيدة إنه يطبخ. مش بيقدم الأكل للزبون، ومش بيحاسب.
+                            لو فيه مشكلة في الطبخ، <span class="text-yellow-400 font-bold">تروح للشيف بس</span>.
+                        </p>
+                    </div>
+
+                    <div
+                        class="glass-card p-6 rounded-xl hover:bg-slate-800/50 transition border-r-4 border-r-emerald-500">
+                        <h3 class="text-xl font-bold text-white mb-3 flex items-center gap-2">
+                            <span class="text-2xl">🧑‍🍳</span> الجرسون
+                        </h3>
+                        <p class="text-slate-300 leading-relaxed font-arabic text-right">
+                            شغلته إنه ياخد الطلب ويقدم الأكل. مش بيطبخ ومش بيحاسب.
+                            لو الزبون اشتكى من الخدمة، <span class="text-emerald-400 font-bold">تروح للجرسون</span>.
+                        </p>
+                    </div>
+
+                    <div
+                        class="glass-card p-6 rounded-xl hover:bg-slate-800/50 transition border-r-4 border-r-pink-500">
+                        <h3 class="text-xl font-bold text-white mb-3 flex items-center gap-2">
+                            <span class="text-2xl">💰</span> الكاشير
+                        </h3>
+                        <p class="text-slate-300 leading-relaxed font-arabic text-right">
+                            شغلته إنه يحسب الفاتورة وياخد الفلوس. بس كده!
+                            لو فيه مشكلة في الحساب، <span class="text-pink-400 font-bold">تروح للكاشير</span>.
+                        </p>
+                    </div>
+
+                    <div class="p-4 bg-blue-950/50 border border-blue-500/30 rounded-xl">
+                        <p class="font-arabic text-blue-200 text-right text-lg">
+                            <i class="fa-solid fa-lightbulb text-yellow-500 mr-2"></i>
+                            <strong>الخلاصة:</strong> لما كل واحد يركز في شغلانته، المطعم يشتغل زي الفل! 🎯
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Code Section -->
+    <section id="code" class="py-24 px-6 bg-black/20">
+        <div class="container mx-auto max-w-6xl">
+            <div class="text-center mb-16" data-aos="fade-up">
+                <span class="text-red-500 font-mono text-sm tracking-wider">THE CODE</span>
+                <h2 class="text-4xl font-bold text-white mt-2">شوف الفرق في الكود 💻</h2>
             </div>
 
             <!-- Bad Example -->
-            <div class="example bad-example">
-                <h3>❌ Bad Example - Violating SRP</h3>
-                <p>This class does too many things - generating, saving, emailing, and printing reports:</p>
-                
-                <div class="code-container">
-                    <pre dir="ltr"><code>class ReportManager {
-  generateReport(data) {
-    console.log("Generating report...");
-    return `Report: ${JSON.stringify(data)}`;
-  }
-
-  saveToFile(report, filename) {
-    console.log(`Saving to ${filename}...`);
-    // File saving logic
-  }
-
-  sendByEmail(report, email) {
-    console.log(`Sending to ${email}...`);
-    // Email sending logic
-  }
-
-  printReport(report) {
-    console.log("Printing report...");
-    // Printing logic
-  }
-}</code></pre>
-
-                    <div class="code-explanation" dir="rtl">
-                        <h4>🔍 ليه ده غلط؟</h4>
-                        <div class="explanation-item red">
-                            <strong>⚠️ مشكلة التغيير</strong>
-                            <p>لو غيرت طريقة الإيميل، ممكن تأثر على الـ report generation!</p>
-                        </div>
-                        <div class="explanation-item red">
-                            <strong>⚠️ مشكلة الـ Testing</strong>
-                            <p>عشان تختبر جزء واحد، لازم تحضر كل الـ dependencies</p>
-                        </div>
-                        <div class="explanation-item red">
-                            <strong>⚠️ مشكلة الفهم</strong>
-                            <p>الكلاس كبير ومعقد - صعب تفهمه بسرعة</p>
+            <div class="grid lg:grid-cols-2 gap-8 mb-16 items-start" data-aos="fade-up">
+                <div class="glass-card p-6 rounded-xl border-t-4 border-t-red-500">
+                    <div class="flex items-center gap-3 mb-4">
+                        <span class="w-10 h-10 rounded-lg bg-red-500/20 flex items-center justify-center text-red-400">
+                            <i class="fa-solid fa-xmark text-xl"></i>
+                        </span>
+                        <div>
+                            <h3 class="text-xl font-bold text-white">❌ الكود الغلط</h3>
+                            <p class="text-red-400 font-arabic text-sm">Class بيعمل كل حاجة!</p>
                         </div>
                     </div>
+                    <p class="text-slate-400 text-sm mb-4 font-arabic text-right leading-relaxed">
+                        ده زي الشيف اللي بيطبخ ويقدم ويحاسب ويمسح الأرض!
+                        لو عايز تغير طريقة الإيميل، <span class="text-red-400">ممكن تبوظ كل حاجة تانية</span>.
+                    </p>
+                </div>
+                <div class="bg-[#0B1221] rounded-xl overflow-hidden border border-slate-800 shadow-2xl">
+                    <div
+                        class="flex items-center gap-2 px-4 py-2 bg-slate-900 border-b border-slate-800 text-xs text-slate-400">
+                        <span class="w-3 h-3 rounded-full bg-red-500"></span>
+                        <span class="w-3 h-3 rounded-full bg-yellow-500"></span>
+                        <span class="w-3 h-3 rounded-full bg-green-500"></span>
+                        <span class="ml-2 font-mono">BadEmployee.js</span>
+                    </div>
+                    <pre class="p-4 m-0 overflow-x-auto text-sm"><code class="font-mono"><span class="text-purple-400">class</span> <span class="text-yellow-300">SuperEmployee</span> {
+  <span class="text-gray-500">// ❌ بيعمل report</span>
+  <span class="text-blue-400">generateReport</span>(data) {
+    <span class="text-purple-400">return</span> <span class="text-green-400">`Report: </span>${data}<span class="text-green-400">`</span>;
+  }
+  
+  <span class="text-gray-500">// ❌ وكمان بيحفظ files</span>
+  <span class="text-blue-400">saveToFile</span>(content, filename) {
+    console.log(<span class="text-green-400">`Saving to </span>${filename}<span class="text-green-400">`</span>);
+  }
+  
+  <span class="text-gray-500">// ❌ وكمان بيبعت email</span>
+  <span class="text-blue-400">sendEmail</span>(content, email) {
+    console.log(<span class="text-green-400">`Sending to </span>${email}<span class="text-green-400">`</span>);
+  }
+  
+  <span class="text-gray-500">// ❌ وكمان بيطبع!</span>
+  <span class="text-blue-400">printReport</span>(content) {
+    console.log(<span class="text-green-400">`Printing...`</span>);
+  }
+}</code></pre>
                 </div>
             </div>
 
             <!-- Good Example -->
-            <div class="example good-example">
-                <h3>✅ Good Example - Following SRP</h3>
-                <p>Each class has one clear responsibility:</p>
-                
-                <div class="code-container">
-                    <pre dir="ltr"><code>// 📄 Responsibility: Generate reports
-class ReportGenerator {
-  generate(data) {
-    return `Report: ${JSON.stringify(data)}`;
+            <div class="grid lg:grid-cols-2 gap-8 mb-16 items-start" data-aos="fade-up">
+                <div
+                    class="bg-[#0B1221] rounded-xl overflow-hidden border border-slate-800 shadow-2xl order-2 lg:order-1">
+                    <div
+                        class="flex items-center gap-2 px-4 py-2 bg-slate-900 border-b border-slate-800 text-xs text-slate-400">
+                        <span class="w-3 h-3 rounded-full bg-red-500"></span>
+                        <span class="w-3 h-3 rounded-full bg-yellow-500"></span>
+                        <span class="w-3 h-3 rounded-full bg-green-500"></span>
+                        <span class="ml-2 font-mono">GoodDesign.js</span>
+                    </div>
+                    <pre class="p-4 m-0 overflow-x-auto text-sm"><code class="font-mono"><span class="text-gray-500">// ✅ كل class ليه شغلانة واحدة</span>
+
+<span class="text-purple-400">class</span> <span class="text-yellow-300">ReportGenerator</span> {
+  <span class="text-blue-400">generate</span>(data) {
+    <span class="text-purple-400">return</span> <span class="text-green-400">`Report: </span>${data}<span class="text-green-400">`</span>;
   }
 }
 
-// 💾 Responsibility: Save files
-class FileSaver {
-  save(content, filename) {
-    console.log(`Saving to ${filename}`);
+<span class="text-purple-400">class</span> <span class="text-yellow-300">FileSaver</span> {
+  <span class="text-blue-400">save</span>(content, filename) {
+    console.log(<span class="text-green-400">`💾 Saved to </span>${filename}<span class="text-green-400">`</span>);
   }
 }
 
-// 📧 Responsibility: Send emails
-class EmailSender {
-  send(content, email) {
-    console.log(`Sending to ${email}`);
+<span class="text-purple-400">class</span> <span class="text-yellow-300">EmailSender</span> {
+  <span class="text-blue-400">send</span>(content, email) {
+    console.log(<span class="text-green-400">`📧 Sent to </span>${email}<span class="text-green-400">`</span>);
   }
 }
 
-// 🎯 Coordinator (uses all above)
-class ReportWorkflow {
-  constructor() {
-    this.generator = new ReportGenerator();
-    this.saver = new FileSaver();
-    this.emailer = new EmailSender();
-  }
-
-  processReport(data, file, email) {
-    const report = this.generator.generate(data);
-    this.saver.save(report, file);
-    this.emailer.send(report, email);
+<span class="text-gray-500">// المنسق - بيستخدم كل الـ classes</span>
+<span class="text-purple-400">class</span> <span class="text-yellow-300">ReportWorkflow</span> {
+  <span class="text-blue-400">constructor</span>() {
+    <span class="text-purple-400">this</span>.generator = <span class="text-purple-400">new</span> ReportGenerator();
+    <span class="text-purple-400">this</span>.saver = <span class="text-purple-400">new</span> FileSaver();
+    <span class="text-purple-400">this</span>.emailer = <span class="text-purple-400">new</span> EmailSender();
   }
 }</code></pre>
+                </div>
+                <div class="glass-card p-6 rounded-xl border-t-4 border-t-emerald-500 order-1 lg:order-2">
+                    <div class="flex items-center gap-3 mb-4">
+                        <span
+                            class="w-10 h-10 rounded-lg bg-emerald-500/20 flex items-center justify-center text-emerald-400">
+                            <i class="fa-solid fa-check text-xl"></i>
+                        </span>
+                        <div>
+                            <h3 class="text-xl font-bold text-white">✅ الكود الصح</h3>
+                            <p class="text-emerald-400 font-arabic text-sm">كل Class ليه مسؤولية واحدة</p>
+                        </div>
+                    </div>
 
-                    <div class="code-explanation" dir="rtl">
-                        <h4>✨ ليه ده صح؟</h4>
-                        <div class="explanation-item blue">
-                            <strong>📄 ReportGenerator</strong>
-                            <p>شغلته الوحيدة: يولد الـ report - مش بيعرف حاجة عن الإيميل أو الملفات</p>
+                    <div class="space-y-4 font-arabic text-right">
+                        <div class="p-3 bg-yellow-950/30 border border-yellow-900/50 rounded-lg">
+                            <p class="text-yellow-200 text-sm">
+                                <strong class="text-yellow-400">📄 ReportGenerator:</strong>
+                                شغلته الوحيدة يعمل التقرير. مش فاهم حاجة عن الإيميل أو الملفات.
+                            </p>
                         </div>
-                        <div class="explanation-item green">
-                            <strong>💾 FileSaver</strong>
-                            <p>شغلته الوحيدة: يحفظ في ملف - ممكن نغيره بدون ما نأثر على حاجة تانية</p>
+                        <div class="p-3 bg-blue-950/30 border border-blue-900/50 rounded-lg">
+                            <p class="text-blue-200 text-sm">
+                                <strong class="text-blue-400">💾 FileSaver:</strong>
+                                شغلته الوحيدة يحفظ في ملف. لو غيرت طريقة الحفظ، الباقي مش هيتأثر.
+                            </p>
                         </div>
-                        <div class="explanation-item purple">
-                            <strong>📧 EmailSender</strong>
-                            <p>شغلته الوحيدة: يبعت إيميل - لو غيرنا الـ email provider، الباقي مش هيتأثر</p>
+                        <div class="p-3 bg-purple-950/30 border border-purple-900/50 rounded-lg">
+                            <p class="text-purple-200 text-sm">
+                                <strong class="text-purple-400">📧 EmailSender:</strong>
+                                شغلته الوحيدة يبعت إيميل. لو غيرت الـ provider، التقرير مش هيتأثر.
+                            </p>
                         </div>
                     </div>
                 </div>
             </div>
+        </div>
+    </section>
 
-            <!-- Interactive Demo -->
-            <div class="interactive-demo">
-                <h3>🎮 جرب بنفسك - Task Manager</h3>
-                <p dir="rtl">شوف إزاي كل class ليه وظيفة واحدة بس:</p>
-                
-                <div class="demo-grid">
-                    <div class="demo-input">
-                        <label dir="rtl">أدخل اسم الـ Task:</label>
-                        <input type="text" id="task-input" placeholder="مثال: اشتري لبن">
-                        <button onclick="addTask()">Add Task ➕</button>
-                    </div>
-                    <div class="demo-output" id="output">// Output will appear here
-// Each step shows which class is responsible</div>
-                </div>
+    <!-- Interactive Demo -->
+    <section id="demo" class="py-24 px-6">
+        <div class="container mx-auto max-w-4xl">
+            <div class="text-center mb-12" data-aos="fade-up">
+                <span class="text-emerald-500 font-mono text-sm tracking-wider">TRY IT</span>
+                <h2 class="text-4xl font-bold text-white mt-2">جرب بنفسك! 🎮</h2>
+                <p class="text-slate-400 mt-4 font-arabic">شوف كل Class بيعمل شغلته لوحده</p>
             </div>
 
-            <!-- Summary -->
-            <div class="arabic-section">
-                <h3 dir="rtl">📝 ملخص سريع</h3>
-                <div class="arabic-text" dir="rtl">
-                    <p><strong>✅ القاعدة:</strong> كل Class ليه سبب واحد للتغيير</p>
-                    <p><strong>✅ الفايدة:</strong> كود سهل الصيانة، سهل الاختبار، سهل الفهم</p>
-                    <p><strong>✅ التشبيه:</strong> زي المطعم - الشيف بيطبخ، الويتر بيقدم، الكاشير بيحسب</p>
+            <div class="glass-card p-8 rounded-2xl border border-emerald-500/20" data-aos="fade-up">
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div>
+                        <label class="block text-white font-bold mb-2 font-arabic text-right">أدخل اسم المهمة:</label>
+                        <input type="text" id="taskInput" placeholder="زي: اشتري لبن"
+                            class="w-full p-4 bg-slate-900 border border-slate-700 rounded-xl text-white focus:border-emerald-500 focus:outline-none transition mb-4">
+                        <button onclick="addTask()"
+                            class="w-full py-4 bg-gradient-to-r from-emerald-500 to-blue-500 text-white font-bold rounded-xl hover:opacity-90 transition flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-plus"></i>
+                            أضف المهمة
+                        </button>
+                    </div>
+                    <div>
+                        <label class="block text-white font-bold mb-2">Output:</label>
+                        <div id="output"
+                            class="h-48 p-4 bg-slate-900 border border-slate-700 rounded-xl font-mono text-sm text-slate-300 overflow-y-auto">
+                            // كل step بتوضح مين المسؤول
+                            // جرب تضيف task وشوف!
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Summary -->
+    <section class="py-20 px-6 bg-gradient-to-b from-transparent to-blue-950/20">
+        <div class="container mx-auto max-w-4xl text-center" data-aos="fade-up">
+            <h2 class="text-3xl font-bold text-white mb-8 font-arabic">📝 الخلاصة</h2>
+
+            <div class="grid md:grid-cols-3 gap-6">
+                <div class="glass-card p-6 rounded-xl">
+                    <div class="text-4xl mb-4">🎯</div>
+                    <h3 class="text-lg font-bold text-white mb-2">القاعدة</h3>
+                    <p class="text-slate-400 font-arabic text-sm">كل Class ليه سبب واحد للتغيير</p>
+                </div>
+                <div class="glass-card p-6 rounded-xl">
+                    <div class="text-4xl mb-4">✨</div>
+                    <h3 class="text-lg font-bold text-white mb-2">الفايدة</h3>
+                    <p class="text-slate-400 font-arabic text-sm">كود سهل الصيانة والاختبار</p>
+                </div>
+                <div class="glass-card p-6 rounded-xl">
+                    <div class="text-4xl mb-4">🍽️</div>
+                    <h3 class="text-lg font-bold text-white mb-2">التشبيه</h3>
+                    <p class="text-slate-400 font-arabic text-sm">الشيف بيطبخ، الجرسون بيقدم</p>
                 </div>
             </div>
 
             <!-- Navigation -->
-            <div class="navigation">
-                <a href="../../index.html" class="nav-btn">
-                    ← Overview
+            <div class="flex justify-between items-center mt-12">
+                <a href="../../index.html"
+                    class="px-6 py-3 glass-card rounded-xl text-slate-300 hover:text-white hover:border-blue-500 transition flex items-center gap-2">
+                    <i class="fa-solid fa-home"></i>
+                    الرئيسية
                 </a>
-                <a href="../02_open_closed/index.html" class="nav-btn next">
-                    Next: Open/Closed →
+                <a href="../02_open_closed/index.html"
+                    class="px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-500 text-white font-bold rounded-xl hover:opacity-90 transition flex items-center gap-2">
+                    التالي: Open/Closed
+                    <i class="fa-solid fa-arrow-left"></i>
                 </a>
             </div>
         </div>
-    </div>
+    </section>
 
-    <footer>
-        <p>SOLID Principles Interactive Guide | Created by Osama Zinhom</p>
+    <footer class="py-12 text-center text-slate-600 bg-black/40 text-sm border-t border-slate-800">
+        <p>SOLID Principles Interactive Guide</p>
+        <p class="font-arabic mt-1">Eng. Osama Zinhom</p>
     </footer>
 
     <script>
-        // SRP Demo - Each class has single responsibility
+        AOS.init({ duration: 800, once: true, offset: 100 });
+
+        // SRP Demo Classes
         class TaskValidator {
             validate(text) {
-                if (!text || text.trim() === '') {
-                    return { valid: false, message: "❌ Task cannot be empty" };
-                }
-                if (text.length > 50) {
-                    return { valid: false, message: "❌ Task too long (max 50 chars)" };
-                }
+                if (!text.trim()) return { valid: false, msg: "❌ المهمة فاضية!" };
+                if (text.length > 50) return { valid: false, msg: "❌ المهمة طويلة أوي!" };
                 return { valid: true };
             }
         }
 
         class TaskStorage {
-            constructor() {
-                this.tasks = [];
+            constructor() { this.tasks = []; }
+            add(text) {
+                const task = { id: Date.now(), text, time: new Date().toLocaleTimeString('ar-EG') };
+                this.tasks.push(task);
+                return task;
             }
-            add(task) {
-                const newTask = { id: Date.now(), text: task, time: new Date().toLocaleTimeString() };
-                this.tasks.push(newTask);
-                return newTask;
-            }
-            getAll() {
-                return this.tasks;
-            }
+            getAll() { return this.tasks; }
         }
 
         class TaskFormatter {
-            format(task) {
-                return `✅ Task #${task.id}: "${task.text}" (${task.time})`;
-            }
-            formatError(msg) {
-                return msg;
-            }
+            format(task) { return `✅ المهمة #${task.id}: "${task.text}" (${task.time})`; }
         }
 
-        // Initialize single-responsibility classes
         const validator = new TaskValidator();
         const storage = new TaskStorage();
         const formatter = new TaskFormatter();
 
         function addTask() {
-            const input = document.getElementById('task-input');
+            const input = document.getElementById('taskInput');
             const output = document.getElementById('output');
             const text = input.value;
-            
+
             let log = [];
-            
-            // Step 1: Validation (TaskValidator)
             log.push("🔍 Step 1: TaskValidator.validate()");
+
             const result = validator.validate(text);
-            
             if (!result.valid) {
-                log.push("   ↳ " + formatter.formatError(result.message));
+                log.push(`   ↳ ${result.msg}`);
                 output.textContent = log.join('\n');
                 return;
             }
-            log.push("   ↳ ✓ Validation passed!");
-            
-            // Step 2: Storage (TaskStorage)
+            log.push("   ↳ ✓ Valid!");
+
             log.push("\n💾 Step 2: TaskStorage.add()");
             const task = storage.add(text);
-            log.push("   ↳ ✓ Task stored with ID: " + task.id);
-            
-            // Step 3: Format (TaskFormatter)
+            log.push(`   ↳ ✓ Stored with ID: ${task.id}`);
+
             log.push("\n📝 Step 3: TaskFormatter.format()");
-            log.push("   ↳ " + formatter.format(task));
-            
-            log.push("\n----------------------------------------");
-            log.push("📋 All Tasks (" + storage.getAll().length + "):");
-            storage.getAll().forEach(t => {
-                log.push("   • " + t.text);
-            });
-            
+            log.push(`   ↳ ${formatter.format(task)}`);
+
+            log.push("\n━━━━━━━━━━━━━━━━━━━━━━━━━");
+            log.push(`📋 Total Tasks: ${storage.getAll().length}`);
+            storage.getAll().forEach(t => log.push(`   • ${t.text}`));
+
             output.textContent = log.join('\n');
             input.value = '';
         }
     </script>
+
 </body>
+
 </html>
